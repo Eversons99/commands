@@ -115,16 +115,17 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    BASE_DIR / "/attenuations_manager/static",
-    BASE_DIR / "/commands_generator/static",
+    f'{BASE_DIR}/attenuations_manager/static/'.replace('\\', '/'),
+    f'{BASE_DIR}/commands_generator/static/'.replace('\\', '/'),
+    f'{BASE_DIR}/maintence_manager/static/'.replace('\\', '/'),
 ]
 
-STATIC_URL = "static/"
+STATIC_ROOT = f'{BASE_DIR}/static/'.replace('\\', '/')
+STATIC_URL = f'{BASE_DIR}/static/'.replace('\\', '/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

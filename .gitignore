@@ -1,0 +1,5 @@
+/commands_generator/__pycache__
+/attenuations_manager/__pycache__
+/static
+/db.sqlite3
+/virtual_env
