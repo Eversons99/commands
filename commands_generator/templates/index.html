@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<section id="source-container">
+    <div id="olt">
+        <h3>Selecione a OLT da porta de origem</h3>
+        <select id="" class="select-olt-source" onchange="getHost()">
+            <option></option>
+            <option class="options">OLT_CCDA_01</option>
+            <option class="options">OLT_COTIA_01</option>
+            <option class="options">OLT_COTIA_02</option>
+            <option class="options">OLT_COTIA_03</option>
+            <option class="options">OLT_COTIA_04</option>
+            <option class="options">OLT_EMBU_01</option>
+            <option class="options">OLT_GRVN_01</option>
+            <option class="options">OLT_IPTV_01</option>
+            <option class="options">OLT_TRMS-01</option>
+            <option class="options">OLT_TRMS_02</option>
+            <option class="options">OLT_VGPA_01</option>
+        </select>
+    </div>
+    <div id="gpon">
+        <h3>Selecione a porta GPON de origem</h3>
+        <div id="selects-source-gpon">
+            <select id="" class="select-frame-source">
+                <option>0</option>
+            </select>
+            <select id="select-slot-source">
+                <option></option>
+            </select>
+            <select id="select-port-source">
+                <option></option>
+            </select>
+        </div>
+    </div>
+    <div class="search-btn">
+        <button onclick="getDevices()">Buscar</button>
+    </div>
+</section>
+
+{% endblock%}

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
   <head>
@@ -5,9 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Commands Generator</title>
   </head>
-
   <body>
+    <header>
+      <div class="modal-loader">
+        <div class="loader"></div>
+      </div>
+      <div class="logo">
+          <img src="{% static '/img/logoNM.png'%}" alt="Logo N-Multifibra" />
+      </div>
+  
+      <h1 id="title">CG - Commands Generator</h1>
+    </header>
 
+    {% block content %} {% endblock %} 
+
+    <script type='text/javascript' src="{% static 'resources/clientSideMaintence.js' %}"></script>
   </body>
 </html>
-
