@@ -1,25 +1,70 @@
-async function getHost(){
-    const slot = document.getElementById('select-slot-source')
-    const port = document.getElementById('select-port-source')
-    const olt = document.getElementById('select-olt-source').value
+async function getBoardsHost(){
+    const host = document.getElementById('select-olt-source').value
+    let hostSlots = await fetch(`https://nmt.nmultifibra.com.br/files/hosts?olt=${host}`)
+    hostSlots = await hostSlots.json()
 
-    let hostBoards = await fetch(`https://nmt.nmultifibra.com.br/files/hosts?olt=${olt}`)
-    hostBoards = await hostBoards.json()
-
-    if (hostBoards.length == 0 || hostBoards == undefined){
-        return window.alert(`Ocorreu um erro aos buscar as informações da ${olt} no NMT`)
+    if (hostSlots.message == 'Host not Found'){
+        return alert(`Ocorreu um erro aos buscar as informações da ${host} no NMT`)
     }
 
-    hostBoards.forEach(board => {
-        const optionElement = document.createElement('option')
-        optionElement.textContent = board.split('/')[1]
-        slot.append(optionElement)
-    })
-
-    if (!slot || !port || !port) return window.alert('Preencha a OLT e o F/S/P')
-
+    fillElementsOptions(hostSlots)
+    setIdentificator()
 }
 
-async function getDevices(){
+function fillElementsOptions(slots){
+    const slotSelectElement = document.getElementById('select-slot-source')
+    const portSelectElement = document.getElementById('select-port-source')
+    let counterPorts = 0
 
+    slots.forEach(slot => {
+        const optionPortElement = document.createElement('option')
+        const currentPortValue = slot.split('/')[1]
+        optionPortElement.textContent = currentPortValue
+        slotSelectElement.append(optionPortElement)
+    })
+
+    while(counterPorts < 16){
+        const optionPortElement = document.createElement('option')
+        optionPortElement.textContent = counterPorts
+        portSelectElement.append(optionPortElement)
+        counterPorts++
+    }
+}
+
+function setIdentificator(){
+    const identificatorTab = Date.now()
+    window.sessionStorage.setItem('tabId', identificatorTab)
+}
+
+async function searchOnts(){
+    const sourceHost = document.getElementById('select-olt-source').value
+    const sourceSlot = document.getElementById('select-slot-source').value
+    const sourcePort = document.getElementById('select-port-source').value
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const sourcePonLocation = `0/${sourceSlot}/${sourcePort}`
+    
+    if(!sourceHost || !sourceSlot || !sourcePort) return alert("ATENÇÃO: Preencha o F/S/P!")
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            tabId: getIdentificator(),
+            sourceHost,
+            sourceSlot,
+            sourcePort,
+            sourcePonLocation
+        })
+    }
+
+    const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
+    const responsOfontsRequest = await ontsRequest.json()
+}
+
+function getIdentificator(){
+    const identificatorTab = window.sessionStorage.getItem('tabId')
+    return identificatorTab
 }

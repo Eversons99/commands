@@ -1,5 +1,9 @@
-/commands_generator/__pycache__
-/attenuations_manager/__pycache__
-/static
-/db.sqlite3
-/virtual_env
+commands_generator/__pycache__/
+attenuations_manager/__pycache__/
+maintence_manager/__pycache__/
+commands_generator/migrations/__pycache__/
+attenuations_manager/migrations/__pycache__/
+static/
+virtual_env/
+env/
+db.sqlite3
