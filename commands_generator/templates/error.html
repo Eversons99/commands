@@ -1,0 +1,18 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erro Page</title>
+  </head>
+  <body>
+    <header>
+      <img src="{% static '/img/error.png' %}" alt="" srcset="">
+      <h1>Oops um erro ocorreu:</h1>
+    </header>
+    <section>
+      Error: {{ error_message }}
+    </section>
+</body>
+</html>

@@ -60,9 +60,7 @@ async function searchOnts(){
         })
     }
 
-    const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
-    const onts = await ontsRequest.json()
-
+    fetch('http://localhost:8000/generator/search_onts', requestOptions)
 }
 
 function getIdentificator(){

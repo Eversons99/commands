@@ -7,3 +7,4 @@ static/
 virtual_env/
 env/
 db.sqlite3
+commands.env

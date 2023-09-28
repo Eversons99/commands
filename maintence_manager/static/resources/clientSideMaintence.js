@@ -60,7 +60,7 @@ async function searchOnts(){
         })
     }
 
-    const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
+    const ontsRequest = fetch('http://localhost:8000/generator/search_onts', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
 }
 
