@@ -2,6 +2,7 @@ import json
 import requests
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
+from django.template import loader
 
 # Create your views here.
 def home(request):
@@ -25,16 +26,15 @@ def search_onts(request):
         onts = get_onts_snmp(source_host, source_pon_location)
 
         if isinstance(onts, dict):
-            error_context = {
-                'error_message': f'Ocorreu um erro ao buscar as ONTS: {onts["error"]}'
-            }
-
-            return render(request, 'error.html', error_context)
-
-        print('nada de erro')
-
-        response = json.dumps({ 'message' :'Chegou com sucesso'})
-        return HttpResponse(content=response)
+            response = json.dumps({
+                'error': True,
+                'message': onts['error']
+            })
+            return HttpResponse(response)
+        context = {'onts': onts}
+        # Salvar dados no banco
+        # Retornar uma mensagem de sucesso
+        return redirect(home)
 
     return redirect(home)
 
@@ -62,3 +62,11 @@ def get_onts_snmp(host, pon_location):
         raise requests.exceptions.RequestException(
             f'Ocorreu um erro ao buscar as ONTs no NMT{error}'
         )
+
+def render_error_page(request):
+    """"Render error page, showing the error message"""
+    error_message = {'message': request.GET.get('message')}
+    return redirect(request, 'error.html', context=error_message)
+
+def render_onts_table(request):
+    pass
