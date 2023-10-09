@@ -5,6 +5,7 @@ commands_generator/migrations/__pycache__/
 attenuations_manager/migrations/__pycache__/
 static/
 virtual_env/
-env/
+venv/
+node_modules/
 db.sqlite3
 commands.env

@@ -1,7 +1,7 @@
 import json
 import requests
 from django.shortcuts import render, redirect
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 
 # Create your views here.
 def home(request):
@@ -26,14 +26,15 @@ def search_onts(request):
 
         if isinstance(onts, dict):
             error_context = {
+                'error': True,
                 'error_message': f'Ocorreu um erro ao buscar as ONTS: {onts["error"]}'
             }
+            response = json.dumps({ 'error': False, 'message' :'Chegou com sucesso' })
 
-            return render(request, 'error.html', error_context)
-
+            return None
+        
         print('nada de erro')
-
-        response = json.dumps({ 'message' :'Chegou com sucesso'})
+        response = json.dumps({ 'error': False, 'message' :'Chegou com sucesso' })
         return HttpResponse(content=response)
 
     return redirect(home)
