@@ -2,7 +2,7 @@ import json
 import requests
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
-from django.template import loader
+from .models import MaintenceInfo
 
 # Create your views here.
 def home(request):
@@ -13,27 +13,42 @@ def search_onts(request):
     """Receive a request and call the function to get ONTS"""
     if request.method == 'POST':
         body_request = json.loads(request.body)
-        source_host = body_request['sourceHost']
-        source_pon_location = body_request['sourcePonLocation']
+        tab_id = body_request['tabId']
+        source_gpon = body_request['sourceGpon']
+        source_host = source_gpon['host']
+        source_pon = source_gpon['gpon']
 
-        if not source_host or not source_pon_location:
+        if not tab_id or not source_gpon:
             response_message = json.dumps({
                 'error': True, 
                 'message': 'O host ou a localização pon não foram informados no corpo da requisição'
             })
             return HttpResponse(response_message, status=400)
 
-        onts = get_onts_snmp(source_host, source_pon_location)
+        onts = get_onts_snmp(source_host, source_pon)
+        print(onts)
 
         if isinstance(onts, dict):
-            response = json.dumps({
-                'error': True,
-                'message': onts['error']
-            })
-            return HttpResponse(response)
-        context = {'onts': onts}
-        # Salvar dados no banco
-        # Retornar uma mensagem de sucesso
+            response_error = ''
+            if 'error' in onts.keys():
+                response_error = json.dumps({
+                    'error': True,
+                    'message': onts['error']
+                })
+            else:
+                response_error = json.dumps({
+                    'error': True,
+                    'message': f'O NMT não retornou nenhum dado apenas {onts}. Consulte novamente.'
+                })
+            return HttpResponse(response_error)
+
+        save_device_info = MaintenceInfo(
+            tab_id = tab_id,
+            file_name = 'None',
+            source_gpon = source_gpon,
+            destination_gpon = 'None',
+            unchanged_devices = 'None'
+        )
         return redirect(home)
 
     return redirect(home)
@@ -66,7 +81,9 @@ def get_onts_snmp(host, pon_location):
 def render_error_page(request):
     """"Render error page, showing the error message"""
     error_message = {'message': request.GET.get('message')}
-    return redirect(request, 'error.html', context=error_message)
+    return render(request, 'error.html', context=error_message)
 
-def render_onts_table(request):
-    pass
+def save_device_info_on_db(fields, db_table):
+    """Save device info in database"""
+    key_fields = fields.keys()
+    return True
