@@ -68,8 +68,6 @@ async function searchOnts(){
         const message = responsOfontsRequest.message
         return window.location = `http://localhost:8000/generator/render_error_page?message=${message}`
     }
-
-    // Receber o status de sucesso e fazer get para renderizar as tabelas, passar o id da tabala no query param
 }
 
 function getIdentificator(){
