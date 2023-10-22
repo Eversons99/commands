@@ -60,8 +60,15 @@ async function searchOnts(){
         })
     }
 
-    const ontsRequest = fetch('http://localhost:8000/generator/search_onts', requestOptions)
-    const responsOfontsRequest = await ontsRequest.json()
+    const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
+    const responsOfontsRequest = await ontsRequest.status('301')
+    
+    if(responsOfontsRequest.error == true){
+        const message = responsOfontsRequest.message
+        return window.location = `http://localhost:8000/generator/render_error_page?message=${message}`
+    }
+
+    // Receber o status de sucesso e fazer get para renderizar as tabelas, passar o id da tabala no query param
 }
 
 function getIdentificator(){

@@ -1,7 +1,7 @@
 import json
 import requests
 from django.shortcuts import render, redirect
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponse
 
 # Create your views here.
 def home(request):
@@ -16,26 +16,25 @@ def search_onts(request):
         source_pon_location = body_request['sourcePonLocation']
 
         if not source_host or not source_pon_location:
-            response_message = json.dumps({
+            response_to_request = json.dumps({
                 'error': True, 
                 'message': 'O host ou a localização pon não foram informados no corpo da requisição'
             })
-            return HttpResponse(response_message, status=400)
+            return HttpResponse(response_to_request, status=400)
 
         onts = get_onts_snmp(source_host, source_pon_location)
 
         if isinstance(onts, dict):
-            error_context = {
+            response_error = json.dumps({
                 'error': True,
-                'error_message': f'Ocorreu um erro ao buscar as ONTS: {onts["error"]}'
-            }
-            response = json.dumps({ 'error': False, 'message' :'Chegou com sucesso' })
-
-            return None
+                'message': onts['error']
+            })
+            return HttpResponse(response_error)
         
-        print('nada de erro')
-        response = json.dumps({ 'error': False, 'message' :'Chegou com sucesso' })
-        return HttpResponse(content=response)
+        context = {'onts': onts}
+        # Salvar dados no banco
+        # Retornar uma mensagem de sucesso
+        return redirect(home)
 
     return redirect(home)
 
@@ -63,3 +62,8 @@ def get_onts_snmp(host, pon_location):
         raise requests.exceptions.RequestException(
             f'Ocorreu um erro ao buscar as ONTs no NMT{error}'
         )
+
+def render_error_page(request):
+    """"Render error page, showing the error message"""
+    error_message = {'message': request.GET.get('message')}
+    return redirect(request, 'error.html', context=error_message)

@@ -9,3 +9,4 @@ venv/
 node_modules/
 db.sqlite3
 commands.env
+virtual-env/

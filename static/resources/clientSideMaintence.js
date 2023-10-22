@@ -60,7 +60,13 @@ async function searchOnts(){
         })
     }
 
-    fetch('http://localhost:8000/generator/search_onts', requestOptions)
+    const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
+    const responsOfontsRequest = await ontsRequest.json()
+    
+    if(responsOfontsRequest.error == true){
+        const message = responsOfontsRequest.error
+        return window.location = `https://localhost:8000/generator/error_page?message=${message}`
+    }
 }
 
 function getIdentificator(){
