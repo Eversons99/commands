@@ -2,6 +2,7 @@ import json
 import requests
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
+from django.db.utils import IntegrityError
 from .models import MaintenanceInfo
 
 # Create your views here.
@@ -48,6 +49,7 @@ def search_onts(request):
             'destination_gpon': None,
             'unchanged_devices': onts
         }
+
         save_maintence_info = save_maintenance_info_in_db(maintenance_info)
 
         return HttpResponse(json.dumps(save_maintence_info))
@@ -87,16 +89,29 @@ def render_error_page(request):
 def save_maintenance_info_in_db(maintenance_info):
     """Save device info in database"""
     try:
-        save_data = MaintenanceInfo.objects.create(**maintenance_info)
-        print(save_data)
-
+        MaintenanceInfo.objects.create(**maintenance_info)
         return {
-            'error': False,
-            'message': save_data
+            'error': False
         }
-    except Exception as err:
-        print(err)
+    except IntegrityError as err:
         return {
             'error': True,
-            'message': 'Caiu no except'
+            'message': f'Erro de integridade, {err}'
         }
+
+def render_onts_table(request):
+    """Render a table with all devices (ONT's)"""
+    tab_idd = request.GET.get('tab_id')
+
+    if not tab_idd:
+        response_error = {
+            'error': True,
+            'message': 'O ID da guia não foi informado, impossível prosseguir'
+        }
+        return HttpResponse(json.dumps(response_error))
+
+    return render(request, 'ontsTable.html')
+
+def get_single_register_in_database(tab_idd):
+    pass
+    

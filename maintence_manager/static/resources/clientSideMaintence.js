@@ -41,6 +41,7 @@ async function searchOnts(){
     const sourceSlot = document.getElementById('select-slot-source').value
     const sourcePort = document.getElementById('select-port-source').value
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const tabId = getIdentificator()
     const sourcePonLocation = `0/${sourceSlot}/${sourcePort}`
     const sourceGpon = {
         'host':  sourceHost,
@@ -56,7 +57,7 @@ async function searchOnts(){
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            tabId: getIdentificator(),
+            tabId,
             sourceGpon
         })
     }
@@ -68,6 +69,8 @@ async function searchOnts(){
         const message = responsOfontsRequest.message
         return window.location = `http://localhost:8000/generator/render_error_page?message=${message}`
     }
+
+    return window.location = `http://localhost:8000/generator/render_onts_table?tab_id=${tabId}` 
 }
 
 function getIdentificator(){
