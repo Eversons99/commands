@@ -1,3 +1,4 @@
+import ast
 import json
 import requests
 from django.shortcuts import render, redirect
@@ -101,17 +102,30 @@ def save_maintenance_info_in_db(maintenance_info):
 
 def render_onts_table(request):
     """Render a table with all devices (ONT's)"""
-    tab_idd = request.GET.get('tab_id')
+    register_id = request.GET.get('tab_id')
 
-    if not tab_idd:
-        response_error = {
-            'error': True,
+    if not register_id:
+        error_message = {
             'message': 'O ID da guia não foi informado, impossível prosseguir'
         }
-        return HttpResponse(json.dumps(response_error))
+        return render(request,'error.html', context=error_message)
 
-    return render(request, 'ontsTable.html')
+    try:
+        device_info = get_maintenance_info_in_database(register_id)
+        onts = device_info.unchanged_devices
+        print(type(onts))
+        return render(request, 'ontsTable.html', context=onts)
 
-def get_single_register_in_database(tab_idd):
-    pass
-    
+    except Exception as err:
+        error_message = {
+            'message': f'Ocorreu um erro ao buscar registo no banco. Error: {err}' 
+        }
+        return render(request,'error.html', context=error_message)
+
+def get_maintenance_info_in_database(register_id):
+    """Make a query in database and return an register"""
+    try:
+        single_register = MaintenanceInfo.objects.get(tab_id=register_id)
+        return single_register
+    except Exception:
+        return Exception
