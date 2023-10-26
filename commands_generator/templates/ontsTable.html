@@ -23,10 +23,11 @@
             </tr>
         {% endfor %}
     </table>
-    <form>
-        <h2>Digite um nome para o seu arquivo</h2>
-        <input type="input" name="file-name">
+    
+    <h2>Selecione um nome para o arquivo</h2>
+    <input type="text" id="file-name">
 
-        {% include 'partials/gponForm.html' %}
-    </form>
+    {% include 'partials/gponForm.html'%}
+
+    <button onclick="generateCommands()">Gerados comandos</button>
 {% endblock%}

@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "attenuations_manager",
+    #"attenuations_manager",
     "commands_generator",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -59,7 +59,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             f'{ABSOLUTE_PATH}/commands_generator/templates/',
-            f'{ABSOLUTE_PATH}/atteuations_manager/templates/',
+            #f'{ABSOLUTE_PATH}/atteuations_manager/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],
         "APP_DIRS": True,
@@ -124,7 +124,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    f'{ABSOLUTE_PATH}/attenuations_manager/static',
+    #f'{ABSOLUTE_PATH}/attenuations_manager/static',
     f'{ABSOLUTE_PATH}/commands_generator/static',
     f'{ABSOLUTE_PATH}/maintence_manager/static',
 ]

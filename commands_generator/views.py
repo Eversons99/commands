@@ -117,8 +117,7 @@ def render_onts_table(request):
             'all_devices': onts
         }
 
-        return render(request, 'ontsTable.html', context=onts_context)
-
+        return render(request,'ontsTable.html', context=onts_context)
     except Exception as err:
         error_message = {
             'message': f'Ocorreu um erro ao buscar registo no banco. Error: {err}' 
