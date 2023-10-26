@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <table>
+        <tr>
+            <th><input type="checkbox" id="cbx-select-all"></th>
+            <th>ID</th>
+            <th>Serial Number</th>
+            <th>Type</th>
+            <th>Status</th>
+        </tr>
+        {% for device in all_devices %}
+            <tr>
+                <td><input type="checkbox" id="cbx-single-item"></td>
+                <td>{{ device.id }}</td>
+                <td>{{ device.sn }}</td>
+                <td>{{ device.type }}</td>
+                {% if device.status == 1 %}
+                    <td>ONLINE</td>
+                {% else %}
+                    <td>OFFLINE</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+    <form>
+        <h2>Digite um nome para o seu arquivo</h2>
+        <input type="input" name="file-name">
+
+        {% include 'partials/gponForm.html' %}
+    </form>
+{% endblock%}

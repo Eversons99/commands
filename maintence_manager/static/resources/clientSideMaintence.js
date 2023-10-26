@@ -1,5 +1,5 @@
 async function getBoardsHost(){
-    const host = document.getElementById('select-olt-source').value
+    const host = document.getElementById('select-olt').value
     let hostSlots = await fetch(`https://nmt.nmultifibra.com.br/files/hosts?olt=${host}`)
     hostSlots = await hostSlots.json()
 
@@ -12,8 +12,8 @@ async function getBoardsHost(){
 }
 
 function fillElementsOptions(slots){
-    const slotSelectElement = document.getElementById('select-slot-source')
-    const portSelectElement = document.getElementById('select-port-source')
+    const slotSelectElement = document.getElementById('select-slot')
+    const portSelectElement = document.getElementById('select-port')
     let counterPorts = 0
 
     slots.forEach(slot => {
@@ -37,9 +37,9 @@ function setIdentificator(){
 }
 
 async function searchOnts(){
-    const sourceHost = document.getElementById('select-olt-source').value
-    const sourceSlot = document.getElementById('select-slot-source').value
-    const sourcePort = document.getElementById('select-port-source').value
+    const sourceHost = document.getElementById('select-olt').value
+    const sourceSlot = document.getElementById('select-slot').value
+    const sourcePort = document.getElementById('select-port').value
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     const tabId = getIdentificator()
     const sourcePonLocation = `0/${sourceSlot}/${sourcePort}`

@@ -59,7 +59,8 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             f'{ABSOLUTE_PATH}/commands_generator/templates/',
-            f'{ABSOLUTE_PATH}/atteuations_manager/templates/'
+            f'{ABSOLUTE_PATH}/atteuations_manager/templates/',
+            f'{ABSOLUTE_PATH}/templates/'
         ],
         "APP_DIRS": True,
         "OPTIONS": {

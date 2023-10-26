@@ -1,0 +1,32 @@
+{% load static %}
+<div id="olt">
+    <h3>Selecione a OLT desejada</h3>
+    <select id="select-olt" onchange="getBoardsHost()">
+        <option></option>
+        <option class="options">OLT_CCDA_01</option>
+        <option class="options">OLT_COTIA_01</option>
+        <option class="options">OLT_COTIA_02</option>
+        <option class="options">OLT_COTIA_03</option>
+        <option class="options">OLT_COTIA_04</option>
+        <option class="options">OLT_EMBU_01</option>
+        <option class="options">OLT_GRVN_01</option>
+        <option class="options">OLT_ITPV_01</option>
+        <option class="options">OLT_TRMS_01</option>
+        <option class="options">OLT_TRMS_02</option>
+        <option class="options">OLT_VGPA_01</option>
+    </select>
+</div>
+<div id="gpon">
+    <h3>Selecione a localização PON desejada</h3>
+    <div id="selects-source-gpon">
+        <select id="" class="select-frame">
+            <option>0</option>
+        </select>
+        <select id="select-slot">
+            <option></option>
+        </select>
+        <select id="select-port">
+            <option></option>
+        </select>
+    </div>
+</div>
