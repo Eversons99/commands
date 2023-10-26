@@ -112,14 +112,18 @@ def render_onts_table(request):
 
     try:
         device_info = get_maintenance_info_in_database(register_id)
-        onts = device_info.unchanged_devices
-        print(type(onts))
-        return render(request, 'ontsTable.html', context=onts)
+        onts = ast.literal_eval(device_info.unchanged_devices)
+        onts_context = {
+            'all_devices': onts
+        }
+
+        return render(request, 'ontsTable.html', context=onts_context)
 
     except Exception as err:
         error_message = {
             'message': f'Ocorreu um erro ao buscar registo no banco. Error: {err}' 
         }
+
         return render(request,'error.html', context=error_message)
 
 def get_maintenance_info_in_database(register_id):
@@ -127,5 +131,6 @@ def get_maintenance_info_in_database(register_id):
     try:
         single_register = MaintenanceInfo.objects.get(tab_id=register_id)
         return single_register
+
     except Exception:
         return Exception

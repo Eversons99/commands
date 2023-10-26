@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    {{ device_info.unchanged_devices }}
+    {% for device in all_devices %}
+        <p>{{ device }}</p>
+    {% endfor %}
 {% endblock%}
