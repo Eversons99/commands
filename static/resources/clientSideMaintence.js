@@ -77,3 +77,28 @@ function getIdentificator(){
     const identificatorTab = window.sessionStorage.getItem('tabId')
     return identificatorTab
 }
+
+function selectAllDevices(){
+    const checkboxSelectAll = document.getElementById('cbx-select-all')
+    const checkboxesSingleItems = document.querySelectorAll('#cbx-single-item')
+
+    checkboxesSingleItems.forEach((singleCheckbox) => {
+        if (checkboxSelectAll.checked){
+            singleCheckbox.checked = true
+        } else {
+            singleCheckbox.checked = false
+        }
+    })
+}
+
+async function generateCommands(){
+    const allDevices = document.querySelectorAll('#cbx-single-item')
+    const devicesSelecteds = []
+
+    if (allDevices.length == 0) return alert('Selecione ao menos um dispositivo')
+
+    allDevices.forEach((device) => {
+        console.log(device.parentNode)
+    })
+
+}

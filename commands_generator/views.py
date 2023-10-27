@@ -133,3 +133,12 @@ def get_maintenance_info_in_database(register_id):
 
     except Exception:
         return Exception
+
+def get_commands(request):
+    """Go to NMT and get commands genereted"""
+    if request.method == 'POST':
+        body_request = json.loads(request.body)
+        print(body_request)
+
+        return HttpResponse(json.dumps({"error": False, 'message': 'Nada ainda'}))
+    return redirect(home)
