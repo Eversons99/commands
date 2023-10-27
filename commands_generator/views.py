@@ -1,7 +1,9 @@
+import ast
 import json
 import requests
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
+from django.db.utils import IntegrityError
 from .models import MaintenanceInfo
 
 # Create your views here.
@@ -48,6 +50,7 @@ def search_onts(request):
             'destination_gpon': None,
             'unchanged_devices': onts
         }
+
         save_maintence_info = save_maintenance_info_in_db(maintenance_info)
 
         return HttpResponse(json.dumps(save_maintence_info))
@@ -87,16 +90,55 @@ def render_error_page(request):
 def save_maintenance_info_in_db(maintenance_info):
     """Save device info in database"""
     try:
-        save_data = MaintenanceInfo.objects.create(**maintenance_info)
-        print(save_data)
-
+        MaintenanceInfo.objects.create(**maintenance_info)
         return {
-            'error': False,
-            'message': save_data
+            'error': False
         }
-    except Exception as err:
-        print(err)
+    except IntegrityError as err:
         return {
             'error': True,
-            'message': 'Caiu no except'
+            'message': f'Erro de integridade, {err}'
         }
+
+def render_onts_table(request):
+    """Render a table with all devices (ONT's)"""
+    register_id = request.GET.get('tab_id')
+
+    if not register_id:
+        error_message = {
+            'message': 'O ID da guia não foi informado, impossível prosseguir'
+        }
+        return render(request,'error.html', context=error_message)
+
+    try:
+        device_info = get_maintenance_info_in_database(register_id)
+        onts = ast.literal_eval(device_info.unchanged_devices)
+        onts_context = {
+            'all_devices': onts
+        }
+
+        return render(request,'ontsTable.html', context=onts_context)
+    except Exception as err:
+        error_message = {
+            'message': f'Ocorreu um erro ao buscar registo no banco. Error: {err}' 
+        }
+
+        return render(request,'error.html', context=error_message)
+
+def get_maintenance_info_in_database(register_id):
+    """Make a query in database and return an register"""
+    try:
+        single_register = MaintenanceInfo.objects.get(tab_id=register_id)
+        return single_register
+
+    except Exception:
+        return Exception
+
+def get_commands(request):
+    """Go to NMT and get commands genereted"""
+    if request.method == 'POST':
+        body_request = json.loads(request.body)
+        print(body_request)
+
+        return HttpResponse(json.dumps({"error": False, 'message': 'Nada ainda'}))
+    return redirect(home)
