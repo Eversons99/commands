@@ -42,6 +42,10 @@ async function searchOnts(){
     const sourcePort = document.getElementById('select-port-source').value
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     const sourcePonLocation = `0/${sourceSlot}/${sourcePort}`
+    const sourceGpon = {
+        'host':  sourceHost,
+        'gpon': sourcePonLocation
+    }
     
     if(!sourceHost || !sourceSlot || !sourcePort) return alert("ATENÇÃO: Preencha o F/S/P!")
 
@@ -53,22 +57,17 @@ async function searchOnts(){
         },
         body: JSON.stringify({
             tabId: getIdentificator(),
-            sourceHost,
-            sourceSlot,
-            sourcePort,
-            sourcePonLocation
+            sourceGpon
         })
     }
 
     const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
-    const responsOfontsRequest = await ontsRequest.status('301')
+    const responsOfontsRequest = await ontsRequest.json()
     
     if(responsOfontsRequest.error == true){
         const message = responsOfontsRequest.message
         return window.location = `http://localhost:8000/generator/render_error_page?message=${message}`
     }
-
-    // Receber o status de sucesso e fazer get para renderizar as tabelas, passar o id da tabala no query param
 }
 
 function getIdentificator(){

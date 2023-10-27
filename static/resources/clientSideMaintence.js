@@ -42,6 +42,10 @@ async function searchOnts(){
     const sourcePort = document.getElementById('select-port-source').value
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     const sourcePonLocation = `0/${sourceSlot}/${sourcePort}`
+    const sourceGpon = {
+        'host':  sourceHost,
+        'gpon': sourcePonLocation
+    }
     
     if(!sourceHost || !sourceSlot || !sourcePort) return alert("ATENÇÃO: Preencha o F/S/P!")
 
@@ -53,10 +57,7 @@ async function searchOnts(){
         },
         body: JSON.stringify({
             tabId: getIdentificator(),
-            sourceHost,
-            sourceSlot,
-            sourcePort,
-            sourcePonLocation
+            sourceGpon
         })
     }
 
@@ -64,8 +65,8 @@ async function searchOnts(){
     const responsOfontsRequest = await ontsRequest.json()
     
     if(responsOfontsRequest.error == true){
-        const message = responsOfontsRequest.error
-        return window.location = `https://localhost:8000/generator/error_page?message=${message}`
+        const message = responsOfontsRequest.message
+        return window.location = `http://localhost:8000/generator/render_error_page?message=${message}`
     }
 }
 
