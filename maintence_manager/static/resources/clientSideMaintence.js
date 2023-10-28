@@ -10,7 +10,6 @@ async function getBoardsHost(){
     }
 
     fillElementsOptions(hostSlots)
-    setIdentificator()
 }
 
 function fillElementsOptions(slots){
@@ -39,6 +38,7 @@ function setIdentificator(){
 }
 
 async function searchOnts(){
+    setIdentificator()
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -94,18 +94,17 @@ function selectAllDevices(){
 
 async function generateCommands(){
     const allDevices = document.querySelectorAll('#cbx-single-item')
-    const idsOfDevicesSelecteds = []
+    const idDevicesSelecteds = []
 
     allDevices.forEach((device) => {
         if(device.checked){
             const deviceId = device.parentNode.parentNode.children[1].innerHTML
-            idsOfDevicesSelecteds.push(Number(deviceId))
+            idDevicesSelecteds.push(Number(deviceId))
         }
     })
 
-    if(idsOfDevicesSelecteds.length == 0) return alert('Selecione ao menos um dispositivo')
+    if(idDevicesSelecteds.length == 0) return alert('Selecione ao menos um dispositivo')
 
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     const destinationHost = document.getElementById('select-olt').value
     const destinationSlot = document.getElementById('select-slot').value
     const destinationPort = document.getElementById('select-port').value 
@@ -132,7 +131,7 @@ async function generateCommands(){
             tabId,
             destinationGpon,
             fileName,
-            idsOfDevicesSelecteds
+            idDevicesSelecteds
         })
     }
 
@@ -143,6 +142,6 @@ async function generateCommands(){
         messageError =  getCommands.message
         return window.location = `http://localhost:8000/render_error_page?message=${messageError}`
     }
-
-    return window.location = `http://localhost:8000/generator/render_ready_commands?tab_id=${tabId}` 
+    console.log(getCommands)
+    //return window.location = `http://localhost:8000/generator/render_ready_commands?tab_id=${tabId}` 
 }

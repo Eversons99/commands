@@ -4,6 +4,7 @@ import requests
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
 from django.db.utils import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from .models import MaintenanceInfo
 
 # Create your views here.
@@ -43,7 +44,7 @@ def search_onts(request):
                 })
             return HttpResponse(response_error)
 
-        maintenance_info = {
+        initial_maintenance_info = {
             'tab_id': tab_id,
             'file_name': None,
             'source_gpon': source_gpon,
@@ -51,7 +52,7 @@ def search_onts(request):
             'unchanged_devices': onts
         }
 
-        save_maintence_info = save_maintenance_info_in_db(maintenance_info)
+        save_maintence_info = save_initial_maintenance_info_in_database(initial_maintenance_info)
 
         return HttpResponse(json.dumps(save_maintence_info))
 
@@ -87,10 +88,10 @@ def render_error_page(request):
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
 
-def save_maintenance_info_in_db(maintenance_info):
+def save_initial_maintenance_info_in_database(initial_maintenance_info):
     """Save device info in database"""
     try:
-        MaintenanceInfo.objects.create(**maintenance_info)
+        MaintenanceInfo.objects.create(**initial_maintenance_info)
         return {
             'error': False
         }
@@ -130,15 +131,37 @@ def get_maintenance_info_in_database(register_id):
     try:
         single_register = MaintenanceInfo.objects.get(tab_id=register_id)
         return single_register
-
-    except Exception:
-        return Exception
+    except ObjectDoesNotExist as err:
+        raise ObjectDoesNotExist from err
+    except Exception as err:
+        raise Exception from err
 
 def get_commands(request):
     """Go to NMT and get commands genereted"""
     if request.method == 'POST':
         body_request = json.loads(request.body)
-        print(body_request)
+        id_devices_selecteds = body_request['idDevicesSelecteds']
+        file_name = body_request['fileName']
+        register_id =  body_request['tabId']
+        all_devices_to_send = []
+
+        try:
+            maintenance_info = get_maintenance_info_in_database(register_id)
+            unchanged_devices = ast.literal_eval(maintenance_info.unchanged_devices)
+
+            for device in unchanged_devices:
+                if int(device['id']) in id_devices_selecteds:
+                    all_devices_to_send.append(device)
+            
+        except Exception as err:
+            message_error = {
+                'error': True,
+                'message': f'Ocorreu um erro ao buscar comandos no NMT. Erro {err}'    
+            }
+            return HttpResponse(json.dumps(message_error))
 
         return HttpResponse(json.dumps({"error": False, 'message': 'Nada ainda'}))
     return redirect(home)
+
+def update_maintenance_info_in_database(single_record_maintenance_info, register_id):
+    current_maintenance_info = MaintenanceInfo.objects.get(tab_id=register_id)
