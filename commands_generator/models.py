@@ -10,4 +10,5 @@ class MaintenanceInfo(models.Model):
     destination_gpon = models.JSONField(null=True)
     unchanged_devices = models.TextField(null=True)
     selected_devices = models.TextField(null=True)
+    commands_url = models.JSONField(null=True)
     created_date = models.DateTimeField(default=timezone.now, null=True)

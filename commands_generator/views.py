@@ -28,7 +28,7 @@ def search_onts(request):
             })
             return HttpResponse(response_message, status=400)
 
-        onts = get_onts_snmp(source_host, source_pon)
+        onts = get_onts_snmp_in_nmt(source_host, source_pon)
 
         if isinstance(onts, dict):
             response_error = ''
@@ -50,16 +50,16 @@ def search_onts(request):
             'source_gpon': source_gpon,
             'destination_gpon': None,
             'unchanged_devices': onts,
-            'selected_devices': None
+            'selected_devices': None,
+            'commands_url': None
         }
 
         save_maintence_info = save_initial_maintenance_info_in_database(initial_maintenance_info)
-
         return HttpResponse(json.dumps(save_maintence_info))
 
     return redirect(home)
 
-def get_onts_snmp(host, pon_location):
+def get_onts_snmp_in_nmt(host, pon_location):
     """Make a request to NMT to get ONT"""
     try:
         api_url = 'https://nmt.nmultifibra.com.br/olt/onts-table'
@@ -79,9 +79,9 @@ def get_onts_snmp(host, pon_location):
         onts =  get_all_onts.json()
 
         return onts
-    except requests.exceptions.RequestException as error:
+    except requests.exceptions.RequestException as err:
         raise requests.exceptions.RequestException(
-            f'Ocorreu um erro ao buscar as ONTs no NMT{error}'
+            f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
         )
 
 def render_error_page(request):
@@ -138,7 +138,7 @@ def get_maintenance_info_in_database(register_id):
         raise Exception from err
 
 def get_commands(request):
-    """Go to NMT and get commands genereted"""
+    """Update maintenance info and go to NMT and get commands genereted"""
     if request.method == 'POST':
         body_request = json.loads(request.body)
         id_devices_selecteds = body_request['idDevicesSelecteds']
@@ -155,14 +155,6 @@ def get_commands(request):
                 if int(device['id']) in id_devices_selecteds:
                     all_devices_selecteds.append(device)
 
-            data_to_update = {
-                'file_name': file_name,
-                'destination_gpon': destination_gpon,
-                'selected_devices': all_devices_selecteds
-            }
-
-            update_maintenance_info_in_database(data_to_update, register_id)
-
         except Exception as err:
             message_error = {
                 'error': True,
@@ -172,14 +164,37 @@ def get_commands(request):
 
         try:
             url = 'https://nmt.nmultifibra.com.br/olt/migration-commands'
-            headers = {"Content-Type": "application/json; charset=utf-8"}
-            http_request_options = {
+            headers_request = {"Content-Type": "application/json; charset=utf-8"}
+            options_request = json.dumps({
                 'onts': all_devices_selecteds,
+                'gpon': destination_gpon['gpon'],
+                'host': destination_gpon['host'],
+                'name': file_name,
+                'oldGpon': maintenance_info.source_gpon['gpon'],
+                'oldHost': maintenance_info.source_gpon['host']
+            })
+
+            commands = requests.post(url, headers=headers_request, data=options_request)
+            commads_response = commands.json()
+            data_to_update = {
                 'file_name': file_name,
+                'destination_gpon': destination_gpon,
+                'selected_devices': all_devices_selecteds,
+                'commands_url': commads_response
             }
-        except:
-            pass
-        return HttpResponse(json.dumps({"error": False, 'message': 'Nada ainda'}))
+
+            update_maintenance_info_in_database(data_to_update, register_id)
+
+            return HttpResponse(json.dumps({
+                "error": False, 
+                'message': 'A requisição para o NMT ocorreu com sucesso',
+                'commands': commads_response
+            }))
+        except requests.exceptions.RequestException as err:
+            raise requests.exceptions.RequestException(
+                f'Ocorreu um erro ao gerar os comandos no NMT. Error: {err}'
+            )
+
     return redirect(home)
 
 def update_maintenance_info_in_database(data_to_update, register_id):
@@ -195,3 +210,6 @@ def update_maintenance_info_in_database(data_to_update, register_id):
             'error': True,
             'message': f'Ocorreu um erro ao atualizar os dados no banco. Error: {err}'
         }
+
+def render_page_commands(request):
+    pass
