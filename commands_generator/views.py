@@ -49,7 +49,8 @@ def search_onts(request):
             'file_name': None,
             'source_gpon': source_gpon,
             'destination_gpon': None,
-            'unchanged_devices': onts
+            'unchanged_devices': onts,
+            'selected_devices': None
         }
 
         save_maintence_info = save_initial_maintenance_info_in_database(initial_maintenance_info)
@@ -141,9 +142,10 @@ def get_commands(request):
     if request.method == 'POST':
         body_request = json.loads(request.body)
         id_devices_selecteds = body_request['idDevicesSelecteds']
+        destination_gpon = body_request['destinationGpon']
         file_name = body_request['fileName']
         register_id =  body_request['tabId']
-        all_devices_to_send = []
+        all_devices_selecteds = []
 
         try:
             maintenance_info = get_maintenance_info_in_database(register_id)
@@ -151,17 +153,45 @@ def get_commands(request):
 
             for device in unchanged_devices:
                 if int(device['id']) in id_devices_selecteds:
-                    all_devices_to_send.append(device)
-            
+                    all_devices_selecteds.append(device)
+
+            data_to_update = {
+                'file_name': file_name,
+                'destination_gpon': destination_gpon,
+                'selected_devices': all_devices_selecteds
+            }
+
+            update_maintenance_info_in_database(data_to_update, register_id)
+
         except Exception as err:
             message_error = {
                 'error': True,
-                'message': f'Ocorreu um erro ao buscar comandos no NMT. Erro {err}'    
+                'message': f'Ocorreu um erro ao recuperar/salvar informações no banco. Erro {err}'    
             }
             return HttpResponse(json.dumps(message_error))
 
+        try:
+            url = 'https://nmt.nmultifibra.com.br/olt/migration-commands'
+            headers = {"Content-Type": "application/json; charset=utf-8"}
+            http_request_options = {
+                'onts': all_devices_selecteds,
+                'file_name': file_name,
+            }
+        except:
+            pass
         return HttpResponse(json.dumps({"error": False, 'message': 'Nada ainda'}))
     return redirect(home)
 
-def update_maintenance_info_in_database(single_record_maintenance_info, register_id):
-    current_maintenance_info = MaintenanceInfo.objects.get(tab_id=register_id)
+def update_maintenance_info_in_database(data_to_update, register_id):
+    """Update datas about maintenance info in database"""
+    try:
+        MaintenanceInfo.objects.filter(tab_id=register_id).update(**data_to_update)
+        return {
+            'error': False,
+            'message': 'Dados atualizados com sucesso'
+        }
+    except Exception as err:
+        return {
+            'error': True,
+            'message': f'Ocorreu um erro ao atualizar os dados no banco. Error: {err}'
+        }

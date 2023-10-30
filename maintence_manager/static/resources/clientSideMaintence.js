@@ -140,7 +140,7 @@ async function generateCommands(){
     
     if(getCommands.error){
         messageError =  getCommands.message
-        return window.location = `http://localhost:8000/render_error_page?message=${messageError}`
+        return window.location = `http://localhost:8000/generator/render_error_page?message=${messageError}`
     }
     console.log(getCommands)
     //return window.location = `http://localhost:8000/generator/render_ready_commands?tab_id=${tabId}` 
