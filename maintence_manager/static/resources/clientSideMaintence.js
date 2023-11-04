@@ -130,7 +130,6 @@ async function generateCommands(){
         body: JSON.stringify({
             tabId,
             destinationGpon,
-            // fileName: formatFileName(fileName),
             fileName,
             idDevicesSelecteds
         })
@@ -143,16 +142,5 @@ async function generateCommands(){
         messageError =  getCommands.message
         return window.location = `http://localhost:8000/generator/render_error_page?message=${messageError}`
     }
-    console.log(getCommands)
-    //return window.location = `http://localhost:8000/generator/render_page_commands?tab_id=${tabId}` 
-}
-
-function formatFileName(fileName){
-    const date = new Date()
-    const day = date.getDate()
-    const month = date.getMonth()
-    const year = date.getFullYear()
-    const formattedName = `${day}_${month + 1}_${year}-${fileName}` 
-
-    return formattedName
+    return window.location = `http://localhost:8000/generator/render_page_commands?tab_id=${tabId}` 
 }
