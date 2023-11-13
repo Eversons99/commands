@@ -1,17 +1,18 @@
-{% load_static %}
-
+{% load static %}
 <h2>Comandos gerados</h2>
-<object class="active-result" id="interface-results" data="{{ commands.interfaceCommands }}">
+<div class="ready-commands">
+    <object class="active-result" id="interface-results" data="{{ commands.interfaceCommands }}">
 
-</object>
-
-<object class="inactive-result" id="global-results" data="{{ commands.globalCommands }}">
-
-</object>
-
-<object class="inactive-result" id="delete-results" data="{{ commands.deleteCommands }}">
-
-</object>
+    </object>
+    
+    <object class="inactive-result" id="global-results" data="{{ commands.globalCommands }}">
+    
+    </object>
+    
+    <object class="inactive-result" id="delete-results" data="{{ commands.deleteCommands }}">
+    
+    </object>
+</div>
 
 <div class="result-buttuns">
     <button id="interface-button" onclick="resultsButton(event)">Comandos Interface</button>

@@ -180,7 +180,7 @@ def get_commands(request):
                 'file_name': file_name,
                 'destination_gpon': destination_gpon,
                 'selected_devices': all_devices_selecteds,
-                'commands_url': [commads_response]
+                'commands_url': commads_response
             }
 
             update_maintenance_info_in_database(data_to_update, register_id)
@@ -215,10 +215,11 @@ def render_page_commands(request):
     """Get commands info and render commands pages"""
     register_id = request.GET.get('tab_id')
     try:
-        commands_url = get_maintenance_info_in_database(register_id)
+        commands = get_maintenance_info_in_database(register_id)
         commands_context = {
-            'commands': commands_url
+            'commands': commands.commands_url
         }
         return render(request, 'commands.html', context=commands_context)
-    except:
-        print('Caiu no execpt')
+    except Exception as error:
+        print(error)
+        return requests.get(f'http://localhost:8000/render_error_page?message={error}')
