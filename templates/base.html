@@ -5,10 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Commands Generator</title>
+    <link rel="stylesheet" href="{% static 'resources/style.css' %}">
   </head>
   <body>
+    {% csrf_token %}
     <header>
-      {% csrf_token %}
       <div class="modal-loader">
         <div class="loader"></div>
       </div>
