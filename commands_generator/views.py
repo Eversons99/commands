@@ -28,20 +28,10 @@ def search_onts(request):
             })
             return HttpResponse(response_message, status=400)
 
-        onts = get_onts_snmp_in_nmt(source_host, source_pon)
+        ont_devices = get_onts_snmp_in_nmt(source_host, source_pon)
 
-        if isinstance(onts, dict):
-            response_error = ''
-            if 'error' in onts.keys():
-                response_error = json.dumps({
-                    'error': True,
-                    'message': onts['error']
-                })
-            else:
-                response_error = json.dumps({
-                    'error': True,
-                    'message': f'O NMT não retornou nenhum dado apenas {onts}. Consulte novamente.'
-                })
+        if ont_devices['error']:
+            response_error = json.dumps(ont_devices)
             return HttpResponse(response_error)
 
         initial_maintenance_info = {
@@ -49,7 +39,7 @@ def search_onts(request):
             'file_name': None,
             'source_gpon': source_gpon,
             'destination_gpon': None,
-            'unchanged_devices': onts,
+            'unchanged_devices': ont_devices['onts'],
             'selected_devices': None,
             'commands_url': None
         }
@@ -74,15 +64,19 @@ def get_onts_snmp_in_nmt(host, pon_location):
         get_all_onts = requests.post(
             api_url, headers=request_options['headers'],
             data=request_options['body'],
-            timeout=300
+            timeout=60
         )
-        onts =  get_all_onts.json()
+        onts = get_all_onts.json()
 
-        return onts
+        return {
+            "error": False,
+            "onts": onts
+        }
     except requests.exceptions.RequestException as err:
-        raise requests.exceptions.RequestException(
-            f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
-        )
+        return {
+            "error": True,
+            "message": f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
+        }
 
 def render_error_page(request):
     """"Render error page, showing the error message"""
@@ -110,6 +104,7 @@ def render_onts_table(request):
         error_message = {
             'message': 'O ID da guia não foi informado, impossível prosseguir'
         }
+
         return render(request,'error.html', context=error_message)
 
     try:
@@ -118,11 +113,12 @@ def render_onts_table(request):
         onts_context = {
             'all_devices': onts
         }
-
         return render(request,'ontsTable.html', context=onts_context)
-    except Exception as err:
+
+    except (Exception, ObjectDoesNotExist) as err:
         error_message = {
-            'message': f'Ocorreu um erro ao buscar registo no banco. Error: {err}' 
+            'error': 'True',
+            'message': f'Ocorreu um erro ao buscar registro no banco. Error: {err}' 
         }
 
         return render(request,'error.html', context=error_message)
@@ -132,10 +128,9 @@ def get_maintenance_info_in_database(register_id):
     try:
         single_register = MaintenanceInfo.objects.get(tab_id=register_id)
         return single_register
+
     except ObjectDoesNotExist as err:
         raise ObjectDoesNotExist from err
-    except Exception as err:
-        raise Exception from err
 
 def get_commands(request):
     """Update maintenance info and go to NMT and get commands genereted"""
@@ -155,10 +150,10 @@ def get_commands(request):
                 if int(device['id']) in id_devices_selecteds:
                     all_devices_selecteds.append(device)
 
-        except Exception as err:
+        except ObjectDoesNotExist as err:
             message_error = {
                 'error': True,
-                'message': f'Ocorreu um erro ao recuperar/salvar informações no banco. Erro {err}'    
+                'message': f'Ocorreu um erro ao recuperar/salvar informações no banco. Erro {err}' 
             }
             return HttpResponse(json.dumps(message_error))
 
@@ -174,7 +169,7 @@ def get_commands(request):
                 'oldHost': maintenance_info.source_gpon['host']
             })
 
-            commands = requests.post(url, headers=headers_request, data=options_request)
+            commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             commads_response = commands.json()
             data_to_update = {
                 'file_name': file_name,
@@ -187,13 +182,14 @@ def get_commands(request):
 
             return HttpResponse(json.dumps({
                 "error": False, 
-                'message': 'A requisição para o NMT ocorreu com sucesso',
-                'commands': commads_response
+                'message': 'A requisição para o NMT ocorreu com sucesso'
             }))
-        except requests.exceptions.RequestException as err:
-            raise requests.exceptions.RequestException(
-                f'Ocorreu um erro ao gerar os comandos no NMT. Error: {err}'
-            )
+
+        except (requests.exceptions.RequestException, Exception) as err:
+            return HttpResponse(json.dumps({
+                "error": True, 
+                'message': f'Ocorreu um erro ao gerar os comandos no NMT. Error: {err}'
+            }))
 
     return redirect(home)
 
@@ -201,15 +197,9 @@ def update_maintenance_info_in_database(data_to_update, register_id):
     """Update datas about maintenance info in database"""
     try:
         MaintenanceInfo.objects.filter(tab_id=register_id).update(**data_to_update)
-        return {
-            'error': False,
-            'message': 'Dados atualizados com sucesso'
-        }
+
     except Exception as err:
-        return {
-            'error': True,
-            'message': f'Ocorreu um erro ao atualizar os dados no banco. Error: {err}'
-        }
+        raise Exception from err
 
 def render_page_commands(request):
     """Get commands info and render commands pages"""
@@ -220,6 +210,10 @@ def render_page_commands(request):
             'commands': commands.commands_url
         }
         return render(request, 'commands.html', context=commands_context)
-    except Exception as error:
-        print(error)
-        return requests.get(f'http://localhost:8000/render_error_page?message={error}')
+
+    except (requests.exceptions.RequestException, Exception) as err:
+        error_message = {
+            "message" :  f'ocorreu um erro ao renderizar a página de comandos. Error: {err}'
+        }
+
+        return render(request, 'error.html', context=error_message)
