@@ -14,12 +14,15 @@ header img {
     width: 60%;
 }
 
-.logo, #source-container, #olt, #gpon, #selects-source-gpon { 
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .logo, .generate-btn { 
     display: flex;
     width: 90%;
+    align-items: center;
+    box-sizing: border-box;
+
 }
 
-#source-container, #olt, #gpon {
+#source-container, #olt, #gpon, #file {
     flex-direction: column;
 }
 
@@ -27,18 +30,20 @@ header img {
     width: 100%;
 }
 
-select {
+select, input {
     width: 100%;
-    padding: 10px; 
+    padding: 15px; 
     margin: 0 4px;  
     border: 2px solid;
     border-color: white;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 20px;
     background-color: #f7f9fd;
+    box-sizing: border-box;
 }
 
-select:hover {
+
+select:hover, input:hover {
     border-color: #fbad18;
     border: 2px solid;
 }
@@ -55,4 +60,7 @@ button {
 button:hover{
     background: #4ebbf4;
 }
- 
+
+table {
+    font-size: 18px;
+}

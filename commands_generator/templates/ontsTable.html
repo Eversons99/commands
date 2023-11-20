@@ -5,9 +5,9 @@
         <tr>
             <th><input type="checkbox" id="cbx-select-all" onclick="selectAllDevices()"></th>
             <th>ID</th>
-            <th>Serial Number</th>
-            <th>Type</th>
-            <th>Status</th>
+            <th>SERIAL NUMBER</th>
+            <th>TYPE</th>
+            <th>STATUS</th>
         </tr>
         {% for device in all_devices %}
             <tr>
@@ -24,10 +24,14 @@
         {% endfor %}
     </table>
     
-    <h2>Selecione um nome para o arquivo</h2>
-    <input type="text" id="file-name">
+    <div id="file">
+        <h2>Selecione um nome para o arquivo</h2>
+        <input type="text" id="file-name">
+    </div>
 
     {% include 'partials/gponForm.html' %}
 
-    <button onclick="generateCommands()">Gerar comandos</button>
+    <div class="generate-btn">
+        <button onclick="generateCommands()">Gerar comandos</button>
+    </div>
 {% endblock %}
