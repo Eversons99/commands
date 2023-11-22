@@ -2,16 +2,16 @@
 {% load static %}
 {% block content %}
     <table>
-        <tr>
+        <tr id="table-head">
             <th><input type="checkbox" id="cbx-select-all" onclick="selectAllDevices()"></th>
             <th>ID</th>
             <th>SERIAL NUMBER</th>
-            <th>TYPE</th>
+            <th>TIPO</th>
             <th>STATUS</th>
         </tr>
         {% for device in all_devices %}
-            <tr>
-                <td><input type="checkbox" id="cbx-single-item"></td>
+            <tr class="device-row">
+                <td><input type="checkbox" id="cbx-single-item" class="input-device" onclick="markSelectedItem()"></td>
                 <td>{{ device.id }}</td>
                 <td>{{ device.sn }}</td>
                 <td>{{ device.type }}</td>

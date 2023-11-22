@@ -93,6 +93,8 @@ function selectAllDevices() {
             singleCheckbox.checked = false
         }
     })
+
+    markSelectedItem()
 }
 
 async function generateCommands() {
@@ -146,4 +148,19 @@ async function generateCommands() {
         return window.location = `http://localhost:8000/generator/render_error_page?message=${messageError}`
     }
     return window.location = `http://localhost:8000/generator/render_page_commands?tab_id=${tabId}` 
+}
+
+function markSelectedItem() {
+    const singleSelect = document.querySelectorAll('#cbx-single-item')
+    const selectAll = document.querySelectorAll('#cbx-select-all')
+
+    singleSelect.forEach( input => {
+        if (selectAll.checked || input.checked) {
+            input.parentElement.parentElement.style.color = 'rgb(64, 76, 87)'
+            input.parentElement.parentElement.style.background = 'rgb(222, 222, 222)'
+        } else {
+            input.parentElement.parentElement.style.color = 'black'
+            input.parentElement.parentElement.style.background = 'white'
+        }
+    })
 }

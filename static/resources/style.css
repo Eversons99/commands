@@ -7,19 +7,21 @@
 header {
     display: flex;
     flex-direction: column;
-    width: 90%;
+    width: 85%;
 }
 
 header img {
     width: 60%;
 }
 
-.logo, #source-container, #olt, #gpon, #selects-source-gpon { 
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .logo, .generate-btn { 
     display: flex;
-    width: 90%;
+    width: 85%;
+    align-items: center;
+    box-sizing: border-box;
 }
 
-#source-container, #olt, #gpon {
+#source-container, #olt, #gpon, #file {
     flex-direction: column;
 }
 
@@ -27,18 +29,19 @@ header img {
     width: 100%;
 }
 
-select {
+select, input {
     width: 100%;
-    padding: 10px; 
+    padding: 15px; 
     margin: 0 4px;  
     border: 2px solid;
     border-color: white;
     border-radius: 10px;
-    font-size: 18px;
+    font-size: 20px;
     background-color: #f7f9fd;
+    box-sizing: border-box;
 }
 
-select:hover {
+select:hover, input:hover {
     border-color: #fbad18;
     border: 2px solid;
 }
@@ -52,6 +55,44 @@ button {
     border: none;
     color: white;
 }
+
 button:hover{
     background: #4ebbf4;
+}
+
+table {
+    text-align: center;
+    font-size: 18px;
+    width: 85%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 6px;
+}
+
+td { 
+    padding: 8px;
+}
+
+#table-head {
+    background: #4e9ff4;
+    color: white;
+}
+
+table th:last-child {
+    border-radius: 0 16px 0 0;    
+}
+
+table th:first-child {
+    border-radius: 16px 0 0 0;
+
+}
+
+.device-row:hover {
+    background: rgb(222, 222, 222);
+}
+
+#title, #file, #olt, #gpon { 
+    margin: 15px auto;
 }
