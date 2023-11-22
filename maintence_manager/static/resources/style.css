@@ -88,10 +88,6 @@ table th:first-child {
     border-radius: 16px 0 0 0;
 }
 
-.device-row:hover {
-    background: rgb(222, 222, 222);
-}
-
 #title, #file, #olt, #gpon { 
     margin: 15px auto;
 }
