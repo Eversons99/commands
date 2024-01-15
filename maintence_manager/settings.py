@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['10.0.30.252', 'localhost']
 
 # Application definition
 
@@ -59,7 +59,6 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             f'{ABSOLUTE_PATH}/commands_generator/templates/',
-            #f'{ABSOLUTE_PATH}/atteuations_manager/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],
         "APP_DIRS": True,
@@ -84,8 +83,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "generatorDB",
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASS'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'
     }
 }
@@ -124,7 +123,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    #f'{ABSOLUTE_PATH}/attenuations_manager/static',
     f'{ABSOLUTE_PATH}/commands_generator/static',
     f'{ABSOLUTE_PATH}/maintence_manager/static',
 ]
