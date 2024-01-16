@@ -66,15 +66,15 @@ async function searchOnts() {
         })
     }
 
-    const ontsRequest = await fetch('http://10.0.30.252:8000/generator/search_onts', requestOptions)
+    const ontsRequest = await fetch('http://localhost:8000/generator/search_onts', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
     
     if (responsOfontsRequest.error == true) {
         const messageError = responsOfontsRequest.message
-        return window.location = `http://10.0.30.252:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `http://localhost:8000/generator/render_error_page?message=${messageError}`
     }
 
-    return window.location = `http://10.0.30.252:8000/generator/render_onts_table?tab_id=${tabId}` 
+    return window.location = `http://localhost:8000/generator/render_onts_table?tab_id=${tabId}` 
 }
 
 function getIdentificator() {
@@ -140,14 +140,14 @@ async function generateCommands() {
         })
     }
 
-    let getCommands = await fetch('http://10.0.30.252:8000/generator/get_commands', requestOptions)
+    let getCommands = await fetch('http://localhost:8000/generator/get_commands', requestOptions)
     getCommands = await getCommands.json()
     
     if (getCommands.error) {
         messageError =  getCommands.message
-        return window.location = `http://10.0.30.252:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `http://localhost:8000/generator/render_error_page?message=${messageError}`
     }
-    return window.location = `http://10.0.30.252:8000/generator/render_page_commands?tab_id=${tabId}` 
+    return window.location = `http://localhost:8000/generator/render_page_commands?tab_id=${tabId}` 
 }
 
 function markSelectedItem() {
@@ -163,4 +163,27 @@ function markSelectedItem() {
             input.parentElement.parentElement.style.background = 'white'
         }
     })
+}
+
+function resultsButton(e) {
+    const interfaceDiv = document.getElementById('interface-results')
+    const globalDiv = document.getElementById('global-results')
+    const deleteDiv = document.getElementById('delete-results')
+
+    if (e.target.id == 'interface-button') {
+        interfaceDiv.setAttribute('class', 'active-result')
+        globalDiv.setAttribute('class', 'inactive-result')
+        deleteDiv.setAttribute('class', 'inactive-result')
+    }
+
+    if (e.target.id == 'global-button') {
+        globalDiv.setAttribute('class', 'active-result')
+        interfaceDiv.setAttribute('class', 'inactive-result')
+        deleteDiv.setAttribute('class', 'inactive-result')
+    }
+    if (e.target.id == 'delete-button') {
+        deleteDiv.setAttribute('class', 'active-result')
+        globalDiv.setAttribute('class', 'inactive-result')
+        interfaceDiv.setAttribute('class', 'inactive-result')
+    }
 }

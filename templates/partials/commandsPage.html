@@ -1,15 +1,20 @@
 {% load static %}
 
-<div class="ready-commands">
-    <h2>Comandos da Interface</h2>
-    <object data="{{ commands.interfaceCommands }}"></object>
-    <h2>Comandos Globais</h2>
-    <object data="{{ commands.globalCommands }}"></object>
-    <h2>Comandos de Remoção</h2>
-    <object data="{{ commands.deleteCommands }}"></object>
+<div class="ready-commands results">
+    <div class="result-buttuns">
+        <button class="result-button" id="interface-button" onclick="resultsButton(event)">Comandos Interface</button>
+        <button class="result-button" id="global-button" onclick="resultsButton(event)">Comandos Globais</button>
+        <button class="result-button" id="delete-button" onclick="resultsButton(event)">Comandos Delete</button>
+    </div>
+    <div class="commands">
+        <textarea class="active-result" id="interface-results" disabled>{{ interface_commands }}</textarea>
+        <textarea class="inactive-result" id="global-results" disabled>{{ global_commands }}</textarea>
+        <textarea class="inactive-result" id="delete-results" disabled>{{ delete_commands }}</textarea>
+    </div>
 </div>
 
 <div class="result-buttons">
     <button id="btn-warn">Aplicar Comandos</button>
+    <button id="btn-save">Salvar Comandos</button>
     <button id="btn-discard">Descartar Comandos</button>
 </div>

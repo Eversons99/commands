@@ -9,3 +9,6 @@ node_modules/
 db.sqlite3
 commands.env
 virtual-env/
+*/__pycache__/*
+__pycache__/
+__pycache__/

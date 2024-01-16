@@ -53,7 +53,6 @@ button {
     background: #4e9ff4;
     border-radius: 10px;
     border: none;
-    color: white;
 }
 
 button:hover{
@@ -102,6 +101,11 @@ table th:first-child {
     color: black;
 }
 
+#btn-save {
+    background: rgb(4, 168, 39);
+    color: black;
+}
+
 #btn-discard:hover{
     background: rgb(227, 107, 107);
 }
@@ -111,6 +115,26 @@ table th:first-child {
 
 }
 
-object {
-    margin: 15px auto;
+#btn-save:hover {
+    background: rgb(132, 231, 153);
 }
+
+textarea {
+    width: 85%;
+    height: 30vh;
+    font-size: 16px;
+    padding: 2vh;
+    border-radius: 10px;
+    resize: none;
+    background: black;
+    color: white;
+}
+
+.results textarea:target {
+    display: block;
+}
+
+.inactive-result {
+    display: none;
+}
+

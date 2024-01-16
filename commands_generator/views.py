@@ -7,10 +7,11 @@ from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import MaintenanceInfo
 
-# Create your views here.
+
 def home(request):
     """Render HTML index page"""
     return render(request, 'index.html')
+
 
 def search_onts(request):
     """Receive a request and call the function to get ONTS"""
@@ -49,6 +50,7 @@ def search_onts(request):
 
     return redirect(home)
 
+
 def get_onts_snmp_in_nmt(host, pon_location):
     """Make a request to NMT to get ONT"""
     try:
@@ -78,10 +80,12 @@ def get_onts_snmp_in_nmt(host, pon_location):
             "message": f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
         }
 
+
 def render_error_page(request):
     """"Render error page, showing the error message"""
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
+
 
 def save_initial_maintenance_info_in_database(initial_maintenance_info):
     """Save device info in database"""
@@ -95,6 +99,7 @@ def save_initial_maintenance_info_in_database(initial_maintenance_info):
             'error': True,
             'message': f'Erro de integridade, {err}'
         }
+
 
 def render_onts_table(request):
     """Render a table with all devices (ONT's)"""
@@ -123,6 +128,7 @@ def render_onts_table(request):
 
         return render(request,'error.html', context=error_message)
 
+
 def get_maintenance_info_in_database(register_id):
     """Make a query in database and return an register"""
     try:
@@ -131,6 +137,7 @@ def get_maintenance_info_in_database(register_id):
 
     except ObjectDoesNotExist as err:
         raise ObjectDoesNotExist from err
+
 
 def get_commands(request):
     """Update maintenance info and go to NMT and get commands genereted"""
@@ -193,6 +200,7 @@ def get_commands(request):
 
     return redirect(home)
 
+
 def update_maintenance_info_in_database(data_to_update, register_id):
     """Update datas about maintenance info in database"""
     try:
@@ -201,19 +209,23 @@ def update_maintenance_info_in_database(data_to_update, register_id):
     except Exception as err:
         raise Exception from err
 
+
 def render_page_commands(request):
     """Get commands info and render commands pages"""
     register_id = request.GET.get('tab_id')
     try:
         commands = get_maintenance_info_in_database(register_id)
         commands_context = {
-            'commands': commands.commands_url
+            'delete_commands': requests.get(commands.commands_url.get('deleteCommands')).text,
+            'interface_commands': requests.get(commands.commands_url.get('interfaceCommands')).text,
+            'global_commands': requests.get(commands.commands_url.get('globalCommands')).text
         }
+
         return render(request, 'commands.html', context=commands_context)
 
     except (requests.exceptions.RequestException, Exception) as err:
         error_message = {
-            "message" :  f'ocorreu um erro ao renderizar a página de comandos. Error: {err}'
+            "message": f'Ocorreu um erro ao renderizar a página de comandos. Error: {err}'
         }
 
         return render(request, 'error.html', context=error_message)
