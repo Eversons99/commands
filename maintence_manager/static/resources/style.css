@@ -2,6 +2,7 @@
     padding: 0;
     margin: 0.5vh auto;
     font-family: sans-serif, Arial, Helvetica;
+    border: none;
 }
 
 header {
@@ -14,7 +15,7 @@ header img {
     width: 60%;
 }
 
-#source-container, #olt, #gpon, #selects-source-gpon,  #file, .logo, .generate-btn, .ready-commands, .result-buttons  { 
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .logo, .generate-btn, .action-buttuns { 
     display: flex;
     width: 85%;
     align-items: center;
@@ -50,13 +51,12 @@ button {
     padding: 12px 50px;
     font-size: 20px;
     font-weight: bold;
-    background: #4e9ff4;
+    background: #000000;
     border-radius: 10px;
-    border: none;
 }
 
 button:hover{
-    background: #4ebbf4;
+    background: #959da1;
 }
 
 table {
@@ -120,21 +120,56 @@ table th:first-child {
 }
 
 textarea {
-    width: 85%;
-    height: 30vh;
+    width: 100%;
+    height: 30em;
     font-size: 16px;
     padding: 2vh;
-    border-radius: 10px;
+    border-radius: 0 0 10px 10px;
+    border: none;
     resize: none;
     background: black;
+    margin: 0;
     color: white;
 }
 
-.results textarea:target {
-    display: block;
-}
 
 .inactive-result {
     display: none;
 }
 
+.ready-commands { 
+    display: block;
+    width: 85%;
+}
+
+.commands, .result-buttuns {
+    display: flex;
+    width: 100%;
+    margin: 0;
+}
+
+.result-buttuns {
+    background-color: #8b8b8b;
+}
+
+#interface-button {
+    border-top-left-radius: 0;
+}
+
+.result-buttuns button { 
+    padding: 12px 50px;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 15px 15px 0 0;
+    color: #ffffff ;
+    margin: 0;
+}
+
+.active-btn {
+    background: #757474;
+}
+
+.inactive-btn {
+    background: #000000;
+
+}

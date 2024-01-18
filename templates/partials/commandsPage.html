@@ -2,9 +2,9 @@
 
 <div class="ready-commands results">
     <div class="result-buttuns">
-        <button class="result-button" id="interface-button" onclick="resultsButton(event)">Comandos Interface</button>
-        <button class="result-button" id="global-button" onclick="resultsButton(event)">Comandos Globais</button>
-        <button class="result-button" id="delete-button" onclick="resultsButton(event)">Comandos Delete</button>
+        <button id="interface-button" onclick="resultsButton(event)">Comandos Interface</button>
+        <button id="global-button" onclick="resultsButton(event)">Comandos Globais</button>
+        <button id="delete-button" onclick="resultsButton(event)">Comandos Delete</button>
     </div>
     <div class="commands">
         <textarea class="active-result" id="interface-results" disabled>{{ interface_commands }}</textarea>
@@ -13,7 +13,7 @@
     </div>
 </div>
 
-<div class="result-buttons">
+<div class="action-buttuns">
     <button id="btn-warn">Aplicar Comandos</button>
     <button id="btn-save">Salvar Comandos</button>
     <button id="btn-discard">Descartar Comandos</button>

@@ -170,20 +170,36 @@ function resultsButton(e) {
     const globalDiv = document.getElementById('global-results')
     const deleteDiv = document.getElementById('delete-results')
 
+    const interfaceButton = document.getElementById('interface-button')
+    const globalButton = document.getElementById('global-button')
+    const deleteButton = document.getElementById('delete-button')
+
     if (e.target.id == 'interface-button') {
         interfaceDiv.setAttribute('class', 'active-result')
         globalDiv.setAttribute('class', 'inactive-result')
         deleteDiv.setAttribute('class', 'inactive-result')
+        
+        interfaceButton.setAttribute('class', 'active-btn')
+        globalButton.setAttribute('class', 'inactive-btn')
+        deleteButton.setAttribute('class', 'inactive-btn')
     }
 
     if (e.target.id == 'global-button') {
         globalDiv.setAttribute('class', 'active-result')
         interfaceDiv.setAttribute('class', 'inactive-result')
         deleteDiv.setAttribute('class', 'inactive-result')
+
+        globalButton.setAttribute('class', 'active-btn')
+        interfaceButton.setAttribute('class', 'inactive-btn')
+        deleteButton.setAttribute('class', 'inactive-btn')
     }
     if (e.target.id == 'delete-button') {
         deleteDiv.setAttribute('class', 'active-result')
         globalDiv.setAttribute('class', 'inactive-result')
         interfaceDiv.setAttribute('class', 'inactive-result')
+
+        deleteButton.setAttribute('class', 'active-btn')
+        globalButton.setAttribute('class', 'inactive-btn')
+        interfaceButton.setAttribute('class', 'inactive-btn')
     }
 }
