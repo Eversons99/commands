@@ -211,7 +211,6 @@ function resultsButton(e) {
         globalButton.setAttribute('class', 'inactive-btn')
         deleteButton.setAttribute('class', 'inactive-btn')
     }
-
     if (e.target.id == 'global-button') {
         globalDiv.setAttribute('class', 'active-result')
         interfaceDiv.setAttribute('class', 'inactive-result')

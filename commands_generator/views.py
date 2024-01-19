@@ -29,7 +29,7 @@ def search_onts(request):
             })
             return HttpResponse(response_message, status=400)
 
-        ont_devices = get_onts_snmp_in_nmt(source_host, source_pon)
+        ont_devices = get_onts_via_snmp(source_host, source_pon)
 
         if ont_devices['error']:
             response_error = json.dumps(ont_devices)
@@ -51,7 +51,7 @@ def search_onts(request):
     return redirect(home)
 
 
-def get_onts_snmp_in_nmt(host, pon_location):
+def get_onts_via_snmp(host, pon_location):
     """Make a request to NMT to get ONT"""
     try:
         api_url = 'https://nmt.nmultifibra.com.br/olt/onts-table'
@@ -79,6 +79,10 @@ def get_onts_snmp_in_nmt(host, pon_location):
             "error": True,
             "message": f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
         }
+
+
+def get_onts_via_ssh():
+    pass
 
 
 def render_error_page(request):
