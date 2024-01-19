@@ -3,6 +3,7 @@
     margin: 0.3em auto;
     font-family: sans-serif, Arial, Helvetica;
     border: none;
+    margin-top: 0;
 }
 
 header {
@@ -18,6 +19,40 @@ header {
 .logo img {
     width: 12%;
     margin: 0.5em 0 0.5em 1em;
+}
+
+.modal-loader {
+    display: none;
+    align-items: center;
+    background-color: #8b8b8b;
+    flex-direction: column;
+    font-family: Arial;
+    font-weight: 900;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+    margin: 0;
+    justify-content: center;
+}
+  
+.loader {  
+    animation: is-rotating 1s infinite;
+    width: 50px;
+    height: 50px;
+    border: 6px solid #e5e5e5;
+    border-top-color: #51d4db;
+    border-radius: 50%;
+}
+  
+@keyframes is-rotating {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+.disable-scroll {
+    overflow: hidden;
 }
 
 #source-container, #olt, #gpon, #selects-source-gpon,  #file, .generate-btn { 
@@ -200,3 +235,4 @@ textarea {
     background: #000000;
 
 }
+

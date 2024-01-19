@@ -1,16 +1,34 @@
 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
 
+function loadingAnimation(active) {
+    const divLoader = document.getElementsByClassName('modal-loader')[0]
+    const body = document.getElementsByTagName('body')[0]
+    
+    if (active) {
+        divLoader.style.display = "flex"
+        body.classList.add('disable-scroll')
+        window.scroll(0, 0)
+    } else {
+        divLoader.style.display = "none"
+        body.classList.remove('disable-scroll')
+    }
+}
+
 async function getBoardsHost() {
     try {
+        loadingAnimation(true)
         const sourceHost = document.getElementById('select-olt').value
         let hostSlots = await fetch(`https://nmt.nmultifibra.com.br/files/hosts?olt=${sourceHost}`)
         hostSlots = await hostSlots.json()
     
         if (hostSlots.message == 'Host not Found') {
+            loadingAnimation(false)
             return alert(`Ocorreu um erro ao buscar as informações da ${sourceHost} no NMT`)
         }
         fillElementsOptions(hostSlots)
+        loadingAnimation(false)
     } catch (error) {
+        loadingAnimation(false)
         return alert(`Ocorreu um erro ao consultar o NMT (Verifique a rede). Error ${error}`)
     }
 }
@@ -42,6 +60,7 @@ function setIdentificator() {
 
 async function searchOnts() {
     setIdentificator()
+    loadingAnimation(true)
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -52,7 +71,10 @@ async function searchOnts() {
         'gpon': `0/${sourceSlot}/${sourcePort}`
     }
     
-    if (!sourceHost || !sourceSlot || !sourcePort) return alert("ATENÇÃO: Preencha o F/S/P!")
+    if (!sourceHost || !sourceSlot || !sourcePort) {
+        loadingAnimation(false)
+        return alert("ATENÇÃO: Preencha o F/S/P!")
+    } 
 
     const requestOptions = {
         method: 'POST',
@@ -98,6 +120,7 @@ function selectAllDevices() {
 }
 
 async function generateCommands() {
+    loadingAnimation(true)
     const allDevices = document.querySelectorAll('#cbx-single-item')
     const idDevicesSelecteds = []
 
@@ -108,7 +131,10 @@ async function generateCommands() {
         }
     })
 
-    if (idDevicesSelecteds.length == 0) return alert('Selecione ao menos um dispositivo')
+    if (idDevicesSelecteds.length == 0) {
+        loadingAnimation(false)
+        return alert('Selecione ao menos um dispositivo')
+    }
 
     const destinationHost = document.getElementById('select-olt').value
     const destinationSlot = document.getElementById('select-slot').value
@@ -121,8 +147,10 @@ async function generateCommands() {
     }
 
     if (!destinationHost || !destinationSlot || !destinationPort) {
+        loadingAnimation(false)
         return alert('Preecha o F/S/P para prosseguir')
     } else if (!fileName) {
+        loadingAnimation(false)
         return alert('Digite um nome para o seu arquivo para prosseguir')
     }
 

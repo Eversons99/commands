@@ -9,14 +9,14 @@
   </head>
   <body>
     {% csrf_token %}
+    <div class="modal-loader">
+      <div class="loader"></div>
+      <h2 id="loader-message">CARREGANDO DADOS...</h2>
+    </div>
     <nav class="logo">
         <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
     </nav>
-
     <header>
-      <div class="modal-loader">
-        <div class="loader"></div>
-      </div>
       <h1 id="title">GC - Gerador de Comandos</h1>
     </header>
     {% block content %} {% endblock %} 
