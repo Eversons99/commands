@@ -9,16 +9,15 @@
   </head>
   <body>
     {% csrf_token %}
+    <nav class="logo">
+        <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+    </nav>
+
     <header>
       <div class="modal-loader">
         <div class="loader"></div>
       </div>
-      <div class="logo">
-          <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
-      </div>
-
-      <h1 id="title">CG - Commands Generator</h1>
-
+      <h1 id="title">GC - Gerador de Comandos</h1>
     </header>
     {% block content %} {% endblock %} 
     <script type='text/javascript' src="{% static 'resources/clientSideMaintence.js' %}"></script>

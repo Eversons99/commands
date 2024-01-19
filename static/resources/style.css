@@ -2,6 +2,7 @@
     padding: 0;
     margin: 0.5vh auto;
     font-family: sans-serif, Arial, Helvetica;
+    border: none;
 }
 
 header {
@@ -10,11 +11,16 @@ header {
     width: 85%;
 }
 
-header img {
-    width: 60%;
+.logo {
+    display: block;
 }
 
-#source-container, #olt, #gpon, #selects-source-gpon,  #file, .logo, .generate-btn, .action-buttuns { 
+.logo img {
+    width: 15%;
+    margin: 0.5em 0 0.5em 1em;
+}
+
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .generate-btn { 
     display: flex;
     width: 85%;
     align-items: center;
@@ -52,6 +58,7 @@ button {
     font-weight: bold;
     background: #000000;
     border-radius: 10px;
+    color: white;
 }
 
 button:hover{
@@ -155,25 +162,37 @@ textarea {
     border-top-left-radius: 0;
 }
 
+.action-buttuns { 
+    display: flex;
+    width: 85%;
+    margin: 1em auto;
+    justify-content: flex-end;
+}
+
+.action-buttuns button {
+    margin: 0 0.3em;
+    padding: 0.5em 1em;
+    font-size: 16px;
+    font-weight: bold;
+    background: #000000;
+    border-radius: 10px;
+    color: white;
+}
+
 .result-buttuns button { 
     padding: 12px 50px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     border-radius: 15px 15px 0 0;
     color: #ffffff ;
     margin: 0;
-    border: none;
-
 }
 
 .active-btn {
-    background: #8b8b8b;
-    border-top: 1px solid rgb(94, 94, 94);
-    border-right: 1px solid rgb(94, 94, 94);
+    background: #757474;
 }
 
 .inactive-btn {
-    background: 1px solid #000000;
-    border-top: 1px solid #000000;
-    border-right: 1px solid #000000;
+    background: #000000;
+
 }
