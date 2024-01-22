@@ -5,9 +5,10 @@ import websockets
 
 async def olt(websocket, path):
     async for message in websocket:
-        print(message)
-        await websocket.send('fkghpdiofkjgh')
-        websocket.close()
+        if path == '/get-onts':
+            print(message)
+            await websocket.send({''})
+            #websocket.close()
 
 
 async def server():

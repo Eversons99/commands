@@ -229,3 +229,39 @@ function resultsButton(e) {
         interfaceButton.setAttribute('class', 'inactive-btn')
     }
 }
+
+
+async function searchOntsViaSsh() {
+    const pon = document.getElementById('pon')
+    const host = document.getElementById('host')
+    const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
+    const onts = []
+
+    socket.onopen = () => {
+        socket.send(JSON.stringify{ pon, host, id: getIdentificator() })
+        console.log('Sessão aberta')
+    }
+
+    socket.onmessage = (event) => {
+        const currentMessage = event.data
+
+        if (currentMessage.ont) {
+            onts.append(currentMessage)
+        }
+        else if (currentMessage.error == "No ont were found") {
+            alert('Não existem dispositivos na localização informada!')
+            socket.close()
+        }
+    }
+
+    socket.onclose = () => {
+        console.log(onts)
+    }
+
+    console.log('Abrir sessão com websocket e renderizar itens na tela')
+    // Ocultar o conteúdo da pagina ou redirecionar o usuário para uma página nova
+    // Adicionar o icone de carregamento
+    // Iniciar a sessão via websocket
+    // Renderizar a tabela dinamicamente
+    // Ocultar o icone de corregamento
+}
