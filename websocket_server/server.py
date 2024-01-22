@@ -1,15 +1,25 @@
 import asyncio
+import datetime
+import random
 import websockets
 
-
-async def echo(websocket):
+async def olt(websocket, path):
     async for message in websocket:
-        await websocket.send(message)
+        print(message)
+        await websocket.send('fkghpdiofkjgh')
+        websocket.close()
 
 
-async def main():
-    async with websockets.serve(echo, "10.0.30.157", 8765):
+async def server():
+    async with websockets.serve(olt, "10.0.30.157", 5678):
         await asyncio.Future()  # run forever
 
-asyncio.run(main())
-    
+
+try:
+    print('WS is running !!!')
+    asyncio.run(server())
+except KeyboardInterrupt:
+    pass
+
+
+

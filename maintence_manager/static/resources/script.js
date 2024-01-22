@@ -88,12 +88,11 @@ async function searchOnts() {
         })
     }
 
-    const ontsRequest = await fetch('http://10.0.30.157:8000/generator/search_onts', requestOptions)
+    const ontsRequest = await fetch('http://10.0.30.157:8000/generator/search_onts_via_snmp', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
     
     if (responsOfontsRequest.error == true) {
-        const messageError = responsOfontsRequest.message
-        return window.location = `http://10.0.30.157:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `http://10.0.30.157:8000/generator/search_onts_via_ssh?tab_id=${tabId}`
     }
 
     return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}` 
@@ -229,4 +228,9 @@ function resultsButton(e) {
         globalButton.setAttribute('class', 'inactive-btn')
         interfaceButton.setAttribute('class', 'inactive-btn')
     }
+}
+
+
+async function searchOntsViaSsh() {
+    console.log('Abrir sessão com websocket e renderizar itens na tela')
 }

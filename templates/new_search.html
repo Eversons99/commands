@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<body>
+    <section class="new-search-ssh">
+        <p>
+            <b id="error">ATENÇÃO:</b>
+            A busca de ONT's via SNMP não retornou nada, realize uma nova busca via SSH clicando no botão abaixo.
+        </p>
+        <table id="query-info-table">
+            <tr>
+                <p><b>INFORMAÇÕES DA CONSULTA</p>
+            </tr>
+            <tr id="qinfo-table-head">
+                <td>ID</td>
+                <td>PON</td>
+                <td>HOST</td>
+            </tr>
+            <tr id="query-infos">
+                <td id="tab_id">{{ tab_id }}</td>
+                <td id="pon">{{ pon }}</td>
+                <td id="host">{{ host }}</td>
+            </tr>
+        </table>
+        <button onclick="searchOntsViaSsh()">Nova busca via SSH</button>
+    </section>
+</body>
+</html>
+{% endblock %}

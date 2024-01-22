@@ -13,7 +13,7 @@ def home(request):
     return render(request, 'index.html')
 
 
-def search_onts(request):
+def search_onts_via_snmp(request):
     """Receive a request and call the function to get ONTS"""
     if request.method == 'POST':
         body_request = json.loads(request.body)
@@ -24,39 +24,56 @@ def search_onts(request):
 
         if not tab_id or not source_gpon:
             response_message = json.dumps({
-                'error': True, 
+                'error': True,
                 'message': 'O host ou a localização pon não foram informados no corpo da requisição'
             })
             return HttpResponse(response_message, status=400)
-
-        ont_devices = get_onts_via_snmp(source_host, source_pon)
-
-        if ont_devices['error']:
-            response_error = json.dumps(ont_devices)
-            return HttpResponse(response_error)
 
         initial_maintenance_info = {
             'tab_id': tab_id,
             'file_name': None,
             'source_gpon': source_gpon,
             'destination_gpon': None,
-            'unchanged_devices': ont_devices['onts'],
+            'unchanged_devices': None,
             'selected_devices': None,
             'commands_url': None
         }
 
-        save_maintence_info = save_initial_maintenance_info_in_database(initial_maintenance_info)
-        return HttpResponse(json.dumps(save_maintence_info))
+        ont_devices = get_onts_via_snmp(source_host, source_pon)
+
+        if ont_devices['error']:
+            save_initial_maintenance_info_in_database(initial_maintenance_info)
+            response_error = json.dumps(ont_devices)
+            return HttpResponse(response_error)
+
+        initial_maintenance_info['unchanged_devices'] = ont_devices['onts']
+        save_maintenance_info = save_initial_maintenance_info_in_database(initial_maintenance_info)
+        return HttpResponse(json.dumps(save_maintenance_info))
 
     return redirect(home)
 
+
+def search_onts_via_ssh(request):
+    tab_id = request.GET.get('tab_id')
+    if tab_id:
+        maintenance_info = get_maintenance_info_in_database(tab_id)
+        gpon_info = maintenance_info.source_gpon
+        query_info = {
+            "tab_id": tab_id,
+            "pon": gpon_info.get("gpon"),
+            "host": gpon_info.get("host")
+        }
+        return render(request, 'new_search.html', context=query_info)
+    else:
+        # Call the error page
+        pass
 
 def get_onts_via_snmp(host, pon_location):
     """Make a request to NMT to get ONT"""
     try:
         api_url = 'https://nmt.nmultifibra.com.br/olt/onts-table'
         request_options = {
-            'headers' : {'Content-Type': 'application/json; charset=utf-8'},
+            'headers': {'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({
                 'gpon': pon_location,
                 'host': host
@@ -70,6 +87,13 @@ def get_onts_via_snmp(host, pon_location):
         )
         onts = get_all_onts.json()
 
+        if len(onts) == 0 or isinstance(onts, dict):
+            return {
+                "error": True,
+                "onts": 0,
+                "message": f'A busca via SNMP não retornou nenhuma informação'
+            }
+
         return {
             "error": False,
             "onts": onts
@@ -79,10 +103,6 @@ def get_onts_via_snmp(host, pon_location):
             "error": True,
             "message": f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
         }
-
-
-def get_onts_via_ssh():
-    pass
 
 
 def render_error_page(request):

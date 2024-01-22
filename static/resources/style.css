@@ -55,7 +55,7 @@ header {
     overflow: hidden;
 }
 
-#source-container, #olt, #gpon, #selects-source-gpon,  #file, .generate-btn { 
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .generate-btn {
     display: flex;
     width: 85%;
     align-items: center;
@@ -94,6 +94,7 @@ button {
     background: #000000;
     border-radius: 10px;
     color: white;
+    cursor: pointer;
 }
 
 button:hover{
@@ -236,3 +237,33 @@ textarea {
 
 }
 
+.new-search-ssh {
+    display: flex;
+    width: 85%;
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#qinfo-table-head {
+    background: #4e9ff4;
+    color: white;
+}
+
+.new-search-ssh * {
+    padding: 0.6em;
+}
+
+#qinfo-table-head > :first-child {
+    border-radius: 10px 0 0 0;
+}
+
+#qinfo-table-head > :last-child {
+    border-radius: 0 10px 0 0;
+}
+
+#error {
+    color: red;
+}
