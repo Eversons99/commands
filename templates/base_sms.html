@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>SMS Sender</title>
+    <link rel="stylesheet" href="{% static 'resources/style.css' %}">
+  </head>
+  <body>
+    {% csrf_token %}
+    <header>
+      <div class="modal-loader">
+        <div class="loader"></div>
+      </div>
+      <div class="logo">
+          <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+      </div>
+
+      <h1 id="title">SS - SMS Sender</h1>
+
+    </header>
+    {% block content %} {% endblock %} 
+    <script type='text/javascript' src="{% static 'resources/clientSideMaintence.js' %}"></script>
+  </body>
+</html>

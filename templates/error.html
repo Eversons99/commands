@@ -4,21 +4,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Erro Page</title>
+    <title>Error Page</title>
+    <link rel="stylesheet" href="{% static './resources/style.css' %}">
   </head>
-  <body>
-    <header>
-      <img src="{% static '/img/error.png' %}" alt="" srcset="">
-      <h1>Oops um erro ocorreu:</h1>
-    </header>
-    <section>
-      <b>Error:</b> {{ message }}
+  <body class="error">
+    <div class="container">
+      <h1 class="error-h1">Erro! Operação falhou.</h1>
+      {{ message }}
+      <p>Por favor, verifique o URL ou <a href="http://localhost:8000/generator/home/">retorne à página inicial</a>.</p>
+    </div>
 
-      <button>
-        <a href="http://localhost:8000/generator/home">
-          Volte para homepage
-        </a>
-      </button>
-    </section>
-</body>
+  </body>
 </html>
+

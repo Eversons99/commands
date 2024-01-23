@@ -1,0 +1,19 @@
+{% extends 'base_sms.html' %}
+{% load static %}
+{% block content %}
+    <section id="source-container">
+        <h1>Rompimento criado</h1>
+        <h3>Id: {{ id }}</h3>
+        <h3>Previsão: {{ previsao }}</h3>
+        <h3>Assinantes afetados: {{ assinantes_afetados }}</h3>
+        <h3>Contatos: {{ contatos }}</h3>
+        <h3>Sms enviado: {{ sms_enviado }}</h3>
+    </section>
+
+    <section id="source-container">
+        <div class="search-btn">
+            <button onclick="sendSms()">Enviar SMS</button>
+        </div>
+    </section>
+{% endblock %}
+

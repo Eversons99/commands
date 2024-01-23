@@ -27,11 +27,12 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.252', 'localhost']
+ALLOWED_HOSTS = ['10.0.30.241', 'localhost']
 
 # Application definition
 
 INSTALLED_APPS = [
+    "send_sms",
     #"attenuations_manager",
     "commands_generator",
     "django.contrib.admin",
@@ -82,7 +83,7 @@ WSGI_APPLICATION = "maintence_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "generatorDB",
+        "NAME": "commands",
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'

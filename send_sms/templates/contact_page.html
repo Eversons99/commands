@@ -1,0 +1,24 @@
+{% extends 'base_sms.html' %}
+{% load static %}
+{% block content %}
+    <section id="source-container">
+        <h3>Quantidade de clientes afetados: {{ assinantes }}</h3>
+        <h3>Quantidade de contatos encontrados: {{ contatos }}</h3>
+    </section>
+    
+        <div class="name">
+            <h3>Previsão de retorno:</h3>
+            <input type="text" id='input-previsao' placeholder="dd/mm/aaaa hh:mm" name="input-previsao"></input>
+        </div>
+        <div class="name">
+            <h3>Tipo:</h3>
+            <input type="text" id='input-tipo' placeholder="Manutenção ou Rompimento" name="input-tipo"></input>
+        </div>
+        
+    <section id="source-container">
+        <div class="search-btn">
+            <button onclick="createRupture()">Enviar</button>
+        </div>
+    </section>
+{% endblock %}
+
