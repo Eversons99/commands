@@ -230,27 +230,29 @@ function resultsButton(e) {
     }
 }
 
-
 async function searchOntsViaSsh() {
-    const pon = document.getElementById('pon')
-    const host = document.getElementById('host')
+    const pon = document.getElementById('pon').textContent
+    const host = document.getElementById('host').textContent
     const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
     const onts = []
 
     socket.onopen = () => {
-        socket.send(JSON.stringify{ pon, host, id: getIdentificator() })
-        console.log('Sessão aberta')
+        socket.send(JSON.stringify({
+            pon, 
+            host, 
+            id: getIdentificator() 
+        }))
+        console.log('Sessão com o servidor Websocket iniciada')
     }
 
     socket.onmessage = (event) => {
         const currentMessage = event.data
 
-        if (currentMessage.ont) {
+        if (!currentMessage.error) {
             onts.append(currentMessage)
-        }
-        else if (currentMessage.error == "No ont were found") {
+        } else if (currentMessage.error == "No ont were found") {
             alert('Não existem dispositivos na localização informada!')
-            socket.close()
+            return window.location = "http://10.0.30.157:8000/generator/home"
         }
     }
 
@@ -258,7 +260,6 @@ async function searchOntsViaSsh() {
         console.log(onts)
     }
 
-    console.log('Abrir sessão com websocket e renderizar itens na tela')
     // Ocultar o conteúdo da pagina ou redirecionar o usuário para uma página nova
     // Adicionar o icone de carregamento
     // Iniciar a sessão via websocket

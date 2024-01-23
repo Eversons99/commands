@@ -1,6 +1,8 @@
 import os
 import requests
 from netmiko import ConnectHandler
+from dotenv import load_dotenv
+load_dotenv('../commands.env')
 
 class Olt:
     def connect_olt(self, olt_name):
@@ -9,11 +11,12 @@ class Olt:
         """
         olt_info = requests.get(f'https://nmt.nmultifibra.com.br/olt/get-host?host={olt_name}').json()
         ip_address = olt_info[olt_name]['management']['ipv4']['primary']
+
         params_to_connection = {
-            'device_type': 'huawei',
+            'device_type': 'huawei_smartax',
             'host': ip_address,
-            'username': os.environ.get('OLT_USER'),
-            'password': os.environ.get('OLT_PASS'),
+            'username': os.getenv('OLT_USER'),
+            'password': os.getenv('OLT_PASS'),
             'port': 22
         }
 
@@ -23,15 +26,14 @@ class Olt:
 
         return ssh_connection
 
-    
+    async def get_onts(self, websocket_connection, gpon_info):
+        olt_name = gpon_info.get('host')
+        ssh_connection = self.connect_olt(olt_name)
+        command = ssh_connection.send_command_timing('display version')
+        await websocket_connection.send(command)
+
+        ssh_connection.disconnect()
+        await websocket_connection.close()
+
     def check_vlan(self, olt_name):
         pass
-
-
-    def get_onts(self, gpon_info):
-        ssh_connection = self.connect_olt(gpon_info.get('olt_name'))
-        command = ssh_connection.send_command('display version')
-        return command
-        ssh_connection.disconnect()
-        
-        

@@ -230,15 +230,18 @@ function resultsButton(e) {
     }
 }
 
-
 async function searchOntsViaSsh() {
-    const pon = document.getElementById('pon')
-    const host = document.getElementById('host')
+    const pon = document.getElementById('pon').textContent
+    const host = document.getElementById('host').textContent
     const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
     const onts = []
 
     socket.onopen = () => {
-        socket.send(JSON.stringify{ pon, host, id: getIdentificator() })
+        socket.send(JSON.stringify({
+            pon, 
+            host, 
+            id: getIdentificator() 
+        }))
         console.log('Sessão aberta')
     }
 
@@ -252,6 +255,7 @@ async function searchOntsViaSsh() {
             alert('Não existem dispositivos na localização informada!')
             socket.close()
         }
+        socket.close()
     }
 
     socket.onclose = () => {

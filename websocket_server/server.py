@@ -1,14 +1,20 @@
 import asyncio
-import datetime
-import random
+import json
+import sys
 import websockets
+sys.path.append('C:/Users/Everson/Desktop/commands/')
+from maintence_manager.static.common.olt_api import Olt
+from dotenv import load_dotenv
+load_dotenv()
 
 async def olt(websocket, path):
-    async for message in websocket:
+    async for data in websocket:
         if path == '/get-onts':
-            print(message)
-            await websocket.send({''})
-            #websocket.close()
+            gpon_info = json.loads(data)
+            olt = Olt()
+            onts = await olt.get_onts(websocket, gpon_info)
+
+
 
 
 async def server():
@@ -21,6 +27,3 @@ try:
     asyncio.run(server())
 except KeyboardInterrupt:
     pass
-
-
-

@@ -123,8 +123,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    f'{ABSOLUTE_PATH}/commands_generator/static',
-    f'{ABSOLUTE_PATH}/maintence_manager/static',
+    f'{ABSOLUTE_PATH}/maintence_manager/static'
 ]
 
 STATIC_ROOT = f'{ABSOLUTE_PATH}/static'
