@@ -12,9 +12,7 @@ async def olt(websocket, path):
         if path == '/get-onts':
             gpon_info = json.loads(data)
             olt = Olt()
-            onts = await olt.get_onts(websocket, gpon_info)
-
-
+            await olt.get_onts(websocket, gpon_info)
 
 
 async def server():
