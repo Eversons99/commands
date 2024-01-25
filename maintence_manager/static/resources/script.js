@@ -231,6 +231,7 @@ function resultsButton(e) {
 }
 
 async function searchOntsViaSsh() {
+    loadingAnimation(true)
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
     const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
@@ -246,18 +247,21 @@ async function searchOntsViaSsh() {
     }
 
     socket.onmessage = (event) => {
-        const currentMessage = event.data
+        const currentMessage = JSON.parse(event.data)
 
         if (!currentMessage.error) {
-            onts.append(currentMessage)
-        } else if (currentMessage.error == "No ont were found") {
-            alert('Não existem dispositivos na localização informada!')
+            console.log(currentMessage)
+            onts.push(currentMessage)
+        } else if (currentMessage.message == "No ont were found") {
+            socket.close()
+            alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
             return window.location = "http://10.0.30.157:8000/generator/home"
         }
     }
 
     socket.onclose = () => {
-        console.log(onts)
+        console.log('Sessão com o servidor Websocket finalizada')
+        loadingAnimation(false)
     }
 
     // Ocultar o conteúdo da pagina ou redirecionar o usuário para uma página nova

@@ -1,8 +1,10 @@
+
 virtual_env/
 venv/
 node_modules/
 db.sqlite3
 commands.env
 virtual-env/
-__py_cache__
 .idea/
+*.pyc
+__pycache__/
