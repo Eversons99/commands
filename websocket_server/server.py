@@ -7,6 +7,7 @@ from maintence_manager.static.common.olt_api import Olt
 from dotenv import load_dotenv
 load_dotenv()
 
+
 async def olt(websocket, path):
     async for data in websocket:
         if path == '/get-onts':

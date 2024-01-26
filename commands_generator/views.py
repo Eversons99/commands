@@ -1,8 +1,9 @@
 import ast
 import json
 import requests
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import MaintenanceInfo
@@ -253,3 +254,16 @@ def render_page_commands(request):
         }
 
         return render(request, 'error.html', context=error_message)
+
+
+@csrf_exempt
+def update_onts_in_database(request):
+    if request.method == "POST":
+        request_body = json.loads(request.body)
+        register_id = request_body.get('tab_id')
+        onts = request_body.get('onts')
+
+        data_to_update = {'unchanged_devices': onts}
+        update_maintenance_info_in_database(data_to_update, register_id)
+
+        return HttpResponse(status=200)

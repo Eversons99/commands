@@ -232,26 +232,36 @@ function resultsButton(e) {
 
 async function searchOntsViaSsh() {
     loadingAnimation(true)
+    const divNewSearch = document.getElementById("new-search-ssh")
+    const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
     const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
+    const tabId = getIdentificator()
     const onts = []
+    let total_number_onts = 0
 
     socket.onopen = () => {
         socket.send(JSON.stringify({
             pon, 
             host, 
-            id: getIdentificator() 
+            tab_id: tabId
         }))
         console.log('Sessão com o servidor Websocket iniciada')
+        divNewSearch.style.display = "none"
     }
 
     socket.onmessage = (event) => {
         const currentMessage = JSON.parse(event.data)
+        console.log(currentMessage)
+        if (currentMessage.total_number_onts){
+            total_number_onts = currentMessage.total_number_onts
+            console.log(total_number_onts)
 
-        if (!currentMessage.error) {
-            console.log(currentMessage)
+        } else if (!currentMessage.error) {
+            loadingText.textContent = `CARREGANDO DADOS DA ONT ${currentMessage.id}...`
             onts.push(currentMessage)
+
         } else if (currentMessage.message == "No ont were found") {
             socket.close()
             alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
@@ -261,12 +271,6 @@ async function searchOntsViaSsh() {
 
     socket.onclose = () => {
         console.log('Sessão com o servidor Websocket finalizada')
-        loadingAnimation(false)
+        return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}`
     }
-
-    // Ocultar o conteúdo da pagina ou redirecionar o usuário para uma página nova
-    // Adicionar o icone de carregamento
-    // Iniciar a sessão via websocket
-    // Renderizar a tabela dinamicamente
-    // Ocultar o icone de corregamento
 }

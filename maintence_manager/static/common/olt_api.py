@@ -30,10 +30,17 @@ class Olt:
         return ssh_connection
 
     async def get_onts(self, websocket_connection, gpon_info):
+        """
+        Receives the websocket connection (websocket_connection) and some information that includes host and pon info
+        (gpon_info) as an argument to connect with to an OLT and obtain information about onts. Takes information about
+        the ONTs, forms a json and sends this information via the websocket connection
+        """
         olt_name = gpon_info.get('host')
+        pon_location = gpon_info.get("pon")
+        tab_id = gpon_info.get('tab_id')
         ssh_connection = self.connect_olt(olt_name)
-        all_onts = ssh_connection.send_command_timing(f'display ont in summary {gpon_info.get("pon")}')
-        collection_of_olts = []
+        all_onts = ssh_connection.send_command_timing(f'display ont in summary {pon_location}')
+        collection_onts = []
 
         if 'There is no ONT available' in all_onts or 'Failure: The ONT does not exist' in all_onts:
             error_message = {
@@ -43,6 +50,10 @@ class Olt:
             await websocket_connection.send(json.dumps(error_message))
             ssh_connection.disconnect()
             await websocket_connection.close()
+
+        total_number_onts = self.get_amount_of_devices_by_pon(all_onts)
+        await asyncio.sleep(0.5)
+        await websocket_connection.send(json.dumps(total_number_onts))
 
         all_onts = all_onts.splitlines()
         pattern_express = r"^  [0-9]{1,3} {0,3}\S{16} "
@@ -73,11 +84,32 @@ class Olt:
                         elif status == 'offline':
                             current_ont['status'] = 2
 
+                collection_onts.append(current_ont)
                 await asyncio.sleep(0.5)
                 await websocket_connection.send(json.dumps(current_ont))
 
+        headers = {"Content-Type": 'Application.json'}
+        body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
+        requests.post('http://10.0.30.157:8000/generator/update_onts_in_database', headers=headers, data=body)
+
         await websocket_connection.close()
         ssh_connection.disconnect()
+
+    def get_amount_of_devices_by_pon(self, all_onts):
+        olt_output = all_onts.splitlines()
+        pattern_express = re.compile(r": [0-9]{1,3},")
+        amount_of_devices = {"total_number_onts": 0}
+
+        for record in olt_output:
+            record_match = pattern_express.search(record)
+            if record_match:
+                found_expression = record_match.group()
+                amount = re.sub('[^0-9]{1,3}', '', found_expression)
+                amount_of_devices['total_number_onts'] = amount
+
+                return amount_of_devices
+
+        return amount_of_devices
 
 
     def check_vlan(self, olt_name):
