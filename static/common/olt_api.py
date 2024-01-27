@@ -97,17 +97,18 @@ class Olt:
 
     def get_amount_of_devices_by_pon(self, all_onts):
         olt_output = all_onts.splitlines()
-        pattern_express = re.compile(r"^: [0-9]{1,3}, ")
-
+        pattern_express = re.compile(r": [0-9]{1,3},")
         amount_of_devices = {"total_number_onts": 0}
+
         for record in olt_output:
-            record_match = pattern_express.match(record)
+            record_match = pattern_express.search(record)
             if record_match:
                 found_expression = record_match.group()
                 amount = re.sub('[^0-9]{1,3}', '', found_expression)
                 amount_of_devices['total_number_onts'] = amount
-                print('nsjgndfjghndjhnfjdghjhnfdgjo')
+
                 return amount_of_devices
+
         return amount_of_devices
 
 

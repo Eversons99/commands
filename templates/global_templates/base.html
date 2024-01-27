@@ -1,12 +1,19 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Commands Generator</title>
-    <link rel="stylesheet" href="{% static 'resources/style.css' %}">
-  </head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        {% if "/generator/" in request.path %}
+            <title>Gerador de Comandos</title>
+        {% else  %}
+            <title>Gerenciador de Atenuações</title>
+        {% endif %}
+
+        <link rel="stylesheet" href="{% static 'resources/style.css' %}">
+    </head>
+
+
   <body>
     {% csrf_token %}
     <div class="modal-loader">
@@ -16,9 +23,6 @@
     <nav class="logo">
         <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
     </nav>
-    <header>
-      <h1 id="title">GC - Gerador de Comandos</h1>
-    </header>
     {% block content %} {% endblock %} 
     <script type='text/javascript' src="{% static 'resources/script.js' %}"></script>
   </body>

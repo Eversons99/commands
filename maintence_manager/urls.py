@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    #path("attenuation/", include("attenuations_manager.urls")),
+    path("attenuation/", include("attenuations_manager.urls")),
     path("generator/", include("commands_generator.urls")),
     path("admin/", admin.site.urls),
 ]

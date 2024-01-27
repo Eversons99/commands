@@ -1,0 +1,24 @@
+{% load static %}
+
+<table>
+    <tr id="table-head">
+        <th><input type="checkbox" id="cbx-select-all" onclick="selectAllDevices()"></th>
+        <th>ID</th>
+        <th>SERIAL NUMBER</th>
+        <th>TIPO</th>
+        <th>STATUS</th>
+    </tr>
+    {% for device in all_devices %}
+        <tr class="device-row">
+            <td><input type="checkbox" id="cbx-single-item" class="input-device" onclick="markSelectedItem()"></td>
+            <td>{{ device.id }}</td>
+            <td>{{ device.sn }}</td>
+            <td>{{ device.type }}</td>
+            {% if device.status == 1 %}
+                <td>ONLINE</td>
+            {% else %}
+                <td>OFFLINE</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>

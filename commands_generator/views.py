@@ -11,7 +11,7 @@ from .models import MaintenanceInfo
 
 def home(request):
     """Render HTML index page"""
-    return render(request, 'index.html')
+    return render(request, 'generatorIndex.html')
 
 
 def search_onts_via_snmp(request):
@@ -64,7 +64,7 @@ def search_onts_via_ssh(request):
             "pon": gpon_info.get("gpon"),
             "host": gpon_info.get("host")
         }
-        return render(request, 'new_search.html', context=query_info)
+        return render(request, 'ssh_search_generator.html', context=query_info)
     else:
         # Call the error page
         pass
@@ -143,7 +143,7 @@ def render_onts_table(request):
         onts_context = {
             'all_devices': onts
         }
-        return render(request,'ontsTable.html', context=onts_context)
+        return render(request,'devicesTable.html', context=onts_context)
 
     except (Exception, ObjectDoesNotExist) as err:
         error_message = {

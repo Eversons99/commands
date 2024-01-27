@@ -32,14 +32,14 @@ ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.157', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
-    #"attenuations_manager",
+    "attenuations_manager",
     "commands_generator",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "django.contrib.staticfiles"
 ]
 
 MIDDLEWARE = [
@@ -58,6 +58,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
+            f'{ABSOLUTE_PATH}/attenuations_manager/templates',
             f'{ABSOLUTE_PATH}/commands_generator/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],

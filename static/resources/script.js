@@ -232,7 +232,6 @@ function resultsButton(e) {
 
 async function searchOntsViaSsh() {
     loadingAnimation(true)
-    const divNewSearch = document.getElementById("new-search-ssh")
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -240,6 +239,7 @@ async function searchOntsViaSsh() {
     const tabId = getIdentificator()
     const onts = []
     let total_number_onts = 0
+    let controllerPercentage = 0
 
     socket.onopen = () => {
         socket.send(JSON.stringify({
@@ -248,18 +248,19 @@ async function searchOntsViaSsh() {
             tab_id: tabId
         }))
         console.log('Sessão com o servidor Websocket iniciada')
-        divNewSearch.style.display = "none"
     }
 
     socket.onmessage = (event) => {
         const currentMessage = JSON.parse(event.data)
-        console.log(currentMessage)
+
         if (currentMessage.total_number_onts){
             total_number_onts = currentMessage.total_number_onts
-            console.log(total_number_onts)
+            loadingText.textContent = `Carregando dados dos dispositivos - 0%`
 
-        } else if (!currentMessage.error) {
-            loadingText.textContent = `CARREGANDO DADOS DA ONT ${currentMessage.id}...`
+        } else if (currentMessage.id) {
+            controllerPercentage+=1
+            let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
+            loadingText.textContent = `Carregando dados dos dispositivos  - ${percentage}%`
             onts.push(currentMessage)
 
         } else if (currentMessage.message == "No ont were found") {
@@ -274,3 +275,5 @@ async function searchOntsViaSsh() {
         return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}`
     }
 }
+
+

@@ -1,0 +1,18 @@
+{% extends 'global_templates/base.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'partials/generator_commands_title.html' %}
+{% include 'global_templates/ontsTable.html' %}
+
+<div id="file">
+    <h2>Selecione um nome para o arquivo</h2>
+    <input type="text" id="file-name">
+</div>
+
+{% include 'global_templates/gponForm.html' %}
+
+<div class="generate-btn">
+    <button onclick="generateCommands()">Gerar comandos</button>
+</div>
+{% endblock %}
