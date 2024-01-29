@@ -9,7 +9,10 @@ from django.core.exceptions import ObjectDoesNotExist
 class Utility:
     @staticmethod
     def get_onts_via_snmp(request, db_model):
-        """Update maintenance info on database and call the function that makes a request to NMT to get onts"""
+        """
+        Update maintenance info on database and makes a request to NMT to get onts. In NMT the ont's are searched via
+        SNMP protocol. When the NMT return a response the new HttpResponse object is instantiated and returned
+        """
         body_request = json.loads(request.body)
         tab_id = body_request['tabId']
         source_gpon = body_request['sourceGpon']
@@ -33,7 +36,7 @@ class Utility:
             'commands_url': None
         }
 
-        ont_devices = Utility.get_onts_snmp_mode(source_host, source_pon)
+        ont_devices = Utility.get_onts_info_on_nmt(source_host, source_pon)
 
         if ont_devices['error']:
             Utility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
@@ -45,8 +48,11 @@ class Utility:
         return HttpResponse(json.dumps(save_maintenance_info))
 
     @staticmethod
-    def get_onts_snmp_mode(host, pon_location):
-        """Makes a request to NMT to get onts via snmp"""
+    def get_onts_info_on_nmt(host, pon_location):
+        """
+        Makes a request to NMT to get onts info, on NMT if success in the search a list with onts are returned otherwise an
+        error or an empty list  is returned
+        """
         try:
             api_url = 'https://nmt.nmultifibra.com.br/olt/onts-table'
             request_options = {
@@ -83,7 +89,10 @@ class Utility:
 
     @staticmethod
     def save_initial_maintenance_info_in_database(initial_maintenance_info, db_model):
-        """Save device info in database"""
+        """
+        When a new maintenance is started there is initial data that must be saved in the database, this method save
+        this data on database that's received as argument
+        """
         try:
             db_model.objects.create(**initial_maintenance_info)
             return {
@@ -96,8 +105,10 @@ class Utility:
             }
 
     @staticmethod
-    def get_maintenance_info(request, db_model):
-        """ """
+    def get_gpon_info_to_query_ssh(request, db_model):
+        """
+        Get gpon information from the database, process this information and return a dict
+        """
         tab_id = request.GET.get('tab_id')
         if tab_id:
             maintenance_info = Utility.get_maintenance_info_in_database(tab_id, db_model)
@@ -120,8 +131,9 @@ class Utility:
 
     @staticmethod
     def get_maintenance_info_in_database(register_id, db_model):
-        """ """
-        """Make a query in database and return an register"""
+        """
+        Query the database and return the desired record according to the id received as an argument
+        """
         try:
             single_register = db_model.objects.get(tab_id=register_id)
             return single_register
@@ -131,8 +143,10 @@ class Utility:
 
     @staticmethod
     def get_onts_on_database(request, db_model):
-        """ """
-        """Render a table with all devices (ONT's)"""
+        """
+        Gets a record in the database using the id that was received as an argument (within the request). Only some
+        attributes of the record are placed in a dict, this dict is returned
+        """
         register_id = request.GET.get('tab_id')
 
         if not register_id:
@@ -151,15 +165,15 @@ class Utility:
                 'all_devices': onts
             }
             return onts_info
-            # return render(request, 'devicesTable.html', context=onts_context)
 
         except ObjectDoesNotExist as err:
             raise err
 
     @staticmethod
-    def get_commands(request, db_model):
-        """ """
-        """Update maintenance info and go to NMT and get commands genereted"""
+    def generate_commands(request, db_model):
+        """
+        Gets selected devices on database and make a request to NMT to generate the commands
+        """
         body_request = json.loads(request.body)
         id_devices_selecteds = body_request['idDevicesSelecteds']
         destination_gpon = body_request['destinationGpon']
@@ -218,8 +232,9 @@ class Utility:
 
     @staticmethod
     def update_maintenance_info_in_database(data_to_update, register_id, db_model):
-        """ """
-        """Update datas about maintenance info in database"""
+        """
+         Update datas about maintenance info in database
+        """
         try:
             db_model.objects.filter(tab_id=register_id).update(**data_to_update)
 
@@ -227,9 +242,10 @@ class Utility:
             raise Exception from err
 
     @staticmethod
-    def page_commands(request, db_model):
-        """ """
-        """Get commands info and render commands pages"""
+    def get_urls_to_ready_commands(request, db_model):
+        """
+        Make a query in the database to obtain the urls where the ready commands are stored
+        """
         register_id = request.GET.get('tab_id')
         try:
             commands = Utility.get_maintenance_info_in_database(register_id, db_model)
@@ -252,7 +268,9 @@ class Utility:
 
     @staticmethod
     def update_onts_in_database(request, db_model):
-        """ """
+        """
+        Makes a request to update a record on database
+        """
         request_body = json.loads(request.body)
         register_id = request_body.get('tab_id')
         onts = request_body.get('onts')

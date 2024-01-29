@@ -6,12 +6,16 @@ from maintence_manager.static.common.utils import Utility
 
 
 def home(request):
-    """ Renders the HTML index page """
+    """
+    Renders the HTML index page
+    """
     return render(request, 'generatorIndex.html')
 
 
 def search_onts_via_snmp(request):
-    """Receives a request and call the method to get ONTS and return"""
+    """
+    Call the method that get ont's info via SNMP protocol
+    """
     if request.method == 'POST':
         db_model = MaintenanceInfo
         onts_info = Utility.get_onts_via_snmp(request, db_model)
@@ -21,9 +25,11 @@ def search_onts_via_snmp(request):
 
 
 def search_onts_via_ssh(request):
-    """Renders the HTML page to make a new search of ONTs via SSH"""
+    """
+    Renders the HTML page to make a new search of ONTs via SSH
+    """
     db_model = MaintenanceInfo
-    query_info = Utility.get_onts_via_ssh(request, db_model)
+    query_info = Utility.get_gpon_info_to_query_ssh(request, db_model)
     query_info['operation_mode'] = 'generator'
 
     if not query_info.get('error'):
@@ -33,13 +39,17 @@ def search_onts_via_ssh(request):
 
 
 def render_error_page(request):
-    """Renders error page, showing the personalised error message"""
+    """
+    Renders error page, showing the personalised error message
+    """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
 
 
 def render_onts_table(request):
-    """Render a table with all devices (ONT's)"""
+    """
+    Render a table with all onts
+    """
     if request.method == "GET":
         try:
             db_model = MaintenanceInfo
@@ -60,10 +70,12 @@ def render_onts_table(request):
 
 
 def get_commands(request):
-    """Updates maintenance info and go to NMT and get commands generated"""
+    """
+    Query NMT to generate commands and place the returned information in a database record
+    """
     if request.method == 'POST':
         db_model = MaintenanceInfo
-        commands = Utility.get_commands(request, db_model)
+        commands = Utility.generate_commands(request, db_model)
 
         return commands
 
@@ -71,9 +83,11 @@ def get_commands(request):
 
 
 def render_page_commands(request):
-    """Gets commands info and render commands pages"""
+    """
+    Gets commands info and render commands pages
+    """
     db_model = MaintenanceInfo
-    commands = Utility.page_commands(request, db_model)
+    commands = Utility.get_urls_to_ready_commands(request, db_model)
 
     if commands.get('error'):
         return render(request, 'error.html', context=commands)
@@ -83,7 +97,12 @@ def render_page_commands(request):
 
 @csrf_exempt
 def update_onts_in_database(request):
-    """Updates unchanged devices on database"""
+    """
+    Updates unchanged devices on database
+    """
     if request.method == "POST":
         db_model = MaintenanceInfo
-        Utility.update_onts_in_database(request, db_model)
+        update_status = Utility.update_onts_in_database(request, db_model)
+
+        return update_status
+
