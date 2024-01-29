@@ -6,6 +6,6 @@ db.sqlite3
 commands.env
 virtual-env/
 .idea/
-*.pyc
-__pycache__/
+**.pyc
+**/__pycache__/
 */__pycache__/
