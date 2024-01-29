@@ -58,9 +58,10 @@ function setIdentificator() {
     window.sessionStorage.setItem('tabId', identificatorTab)
 }
 
-async function searchOnts() {
+async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -88,14 +89,14 @@ async function searchOnts() {
         })
     }
 
-    const ontsRequest = await fetch('http://10.0.30.157:8000/generator/search_onts_via_snmp', requestOptions)
-    const responsOfontsRequest = await ontsRequest.json()
+    const ontsRequest = await fetch(`${baseUrl}/search_onts_via_snmp`, requestOptions)
+    const responseRequest = await ontsRequest.json()
     
-    if (responsOfontsRequest.error == true) {
-        return window.location = `http://10.0.30.157:8000/generator/search_onts_via_ssh?tab_id=${tabId}`
+    if (responseRequest.error == true) {
+        return window.location = `${baseUrl}/search_onts_via_ssh?tab_id=${tabId}`
     }
 
-    return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}` 
+    return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
 }
 
 function getIdentificator() {
@@ -118,8 +119,9 @@ function selectAllDevices() {
     markSelectedItem()
 }
 
-async function generateCommands() {
+async function generateCommands(operationMode) {
     loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const allDevices = document.querySelectorAll('#cbx-single-item')
     const idDevicesSelecteds = []
 
@@ -167,14 +169,14 @@ async function generateCommands() {
         })
     }
 
-    let getCommands = await fetch('http://10.0.30.157:8000/generator/get_commands', requestOptions)
+    let getCommands = await fetch(`${baseUrl}/get_commands`, requestOptions)
     getCommands = await getCommands.json()
     
     if (getCommands.error) {
         messageError =  getCommands.message
-        return window.location = `http://10.0.30.157:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
-    return window.location = `http://10.0.30.157:8000/generator/render_page_commands?tab_id=${tabId}` 
+    return window.location = `${baseUrl}/render_page_commands?tab_id=${tabId}`
 }
 
 function markSelectedItem() {
@@ -230,8 +232,9 @@ function resultsButton(e) {
     }
 }
 
-async function searchOntsViaSsh() {
+async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -266,13 +269,13 @@ async function searchOntsViaSsh() {
         } else if (currentMessage.message == "No ont were found") {
             socket.close()
             alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
-            return window.location = "http://10.0.30.157:8000/generator/home"
+            return window.location =  `${baseUrl}/home`
         }
     }
 
     socket.onclose = () => {
         console.log('Sessão com o servidor Websocket finalizada')
-        return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}`
+        return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
     }
 }
 

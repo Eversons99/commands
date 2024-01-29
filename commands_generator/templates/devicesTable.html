@@ -13,6 +13,6 @@
 {% include 'global_templates/gponForm.html' %}
 
 <div class="generate-btn">
-    <button onclick="generateCommands()">Gerar comandos</button>
+    <button onclick="generateCommands('{{ operation_mode }}')">Gerar comandos</button>
 </div>
 {% endblock %}
