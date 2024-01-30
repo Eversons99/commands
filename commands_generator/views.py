@@ -1,7 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import MaintenanceInfo
+from .models import GeneratorDB 
 from maintence_manager.static.common.utils import Utility
 
 
@@ -17,7 +17,7 @@ def search_onts_via_snmp(request):
     Call the method that get ont's info via SNMP protocol
     """
     if request.method == 'POST':
-        db_model = MaintenanceInfo
+        db_model = GeneratorDB
         onts_info = Utility.get_onts_via_snmp(request, db_model)
         return onts_info
 
@@ -28,7 +28,7 @@ def search_onts_via_ssh(request):
     """
     Renders the HTML page to make a new search of ONTs via SSH
     """
-    db_model = MaintenanceInfo
+    db_model = GeneratorDB
     query_info = Utility.get_gpon_info_to_query_ssh(request, db_model)
     query_info['operation_mode'] = 'generator'
 
@@ -52,7 +52,7 @@ def render_onts_table(request):
     """
     if request.method == "GET":
         try:
-            db_model = MaintenanceInfo
+            db_model = GeneratorDB
             onts_info = Utility.get_onts_on_database(request, db_model)
             onts_info['operation_mode'] = 'generator'
 
@@ -74,7 +74,7 @@ def get_commands(request):
     Query NMT to generate commands and place the returned information in a database record
     """
     if request.method == 'POST':
-        db_model = MaintenanceInfo
+        db_model = GeneratorDB
         commands = Utility.generate_commands(request, db_model)
 
         return commands
@@ -86,7 +86,7 @@ def render_page_commands(request):
     """
     Gets commands info and render commands pages
     """
-    db_model = MaintenanceInfo
+    db_model = GeneratorDB
     commands = Utility.get_urls_to_ready_commands(request, db_model)
 
     if commands.get('error'):
@@ -101,7 +101,7 @@ def update_onts_in_database(request):
     Updates unchanged devices on database
     """
     if request.method == "POST":
-        db_model = MaintenanceInfo
+        db_model = GeneratorDB
         update_status = Utility.update_onts_in_database(request, db_model)
 
         return update_status

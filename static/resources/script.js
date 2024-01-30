@@ -88,14 +88,14 @@ async function searchOnts() {
         })
     }
 
-    const ontsRequest = await fetch('http://10.0.30.157:8000/generator/search_onts_via_snmp', requestOptions)
+    const ontsRequest = await fetch('http://192.168.18.8:8000/generator/search_onts_via_snmp', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
     
     if (responsOfontsRequest.error == true) {
-        return window.location = `http://10.0.30.157:8000/generator/search_onts_via_ssh?tab_id=${tabId}`
+        return window.location = `http://192.168.18.8:8000/generator/search_onts_via_ssh?tab_id=${tabId}`
     }
 
-    return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}` 
+    return window.location = `http://192.168.18.8:8000/generator/render_onts_table?tab_id=${tabId}` 
 }
 
 function getIdentificator() {
@@ -167,14 +167,14 @@ async function generateCommands() {
         })
     }
 
-    let getCommands = await fetch('http://10.0.30.157:8000/generator/get_commands', requestOptions)
+    let getCommands = await fetch('http://192.168.18.8:8000/generator/get_commands', requestOptions)
     getCommands = await getCommands.json()
     
     if (getCommands.error) {
         messageError =  getCommands.message
-        return window.location = `http://10.0.30.157:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `http://192.168.18.8:8000/generator/render_error_page?message=${messageError}`
     }
-    return window.location = `http://10.0.30.157:8000/generator/render_page_commands?tab_id=${tabId}` 
+    return window.location = `http://192.168.18.8:8000/generator/render_page_commands?tab_id=${tabId}` 
 }
 
 function markSelectedItem() {
@@ -266,13 +266,13 @@ async function searchOntsViaSsh() {
         } else if (currentMessage.message == "No ont were found") {
             socket.close()
             alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
-            return window.location = "http://10.0.30.157:8000/generator/home"
+            return window.location = "http://192.168.18.8:8000/generator/home"
         }
     }
 
     socket.onclose = () => {
         console.log('Sessão com o servidor Websocket finalizada')
-        return window.location = `http://10.0.30.157:8000/generator/render_onts_table?tab_id=${tabId}`
+        return window.location = `http://192.168.18.8:8000/generator/render_onts_table?tab_id=${tabId}`
     }
 }
 
