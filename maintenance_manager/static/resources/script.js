@@ -61,11 +61,10 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
     const tabId = getIdentificator()
     const sourceGpon = {
         'host':  sourceHost,
@@ -119,40 +118,21 @@ function selectAllDevices() {
     markSelectedItem()
 }
 
-async function generateCommands(operationMode) {
+async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
-    const allDevices = document.querySelectorAll('#cbx-single-item')
-    const idDevicesSelecteds = []
+    const baseUrl = "http://10.0.30.157:8000/generator"
+    const idDevicesSelected = getIdDevicesSelected()
 
-    allDevices.forEach((device) => {
-        if (device.checked) {
-            const deviceId = device.parentNode.parentNode.children[1].innerHTML
-            idDevicesSelecteds.push(Number(deviceId))
-        }
-    })
-
-    if (idDevicesSelecteds.length == 0) {
+    if (idDevicesSelected.length == 0) {
         loadingAnimation(false)
         return alert('Selecione ao menos um dispositivo')
     }
 
-    const destinationHost = document.getElementById('select-olt').value
-    const destinationSlot = document.getElementById('select-slot').value
-    const destinationPort = document.getElementById('select-port').value 
-    const fileName = document.getElementById('file-name').value
-    const tabId = getIdentificator()
-    const destinationGpon = {
-        'host': destinationHost,
-        'gpon': `0/${destinationSlot}/${destinationPort}`
-    }
+    const maintenanceInfo = getMaintenanceInfoFromForm()
 
-    if (!destinationHost || !destinationSlot || !destinationPort) {
+    if (maintenanceInfo.error) {
         loadingAnimation(false)
-        return alert('Preecha o F/S/P para prosseguir')
-    } else if (!fileName) {
-        loadingAnimation(false)
-        return alert('Digite um nome para o seu arquivo para prosseguir')
+        return alert(maintenanceInfo.message)
     }
 
     const requestOptions = {
@@ -162,10 +142,10 @@ async function generateCommands(operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            tabId,
-            destinationGpon,
-            fileName,
-            idDevicesSelecteds
+            'tabId': maintenanceInfo.tabId,
+            'destinationGpon': maintenanceInfo.destinationGpon,
+            'fileName': maintenanceInfo.fileName,
+            'idDevicesSelected': maintenanceInfo.idDevicesSelected
         })
     }
 
@@ -176,7 +156,7 @@ async function generateCommands(operationMode) {
         messageError =  getCommands.message
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
-    return window.location = `${baseUrl}/render_page_commands?tab_id=${tabId}`
+    return window.location = `${baseUrl}/render_page_commands?tab_id=${maintenanceInfo.tabId}`
 }
 
 function markSelectedItem() {
@@ -234,7 +214,7 @@ function resultsButton(e) {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -277,6 +257,100 @@ async function searchOntsViaSsh(operationMode) {
         console.log('Sessão com o servidor Websocket finalizada')
         return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
     }
+}
+
+async function saveInitialAttenuationState () {
+    loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000/attenuator"
+    allDevicesSelected = checkIfAllDevicesIsSelected()
+
+    if (!allDevicesSelected) {
+        loadingAnimation(false)
+        return alert('Você precisa selecionar todos os dispositivos')
+    }
+
+    const maintenanceInfo = getMaintenanceInfoFromForm()
+
+    if (maintenanceInfo.error) {
+        loadingAnimation(false)
+        return alert(maintenanceInfo.message)
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': maintenanceInfo.tabId,
+            'destinationGpon': maintenanceInfo.destinationGpon,
+            'fileName': maintenanceInfo.fileName,
+            'unchangedDevices': maintenanceInfo.idDevicesSelected
+        })
+    }
+
+    let saveAttenuationState = await fetch(`${baseUrl}/save_initial_attenuation_state`, requestOptions)
+    saveAttenuationState = await saveAttenuationState.json()
+
+    if (saveAttenuationState.error) {
+        messageError = saveAttenuationState.message
+        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
+    }
+
+    return window.location = `${baseUrl}/render_attenuations_page?tab_id=${maintenanceInfo.tabId}`
+}
+
+function getMaintenanceInfoFromForm () {
+    const destinationHost = document.getElementById('select-olt').value
+    const destinationSlot = document.getElementById('select-slot').value
+    const destinationPort = document.getElementById('select-port').value
+    const fileName = document.getElementById('file-name').value
+    const tabId = getIdentificator()
+
+    if (!destinationHost || !destinationSlot || !destinationPort) {
+        return { error: true, message: 'Preecha o F/S/P para prosseguir'}
+    } else if (!fileName) {
+        return { error: true, message: 'Digite um nome para o seu arquivo para prosseguir'}
+    }
+
+    const gponInfo = {
+        destinationGpon: {
+            'host': destinationHost,
+            'gpon': `0/${destinationSlot}/${destinationPort}`
+        },
+        fileName,
+        tabId,
+        idDevicesSelected: getIdDevicesSelected()
+    }
+
+    return gponInfo
+}
+
+function checkIfAllDevicesIsSelected ()  {
+    const allDevices = document.querySelectorAll('#cbx-single-item')
+    let allSelected = true
+
+    for (let device of allDevices) {
+            if (!device.checked) {
+            allSelected = false
+            break
+        }
+    }
+    return allSelected
+}
+
+function getIdDevicesSelected () {
+    const allDevices = document.querySelectorAll('#cbx-single-item')
+    const idDevicesSelected = []
+
+    allDevices.forEach((device) => {
+        if (device.checked) {
+            const deviceId = device.parentNode.parentNode.children[1].innerHTML
+            idDevicesSelected.push(Number(deviceId))
+        }
+    })
+    return idDevicesSelected
 }
 
 

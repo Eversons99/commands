@@ -1,4 +1,4 @@
-"""maintence_manager URL Configuration
+"""maintenance_manager URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -19,5 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path("attenuator/", include("attenuations_manager.urls")),
     path("generator/", include("commands_generator.urls")),
-    path("admin/", admin.site.urls),
+    path("shared_core/", include("shared_core.urls")),
+    path("admin/", admin.site.urls)
 ]

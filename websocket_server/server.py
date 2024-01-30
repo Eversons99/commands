@@ -3,7 +3,7 @@ import json
 import sys
 import websockets
 sys.path.append('C:/Users/Everson/Desktop/commands/')
-from maintence_manager.static.common.olt_api import Olt
+from maintenance_manager.static.common.olt_api import Olt
 from dotenv import load_dotenv
 load_dotenv()
 

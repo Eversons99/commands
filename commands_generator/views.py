@@ -2,7 +2,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB 
-from maintence_manager.static.common.utils import Utility
+from maintenance_manager.static.common.utils import Utility
 
 
 def home(request):
@@ -24,28 +24,6 @@ def search_onts_via_snmp(request):
     return redirect(home)
 
 
-def search_onts_via_ssh(request):
-    """
-    Renders the HTML page to make a new search of ONTs via SSH
-    """
-    db_model = GeneratorDB
-    query_info = Utility.get_gpon_info_to_query_ssh(request, db_model)
-    query_info['operation_mode'] = 'generator'
-
-    if not query_info.get('error'):
-        return render(request, 'ssh_search_generator.html', context=query_info)
-
-    return render(request, 'error.html', context=query_info)
-
-
-def render_error_page(request):
-    """
-    Renders error page, showing the personalised error message
-    """
-    error_message = {'message': request.GET.get('message')}
-    return render(request, 'error.html', context=error_message)
-
-
 def render_onts_table(request):
     """
     Render a table with all onts
@@ -54,7 +32,6 @@ def render_onts_table(request):
         try:
             db_model = GeneratorDB
             onts_info = Utility.get_onts_on_database(request, db_model)
-            onts_info['operation_mode'] = 'generator'
 
             if onts_info.get('error'):
                 return render(request, 'error.html', context=onts_info)
@@ -82,6 +59,20 @@ def get_commands(request):
     return redirect(home)
 
 
+def search_onts_via_ssh(request):
+    """
+    Renders the HTML page to make a new search of ONTs via SSH
+    """
+    db_model = GeneratorDB
+    query_info = Utility.get_gpon_info_to_query_ssh(request, db_model)
+    query_info['operation_mode'] = 'generator'
+
+    if not query_info.get('error'):
+        return render(request, 'ssh_search_generator.html', context=query_info)
+
+    return render(request, 'error.html', context=query_info)
+
+
 def render_page_commands(request):
     """
     Gets commands info and render commands pages
@@ -105,4 +96,12 @@ def update_onts_in_database(request):
         update_status = Utility.update_onts_in_database(request, db_model)
 
         return update_status
+
+
+def render_error_page(request):
+    """
+    Renders error page, showing the personalised error message
+    """
+    error_message = {'message': request.GET.get('message')}
+    return render(request, 'error.html', context=error_message)
 

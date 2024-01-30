@@ -28,12 +28,7 @@ class Utility:
 
         initial_maintenance_info = {
             'tab_id': tab_id,
-            'file_name': None,
             'source_gpon': source_gpon,
-            'destination_gpon': None,
-            'unchanged_devices': None,
-            'selected_devices': None,
-            'commands_url': None
         }
 
         ont_devices = Utility.get_onts_info_on_nmt(source_host, source_pon)
@@ -46,6 +41,8 @@ class Utility:
         initial_maintenance_info['unchanged_devices'] = ont_devices['onts']
         save_maintenance_info = Utility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
         return HttpResponse(json.dumps(save_maintenance_info))
+
+
 
     @staticmethod
     def get_onts_info_on_nmt(host, pon_location):
@@ -74,7 +71,7 @@ class Utility:
                 return {
                     "error": True,
                     "onts": 0,
-                    "message": f'A busca via SNMP não retornou nenhuma informação'
+                    "message": 'A busca via SNMP não retornou nenhuma informação'
                 }
 
             return {
@@ -150,12 +147,12 @@ class Utility:
         register_id = request.GET.get('tab_id')
 
         if not register_id:
-            onts_info = {
+            error_message = {
                 'error': True,
                 'message': 'O ID da guia não foi informado, impossível prosseguir'
             }
 
-            return onts_info
+            return error_message
 
         try:
             device_info = Utility.get_maintenance_info_in_database(register_id, db_model)
@@ -175,24 +172,24 @@ class Utility:
         Gets selected devices on database and make a request to NMT to generate the commands
         """
         body_request = json.loads(request.body)
-        id_devices_selecteds = body_request['idDevicesSelecteds']
+        id_devices_selected = body_request['idDevicesSelected']
         destination_gpon = body_request['destinationGpon']
         file_name = body_request['fileName']
         register_id = body_request['tabId']
-        all_devices_selecteds = []
+        all_devices_selected = []
 
         try:
             maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
             unchanged_devices = ast.literal_eval(maintenance_info.unchanged_devices)
 
             for device in unchanged_devices:
-                if int(device['id']) in id_devices_selecteds:
-                    all_devices_selecteds.append(device)
+                if int(device['id']) in id_devices_selected:
+                    all_devices_selected.append(device)
 
         except ObjectDoesNotExist as err:
             message_error = {
                 'error': True,
-                'message': f'Ocorreu um erro ao recuperar/salvar informações no banco. Erro {err}'
+                'message': f'Ocorreu um erro ao recuperar informações no banco. Erro {err}'
             }
             return HttpResponse(json.dumps(message_error))
 
@@ -200,7 +197,7 @@ class Utility:
             url = 'https://nmt.nmultifibra.com.br/olt/migration-commands'
             headers_request = {"Content-Type": "application/json; charset=utf-8"}
             options_request = json.dumps({
-                'onts': all_devices_selecteds,
+                'onts': all_devices_selected,
                 'gpon': destination_gpon['gpon'],
                 'host': destination_gpon['host'],
                 'name': file_name,
@@ -209,12 +206,12 @@ class Utility:
             })
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
-            commads_response = commands.json()
+            commands_response = commands.json()
             data_to_update = {
                 'file_name': file_name,
                 'destination_gpon': destination_gpon,
-                'selected_devices': all_devices_selecteds,
-                'commands_url': commads_response
+                'selected_devices': all_devices_selected,
+                'commands_url': commands_response
             }
 
             Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)

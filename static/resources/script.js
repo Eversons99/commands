@@ -58,9 +58,10 @@ function setIdentificator() {
     window.sessionStorage.setItem('tabId', identificatorTab)
 }
 
-async function searchOnts() {
+async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -88,14 +89,14 @@ async function searchOnts() {
         })
     }
 
-    const ontsRequest = await fetch('http://192.168.18.8:8000/generator/search_onts_via_snmp', requestOptions)
-    const responsOfontsRequest = await ontsRequest.json()
+    const ontsRequest = await fetch(`${baseUrl}/search_onts_via_snmp`, requestOptions)
+    const responseRequest = await ontsRequest.json()
     
-    if (responsOfontsRequest.error == true) {
-        return window.location = `http://192.168.18.8:8000/generator/search_onts_via_ssh?tab_id=${tabId}`
+    if (responseRequest.error == true) {
+        return window.location = `${baseUrl}/search_onts_via_ssh?tab_id=${tabId}`
     }
 
-    return window.location = `http://192.168.18.8:8000/generator/render_onts_table?tab_id=${tabId}` 
+    return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
 }
 
 function getIdentificator() {
@@ -118,19 +119,20 @@ function selectAllDevices() {
     markSelectedItem()
 }
 
-async function generateCommands() {
+async function generateCommands(operationMode) {
     loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const allDevices = document.querySelectorAll('#cbx-single-item')
-    const idDevicesSelecteds = []
+    const idDevicesSelected = []
 
     allDevices.forEach((device) => {
         if (device.checked) {
             const deviceId = device.parentNode.parentNode.children[1].innerHTML
-            idDevicesSelecteds.push(Number(deviceId))
+            idDevicesSelected.push(Number(deviceId))
         }
     })
 
-    if (idDevicesSelecteds.length == 0) {
+    if (idDevicesSelected.length == 0) {
         loadingAnimation(false)
         return alert('Selecione ao menos um dispositivo')
     }
@@ -163,18 +165,18 @@ async function generateCommands() {
             tabId,
             destinationGpon,
             fileName,
-            idDevicesSelecteds
+            idDevicesSelected
         })
     }
 
-    let getCommands = await fetch('http://192.168.18.8:8000/generator/get_commands', requestOptions)
+    let getCommands = await fetch(`${baseUrl}/get_commands`, requestOptions)
     getCommands = await getCommands.json()
     
     if (getCommands.error) {
         messageError =  getCommands.message
-        return window.location = `http://192.168.18.8:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
-    return window.location = `http://192.168.18.8:8000/generator/render_page_commands?tab_id=${tabId}` 
+    return window.location = `${baseUrl}/render_page_commands?tab_id=${tabId}`
 }
 
 function markSelectedItem() {
@@ -230,8 +232,9 @@ function resultsButton(e) {
     }
 }
 
-async function searchOntsViaSsh() {
+async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -266,14 +269,78 @@ async function searchOntsViaSsh() {
         } else if (currentMessage.message == "No ont were found") {
             socket.close()
             alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
-            return window.location = "http://192.168.18.8:8000/generator/home"
+            return window.location =  `${baseUrl}/home`
         }
     }
 
     socket.onclose = () => {
         console.log('Sessão com o servidor Websocket finalizada')
-        return window.location = `http://192.168.18.8:8000/generator/render_onts_table?tab_id=${tabId}`
+        return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
     }
 }
+
+async function saveInitialAttenuation () {
+    loadingAnimation(true)
+    const baseUrl = "http://10.0.30.157:8000/attenuator"
+    allDevicesSelected = await checkIfAllDevicesIsSelected()
+    console.log(allDevicesSelected)
+
+    if (!allDevicesSelected) {
+        loadingAnimation(true)
+        return alert('Você precisa selecionar todos os dispositivos')
+    }
+
+    const gponInfo = getMaintenanceInfoFromForm()
+    console.log(gponInfo)
+
+    let a = [1,2,3,4,5]
+
+    for (let n in a) {
+        console.log(n)
+    }
+
+
+
+}
+
+function getMaintenanceInfoFromForm () {
+    const destinationHost = document.getElementById('select-olt').value
+    const destinationSlot = document.getElementById('select-slot').value
+    const destinationPort = document.getElementById('select-port').value
+    const fileName = document.getElementById('file-name').value
+    const tabId = getIdentificator()
+
+    if (!destinationHost || !destinationSlot || !destinationPort) {
+        loadingAnimation(false)
+        return alert('Preecha o F/S/P para prosseguir')
+    } else if (!fileName) {
+        loadingAnimation(false)
+        return alert('Digite um nome para o seu arquivo para prosseguir')
+    }
+
+    return {
+        destinationGpon: {
+            'host': destinationHost,
+            'gpon': `0/${destinationSlot}/${destinationPort}`
+        },
+        fileName,
+        tab_id
+    }
+}
+
+async function checkIfAllDevicesIsSelected ()  {
+    const allDevices = document.querySelectorAll('#cbx-single-item')
+    let allSelected = true
+
+    for (let device of allDevices) {
+            if (!device.checked) {
+            allSelected = false
+            break
+        }
+    }
+
+    return allSelected
+}
+
 
 
