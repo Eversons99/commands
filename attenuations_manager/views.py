@@ -52,8 +52,13 @@ def save_initial_attenuation_state(request):
             register_id = body_request.get('tabId')
             file_name = body_request.get('fileName')
             destination_gpon = body_request.get('fileName')
+            all_onts_id = body_request.get('unchangedDevices')
 
-            maintenance_info = {'file_name': file_name, 'destination_gpon': destination_gpon}
+            maintenance_info = {
+                'file_name': file_name,
+                'destination_gpon': destination_gpon,
+                'attenuations': [{'attenuation_id': 0, "onts": all_onts_id}]
+            }
             data_to_update = maintenance_info
             Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
@@ -74,7 +79,14 @@ def render_attenuations_page(request):
         db_model = AttenuatorDB
         register_id = request.GET.get('tab_id')
         maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
-        maintenance_info
+        print(maintenance_info)
+
+        attenuations = {
+
+        }
+
+        error = {'message': 'Mensagem de erro'}
+        return render(request, 'error.html', context=error)
 
 
 def render_error_page(request):

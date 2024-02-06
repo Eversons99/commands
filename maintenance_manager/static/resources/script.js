@@ -61,7 +61,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -120,7 +120,7 @@ function selectAllDevices() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000/generator"
+    const baseUrl = "http://192.168.18.8:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {
@@ -214,7 +214,7 @@ function resultsButton(e) {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -261,7 +261,7 @@ async function searchOntsViaSsh(operationMode) {
 
 async function saveInitialAttenuationState () {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000/attenuator"
+    const baseUrl = "http://192.168.18.8:8000/attenuator"
     allDevicesSelected = checkIfAllDevicesIsSelected()
 
     if (!allDevicesSelected) {
