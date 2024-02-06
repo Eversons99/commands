@@ -1,0 +1,17 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'partials/attenuations_manager_title.html' %}
+
+<table id="attenuations-table">
+    {% for attenuation in attenuations %}
+    <tr>
+        <button id="attenuation-{{ attenuation.attenuation_id }}" onclick="showAttenuation({{ attenuation.attenuation_id }})">
+            Atenuação {{ attenuation.attenuation_id }}
+        </button>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

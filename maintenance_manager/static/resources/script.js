@@ -61,7 +61,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -120,7 +120,7 @@ function selectAllDevices() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000/generator"
+    const baseUrl = "http://10.0.30.157:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {
@@ -214,7 +214,7 @@ function resultsButton(e) {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -259,9 +259,9 @@ async function searchOntsViaSsh(operationMode) {
     }
 }
 
-async function saveInitialAttenuationState () {
+async function saveInitialAttenuationState() {
     loadingAnimation(true)
-    const baseUrl = "http://192.168.18.8:8000/attenuator"
+    const baseUrl = "http://10.0.30.157:8000/attenuator"
     allDevicesSelected = checkIfAllDevicesIsSelected()
 
     if (!allDevicesSelected) {
@@ -301,7 +301,7 @@ async function saveInitialAttenuationState () {
     return window.location = `${baseUrl}/render_attenuations_page?tab_id=${maintenanceInfo.tabId}`
 }
 
-function getMaintenanceInfoFromForm () {
+function getMaintenanceInfoFromForm() {
     const destinationHost = document.getElementById('select-olt').value
     const destinationSlot = document.getElementById('select-slot').value
     const destinationPort = document.getElementById('select-port').value
@@ -327,7 +327,7 @@ function getMaintenanceInfoFromForm () {
     return gponInfo
 }
 
-function checkIfAllDevicesIsSelected ()  {
+function checkIfAllDevicesIsSelected()  {
     const allDevices = document.querySelectorAll('#cbx-single-item')
     let allSelected = true
 
@@ -340,7 +340,7 @@ function checkIfAllDevicesIsSelected ()  {
     return allSelected
 }
 
-function getIdDevicesSelected () {
+function getIdDevicesSelected() {
     const allDevices = document.querySelectorAll('#cbx-single-item')
     const idDevicesSelected = []
 
@@ -353,4 +353,42 @@ function getIdDevicesSelected () {
     return idDevicesSelected
 }
 
+async function showAttenuation(attenuationId) {
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator()
+        })
+    }
+
+    let allAttenuations = await fetch('http://10.0.30.157:8000/attenuator/get_onts_to_render', requestOptions)
+    allAttenuations = await allAttenuations.json()
+    ontsInAttenuation = getOntsInAttenuation(attenuationId, allAttenuations)
+    console.log(ontsInAttenuation)
+
+}
+
+function getOntsInAttenuation(attenuationId, allAttenuations) {
+    onts = []
+    unchangedDevices = JSON.parse(allAttenuations.unchanged_devices.replaceAll("'", '"'))
+    attenuations = allAttenuations.attenuations
+
+    attenuations.forEach((attenuation) => {
+        if (attenuationId == attenuation.attenuation_id) {
+            unchangedDevices.forEach((device) => {
+                allIdsInAttenuation = attenuation.onts
+                ontId = device.id
+                if (allIdsInAttenuation.includes(Number(ontId))){
+                    onts.push(device)
+                }
+            })
+        }
+    })
+
+    return onts
+}
 

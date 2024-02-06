@@ -79,14 +79,31 @@ def render_attenuations_page(request):
         db_model = AttenuatorDB
         register_id = request.GET.get('tab_id')
         maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
-        print(maintenance_info)
 
-        attenuations = {
-
+        attenuations_context = {
+            "attenuations": maintenance_info.attenuations
         }
 
-        error = {'message': 'Mensagem de erro'}
-        return render(request, 'error.html', context=error)
+        return render(request, 'attenuationsPage.html', context=attenuations_context)
+
+    return redirect('home')
+
+
+def get_onts_to_render(request):
+    if request.method == 'POST':
+        body_request = json.loads(request.body)
+        register_id = body_request.get('tabId')
+        db_model = AttenuatorDB
+        maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
+
+        onts = {
+            "attenuations": maintenance_info.attenuations,
+            "unchanged_devices": maintenance_info.unchanged_devices
+        }
+
+        return HttpResponse(json.dumps(onts))
+
+
 
 
 def render_error_page(request):

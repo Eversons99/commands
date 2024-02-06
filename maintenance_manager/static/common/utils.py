@@ -27,8 +27,8 @@ class Utility:
             return HttpResponse(response_message, status=400)
 
         initial_maintenance_info = {
-            'tab_id': tab_id,
-            'source_gpon': source_gpon,
+            "tab_id": tab_id,
+            "source_gpon": source_gpon,
         }
 
         ont_devices = Utility.get_onts_info_on_nmt(source_host, source_pon)
@@ -38,7 +38,7 @@ class Utility:
             response_error = json.dumps(ont_devices)
             return HttpResponse(response_error)
 
-        initial_maintenance_info['unchanged_devices'] = ont_devices['onts']
+        initial_maintenance_info["unchanged_devices"] = ont_devices["onts"]
         save_maintenance_info = Utility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
         return HttpResponse(json.dumps(save_maintenance_info))
 
@@ -247,10 +247,10 @@ class Utility:
         try:
             commands = Utility.get_maintenance_info_in_database(register_id, db_model)
             all_commands = {
-                'error': False,
-                'delete_commands': requests.get(commands.commands_url.get('deleteCommands')).text,
-                'interface_commands': requests.get(commands.commands_url.get('interfaceCommands')).text,
-                'global_commands': requests.get(commands.commands_url.get('globalCommands')).text
+                "error": False,
+                "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
+                "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
+                "global_commands": requests.get(commands.commands_url.get("globalCommands")).text
             }
 
             return all_commands
@@ -269,10 +269,10 @@ class Utility:
         Makes a request to update a record on database
         """
         request_body = json.loads(request.body)
-        register_id = request_body.get('tab_id')
-        onts = request_body.get('onts')
+        register_id = request_body.get("tab_id")
+        onts = request_body.get("onts")
 
-        data_to_update = {'unchanged_devices': onts}
+        data_to_update = {"unchanged_devices": onts}
         Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
         return HttpResponse(status=200)
