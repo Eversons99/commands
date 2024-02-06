@@ -4,14 +4,26 @@
 
 {% include 'partials/attenuations_manager_title.html' %}
 
-<table id="attenuations-table">
-    {% for attenuation in attenuations %}
-    <tr>
-        <button id="attenuation-{{ attenuation.attenuation_id }}" onclick="showAttenuation({{ attenuation.attenuation_id }})">
-            Atenuação {{ attenuation.attenuation_id }}
-        </button>
-    </tr>
-    {% endfor %}
-</table>
+    <table id="attenuations-table">
+        {% for attenuation in attenuations %}
+            <tr>
+                <td>
+                    <button id="attenuation-{{ attenuation.attenuation_id }}" onclick="showAttenuation({{ attenuation.attenuation_id }})">
+                        Atenuação {{ attenuation.attenuation_id }}
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div id="container-onts-table">
+        <table id="onts-table">
+            <tr>
+                <td>ID</td>
+                <td>Serial Number</td>
+            </tr>
+        </table>
+    </div>
+
 
 {% endblock %}

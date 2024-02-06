@@ -368,8 +368,10 @@ async function showAttenuation(attenuationId) {
     let allAttenuations = await fetch('http://10.0.30.157:8000/attenuator/get_onts_to_render', requestOptions)
     allAttenuations = await allAttenuations.json()
     ontsInAttenuation = getOntsInAttenuation(attenuationId, allAttenuations)
-    console.log(ontsInAttenuation)
 
+    if(ontsInAttenuation.length == 0) return alert('Ocorreu um problema ao buscar as atenuações')
+
+    renderAttenuationPage(ontsInAttenuation, attenuationId)
 }
 
 function getOntsInAttenuation(attenuationId, allAttenuations) {
@@ -392,3 +394,32 @@ function getOntsInAttenuation(attenuationId, allAttenuations) {
     return onts
 }
 
+function renderAttenuationPage(ontsInAttenuation, attenuationId) {
+    const table = document.getElementById('onts-table')
+    const containerTable = document.getElementById('container-onts-table')
+    const attenuationsTable =document.getElementById('attenuations-table')
+
+    attenuationsTable.style.display='none'
+
+    ontsInAttenuation.forEach((ont) => {
+        const tr = document.createElement('tr')
+        const idElement = document.createElement('td')
+        const snElement = document.createElement('td')
+        idElement.textContent = ont.id
+        snElement.textContent = ont.sn
+
+        tr.appendChild(idElement)
+        tr.appendChild(snElement)
+        table.appendChild(tr)
+    })
+
+    const holdButton = document.createElement('button')
+    holdButton.textContent = 'Manter'
+    containerTable.appendChild(holdButton)
+
+    if (attenuationId != 0) {
+        const discardButton = document.createElement('button')
+        discardButton.textContent = 'Descartar'
+        containerTable.appendChild(discardButton)
+    }
+}
