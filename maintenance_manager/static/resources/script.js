@@ -456,3 +456,14 @@ async function discardAttenuation(attenuationId) {
 async function maintainAttenuation() {
     window.location.reload()
 }
+
+async function nextAttenuation() {
+    loadingAnimation(true)
+    const tabId = getIdentificator()
+    window.location = `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${tabId}`
+}
+
+async function endAttenuation() {
+
+}
+

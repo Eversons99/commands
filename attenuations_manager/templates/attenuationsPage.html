@@ -3,6 +3,7 @@
 {% block content %}
 
 {% include 'partials/attenuations_manager_title.html' %}
+    <div>Manutenção: {{ name }}</div>
 
     <table id="attenuations-table">
         {% for attenuation in attenuations %}
@@ -26,9 +27,8 @@
     </div>
 
     <div>
-        <button>Finalizar Atenuações</button>
-        <button>Coletar Próxima Atenuação</button>
+        <button onclick="endAttenuation()">Finalizar Atenuações</button>
+        <button onclick="nextAttenuation()">Coletar Próxima Atenuação</button>
     </div>
-
 
 {% endblock %}

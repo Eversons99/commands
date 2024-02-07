@@ -1,3 +1,4 @@
+import ast
 import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
@@ -81,7 +82,8 @@ def render_attenuations_page(request):
         maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
 
         attenuations_context = {
-            "attenuations": maintenance_info.attenuations
+            "attenuations": maintenance_info.attenuations,
+            "name": maintenance_info.file_name
         }
 
         return render(request, 'attenuationsPage.html', context=attenuations_context)
@@ -115,6 +117,34 @@ def discard_attenuation(request):
 
         return HttpResponse(json.dumps(delete_attenuation))
 
+
+def next_attenuation(request):
+    if request.method == 'GET':
+        register_id = request.GET.get('tab_id')
+        db_model = AttenuatorDB
+        maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
+
+        host = maintenance_info.source_gpon.get('host')
+        pon_location = maintenance_info.source_gpon.get('gpon')
+        all_attenuations = maintenance_info.attenuations
+        old_onts = ast.literal_eval(maintenance_info.unchanged_devices)
+
+        all_onts = Utility.get_onts_info_on_nmt(host, pon_location)
+        onts = all_onts.get('onts')
+
+        separated_onts = separate_offline_onts(old_onts, onts)
+        id_current_attenuation = len(all_attenuations) + 1
+        save_current_attenuation = save_attenuation(separated_onts, all_attenuations)
+        context_next_attenuation = {
+            'onts': separated_onts,
+            'name': maintenance_info.file_name,
+            'total_offline_onts': len(separated_onts),
+            'current_attenuation_id': id_current_attenuation
+        }
+
+        return render(request, 'nextAttenuationPage.html', context=context_next_attenuation)
+
+
 def render_error_page(request):
     """
     Renders error page, showing the personalised error message
@@ -122,3 +152,24 @@ def render_error_page(request):
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
 
+
+def separate_offline_onts(old_onts, onts):
+    separated_off_onts = []
+
+    for ont in onts:
+        ont_status = ont.get('status')
+        ont_sn = ont.get('sn')
+
+        if ont_status == 2:
+            for old_ont in old_onts:
+                old_ont_status = old_ont.get('status')
+                old_ont_sn = old_ont.get('sn')
+
+                if ont_sn == old_ont_sn and ont_status != old_ont_status:
+                    separated_off_onts.append(ont)
+
+    return separated_off_onts
+
+
+def save_attenuation(current_attenuation, attenuation_id):
+    pass
