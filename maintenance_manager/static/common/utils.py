@@ -277,3 +277,20 @@ class Utility:
 
         return HttpResponse(status=200)
 
+    @staticmethod
+    def discard_single_attenuation(db_model, register_id, attenuation_id):
+        maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
+        all_attenuations = maintenance_info.attenuations
+        id_to_remove = attenuation_id
+
+        for attenuation in all_attenuations:
+            current_attenuation_id = attenuation.get('attenuation_id')
+
+            if current_attenuation_id == id_to_remove:
+                maintenance_info.attenuations.remove(attenuation)
+                data_to_update = {"attenuations": all_attenuations}
+                Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+
+                return {'error': False}
+
+        return {'error': True}

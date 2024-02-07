@@ -7,5 +7,6 @@ urlpatterns = [
     path('render_onts_table', views.render_onts_table, name="render_onts_table"),
     path('save_initial_attenuation_state', views.save_initial_attenuation_state, name="save_initial_attenuation_state"),
     path('render_attenuations_page', views.render_attenuations_page, name="render_attenuations_page"),
-    path('get_onts_to_render', views.get_onts_to_render, name="get_onts_to_render")
+    path('get_onts_to_render', views.get_onts_to_render, name="get_onts_to_render"),
+    path('discard_attenuation', views.discard_attenuation, name="discard_attenuation")
 ]

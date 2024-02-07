@@ -399,7 +399,8 @@ function renderAttenuationPage(ontsInAttenuation, attenuationId) {
     const containerTable = document.getElementById('container-onts-table')
     const attenuationsTable =document.getElementById('attenuations-table')
 
-    attenuationsTable.style.display='none'
+    containerTable.style.display = 'block'
+    attenuationsTable.style.display = 'none'
 
     ontsInAttenuation.forEach((ont) => {
         const tr = document.createElement('tr')
@@ -408,18 +409,50 @@ function renderAttenuationPage(ontsInAttenuation, attenuationId) {
         idElement.textContent = ont.id
         snElement.textContent = ont.sn
 
-        tr.appendChild(idElement)
-        tr.appendChild(snElement)
-        table.appendChild(tr)
+        tr.append(idElement, snElement)
+        table.append(tr)
     })
 
     const holdButton = document.createElement('button')
     holdButton.textContent = 'Manter'
+    holdButton.setAttribute('onclick', 'maintainAttenuation()')
     containerTable.appendChild(holdButton)
 
     if (attenuationId != 0) {
         const discardButton = document.createElement('button')
         discardButton.textContent = 'Descartar'
+        discardButton.setAttribute('onclick', `discardAttenuation(${attenuationId})`)
         containerTable.appendChild(discardButton)
     }
+}
+
+async function discardAttenuation(attenuationId) {
+    loadingAnimation(true)
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator(),
+            'attenuationId': attenuationId
+        })
+    }
+
+    let discardSingleAttenuation = await fetch('http://10.0.30.157:8000/attenuator/discard_attenuation', requestOptions)
+    discardSingleAttenuation = await discardSingleAttenuation.json()
+    console.log(discardSingleAttenuation)
+
+    if (discardSingleAttenuation.error) {
+        return alert('Ocorreu um erro ao remover a atenuação')
+    }
+
+    alert(`Atenuação ${attenuationId} removida com sucesso`)
+    return window.location.reload()
+}
+
+async function maintainAttenuation() {
+    window.location.reload()
 }

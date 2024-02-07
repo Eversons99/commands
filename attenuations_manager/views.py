@@ -104,7 +104,16 @@ def get_onts_to_render(request):
         return HttpResponse(json.dumps(onts))
 
 
+def discard_attenuation(request):
+    if request.method == 'POST':
+        body_request = json.loads(request.body)
+        register_id = body_request.get('tabId')
+        attenuation_id = body_request.get('attenuationId')
+        db_model = AttenuatorDB
 
+        delete_attenuation = Utility.discard_single_attenuation(db_model, register_id, attenuation_id)
+
+        return HttpResponse(json.dumps(delete_attenuation))
 
 def render_error_page(request):
     """
