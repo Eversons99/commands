@@ -58,7 +58,7 @@ def save_initial_attenuation_state(request):
             maintenance_info = {
                 'file_name': file_name,
                 'destination_gpon': destination_gpon,
-                'attenuations': [{'attenuation_id': 0, "onts": all_onts_id}]
+                'attenuations': [{"attenuation_id": 0, "onts": all_onts_id}]
             }
             data_to_update = maintenance_info
             Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
@@ -123,7 +123,6 @@ def next_attenuation(request):
         register_id = request.GET.get('tab_id')
         db_model = AttenuatorDB
         maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
-
         host = maintenance_info.source_gpon.get('host')
         pon_location = maintenance_info.source_gpon.get('gpon')
         all_attenuations = maintenance_info.attenuations
@@ -132,16 +131,21 @@ def next_attenuation(request):
         all_onts = Utility.get_onts_info_on_nmt(host, pon_location)
         onts = all_onts.get('onts')
 
-        separated_onts = separate_offline_onts(old_onts, onts)
-        id_current_attenuation = len(all_attenuations) + 1
-        save_current_attenuation = save_attenuation(separated_onts, all_attenuations)
+        onts_in_current_attenuation = separate_offline_onts_in_attenuation(old_onts, onts)
+        id_current_attenuation = get_id_of_current_attenuation(all_attenuations)
+
         context_next_attenuation = {
-            'onts': separated_onts,
+            'onts': onts_in_current_attenuation,
             'name': maintenance_info.file_name,
-            'total_offline_onts': len(separated_onts),
-            'current_attenuation_id': id_current_attenuation
+            'total_offline_onts': len(onts_in_current_attenuation),
+            'attenuation_id': id_current_attenuation,
+            'attenuations': all_attenuations
         }
 
+        if len(onts_in_current_attenuation) == 0:
+            return render(request, 'nextAttenuationPage.html', context=context_next_attenuation)
+
+        save_attenuation(register_id, onts_in_current_attenuation, all_attenuations)
         return render(request, 'nextAttenuationPage.html', context=context_next_attenuation)
 
 
@@ -153,7 +157,7 @@ def render_error_page(request):
     return render(request, 'error.html', context=error_message)
 
 
-def separate_offline_onts(old_onts, onts):
+def separate_offline_onts_in_attenuation(old_onts, onts):
     separated_off_onts = []
 
     for ont in onts:
@@ -171,5 +175,30 @@ def separate_offline_onts(old_onts, onts):
     return separated_off_onts
 
 
-def save_attenuation(current_attenuation, attenuation_id):
-    pass
+def save_attenuation(register_id, onts_in_current_attenuation, all_attenuations):
+    id_of_onts = []
+    db_model = AttenuatorDB
+
+    for ont in onts_in_current_attenuation:
+        ont_id = ont.get('id')
+        id_of_onts.append(ont_id)
+
+    current_attenuation = {
+        "attenuation_id": get_id_of_current_attenuation(all_attenuations),
+        "onts": id_of_onts
+    }
+
+    all_attenuations.append(current_attenuation)
+
+    data_to_update = {
+        "attenuations": all_attenuations
+    }
+
+    Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+
+
+def get_id_of_current_attenuation(all_attenuations):
+    if len(all_attenuations) == 1:
+        return 1
+    else:
+        return len(all_attenuations) - 1

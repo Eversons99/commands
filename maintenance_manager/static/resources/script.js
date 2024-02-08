@@ -375,16 +375,17 @@ async function showAttenuation(attenuationId) {
 }
 
 function getOntsInAttenuation(attenuationId, allAttenuations) {
-    onts = []
-    unchangedDevices = JSON.parse(allAttenuations.unchanged_devices.replaceAll("'", '"'))
-    attenuations = allAttenuations.attenuations
+    const onts = []
+    const unchangedDevices = JSON.parse(allAttenuations.unchanged_devices.replaceAll("'", '"'))
+    const attenuations = allAttenuations.attenuations
 
     attenuations.forEach((attenuation) => {
         if (attenuationId == attenuation.attenuation_id) {
             unchangedDevices.forEach((device) => {
-                allIdsInAttenuation = attenuation.onts
-                ontId = device.id
-                if (allIdsInAttenuation.includes(Number(ontId))){
+                const allIdsInAttenuation = attenuation.onts
+                const ontId = device.id.toString()
+
+                if (allIdsInAttenuation.includes(ontId)){
                     onts.push(device)
                 }
             })
@@ -454,13 +455,14 @@ async function discardAttenuation(attenuationId) {
 }
 
 async function maintainAttenuation() {
-    window.location.reload()
+    const tabId = getIdentificator()
+    return window.location = `http://10.0.30.157:8000/attenuator/render_attenuations_page?tab_id=${tabId}`
 }
 
 async function nextAttenuation() {
     loadingAnimation(true)
     const tabId = getIdentificator()
-    window.location = `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${tabId}`
+    return window.location = `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${tabId}`
 }
 
 async function endAttenuation() {

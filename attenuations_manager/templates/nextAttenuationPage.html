@@ -4,7 +4,10 @@
 {% include 'partials/attenuations_manager_title.html' %}
     <div>Manutenção: {{ name }}</div>
     {% if total_offline_onts == 0 %}
-        <p>Nenhuma ont caiu nesta atenuação</p>
+        <h1>Nenhuma ont caiu nesta atenuação</h1>
+
+        {% include 'attenuationsPagePartial.html' %}
+
     {% else %}
         <table>
             {% for ont in onts %}
@@ -19,10 +22,8 @@
         </div>
 
         <div>
-            <button onclick="">Manter Atenuação</button>
-            <button onclick="">Descartar Atenuação</button>
+            <button onclick="maintainAttenuation()">Manter Atenuação</button>
+            <button onclick="discardAttenuation({{ attenuation_id }})">Descartar Atenuação</button>
         </div>
-
     {% endif %}
-    <button onclick="nextAttenuation()">Coletar Próxima Atenuação</button>
 {% endblock %}
