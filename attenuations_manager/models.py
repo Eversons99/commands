@@ -5,11 +5,11 @@ class AttenuatorDB(models.Model):
     """
     Table which save data from attenuations manager
     """
-    tab_id = models.TextField(max_length=150, primary_key=True)
+    register_id = models.TextField(max_length=150, primary_key=True)
     file_name = models.TextField(max_length=150, null=True)
     source_gpon = models.JSONField(null=True)
     destination_gpon = models.JSONField(null=True)
-    unchanged_devices = models.TextField(null=True)
+    unchanged_onts = models.TextField(null=True)
     selected_devices = models.TextField(null=True)
     commands_url = models.JSONField(null=True)
     search_mode = models.TextField(null=True)

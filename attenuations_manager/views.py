@@ -1,14 +1,17 @@
-import ast
 import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
-from maintenance_manager.static.common.utils import Utility
+from maintenance_manager.static.common.utils import GeneralUtility
+from attenuations_service import AttenuationUtility
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
 
 
 def home(request):
-    return render(request, 'attenuationsIndex.html')
+    """
+    Renders the HTML index page
+    """
+    return render(request, 'homepageAttenuations.html')
 
 
 def search_onts_via_snmp(request):
@@ -17,7 +20,7 @@ def search_onts_via_snmp(request):
     """
     if request.method == 'POST':
         db_model = AttenuatorDB
-        onts_info = Utility.get_onts_via_snmp(request, db_model)
+        onts_info = GeneralUtility.get_onts_via_snmp(request, db_model)
         return onts_info
 
     return redirect(home)
@@ -30,7 +33,7 @@ def render_onts_table(request):
     if request.method == "GET":
         try:
             db_model = AttenuatorDB
-            onts_info = Utility.get_onts_on_database(request, db_model)
+            onts_info = GeneralUtility.get_unchanged_onts_on_database(request, db_model)
 
             if onts_info.get('error'):
                 return render(request, 'error.html', context=onts_info)
@@ -44,42 +47,30 @@ def render_onts_table(request):
 
             return render(request, 'error.html', context=error_message)
 
+    return redirect(home)
+
 
 def save_initial_attenuation_state(request):
+    """
+    Save the main the unchanged onts on database, this save the inital state of all devices(onts) 
+    """
     if request.method == 'POST':
-        try:
-            db_model = AttenuatorDB
-            body_request = json.loads(request.body)
-            register_id = body_request.get('tabId')
-            file_name = body_request.get('fileName')
-            destination_gpon = body_request.get('fileName')
-            all_onts_id = body_request.get('unchangedDevices')
+        db_model = AttenuatorDB
+        save_main_attenuation = AttenuationUtility.save_unchanged_onts_as_first_attenuation(request, db_model)
+        
+        return HttpResponse(json.dumps(save_main_attenuation))
 
-            maintenance_info = {
-                'file_name': file_name,
-                'destination_gpon': destination_gpon,
-                'attenuations': [{"attenuation_id": 0, "onts": all_onts_id}]
-            }
-            data_to_update = maintenance_info
-            Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
-
-            success_response = {'error': False}
-            return HttpResponse(json.dumps(success_response))
-
-        except Exception as err:
-            error_response = {
-                'error': True,
-                'message': f'Ocorreu um erro ao salvar o estado inicial das atenuações. Error: {err}'
-            }
-
-            return HttpResponse(json.dumps(error_response))
+    return redirect(home)
 
 
 def render_attenuations_page(request):
+    """
+    Get attenuations info on database then render it in an html template
+    """
     if request.method == 'GET':
         db_model = AttenuatorDB
         register_id = request.GET.get('tab_id')
-        maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
 
         attenuations_context = {
             "attenuations": maintenance_info.attenuations,
@@ -88,65 +79,63 @@ def render_attenuations_page(request):
 
         return render(request, 'attenuationsPage.html', context=attenuations_context)
 
-    return redirect('home')
+    return redirect(home)
 
 
 def get_onts_to_render(request):
+    """
+    Query the database and return the maintenance info
+    """
     if request.method == 'POST':
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
         db_model = AttenuatorDB
-        maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
 
         onts = {
             "attenuations": maintenance_info.attenuations,
-            "unchanged_devices": maintenance_info.unchanged_devices
+            "unchanged_onts": maintenance_info.unchanged_onts
         }
 
         return HttpResponse(json.dumps(onts))
 
+    return redirect(home)
+
 
 def discard_attenuation(request):
+    """
+    Query the database and delete one register (that is an specific attenuation)
+    """
     if request.method == 'POST':
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
         attenuation_id = body_request.get('attenuationId')
         db_model = AttenuatorDB
 
-        delete_attenuation = Utility.discard_single_attenuation(db_model, register_id, attenuation_id)
+        delete_attenuation = AttenuationUtility.discard_single_attenuation(db_model, register_id, attenuation_id)
 
         return HttpResponse(json.dumps(delete_attenuation))
 
+    return redirect(home)
+
 
 def next_attenuation(request):
+    """
+    Make a new query to get onts and analize to find changes on onts status
+    """
     if request.method == 'GET':
-        register_id = request.GET.get('tab_id')
         db_model = AttenuatorDB
-        maintenance_info = Utility.get_maintenance_info_in_database(register_id, db_model)
-        host = maintenance_info.source_gpon.get('host')
-        pon_location = maintenance_info.source_gpon.get('gpon')
-        all_attenuations = maintenance_info.attenuations
-        old_onts = ast.literal_eval(maintenance_info.unchanged_devices)
-
-        all_onts = Utility.get_onts_info_on_nmt(host, pon_location)
-        onts = all_onts.get('onts')
-
-        onts_in_current_attenuation = separate_offline_onts_in_attenuation(old_onts, onts)
-        id_current_attenuation = get_id_of_current_attenuation(all_attenuations)
-
-        context_next_attenuation = {
-            'onts': onts_in_current_attenuation,
-            'name': maintenance_info.file_name,
-            'total_offline_onts': len(onts_in_current_attenuation),
-            'attenuation_id': id_current_attenuation,
-            'attenuations': all_attenuations
-        }
+        next_attenuation_info = AttenuationUtility.get_next_attenuation(request, db_model)
+        onts_in_current_attenuation = next_attenuation_info.get('onts')
+        all_attenuations =  next_attenuation_info.get('all_attenuations')
 
         if len(onts_in_current_attenuation) == 0:
-            return render(request, 'nextAttenuationPage.html', context=context_next_attenuation)
+            return render(request, 'nextAttenuationPage.html', context=next_attenuation_info)
 
-        save_attenuation(register_id, onts_in_current_attenuation, all_attenuations)
-        return render(request, 'nextAttenuationPage.html', context=context_next_attenuation)
+        AttenuationUtility.save_attenuation(request, db_model, onts_in_current_attenuation, all_attenuations)
+        return render(request, 'nextAttenuationPage.html', context=next_attenuation_info)
+
+    return redirect(home)
 
 
 def render_error_page(request):
@@ -155,50 +144,3 @@ def render_error_page(request):
     """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
-
-
-def separate_offline_onts_in_attenuation(old_onts, onts):
-    separated_off_onts = []
-
-    for ont in onts:
-        ont_status = ont.get('status')
-        ont_sn = ont.get('sn')
-
-        if ont_status == 2:
-            for old_ont in old_onts:
-                old_ont_status = old_ont.get('status')
-                old_ont_sn = old_ont.get('sn')
-
-                if ont_sn == old_ont_sn and ont_status != old_ont_status:
-                    separated_off_onts.append(ont)
-
-    return separated_off_onts
-
-
-def save_attenuation(register_id, onts_in_current_attenuation, all_attenuations):
-    id_of_onts = []
-    db_model = AttenuatorDB
-
-    for ont in onts_in_current_attenuation:
-        ont_id = ont.get('id')
-        id_of_onts.append(ont_id)
-
-    current_attenuation = {
-        "attenuation_id": get_id_of_current_attenuation(all_attenuations),
-        "onts": id_of_onts
-    }
-
-    all_attenuations.append(current_attenuation)
-
-    data_to_update = {
-        "attenuations": all_attenuations
-    }
-
-    Utility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
-
-
-def get_id_of_current_attenuation(all_attenuations):
-    if len(all_attenuations) == 1:
-        return 1
-    else:
-        return len(all_attenuations) - 1

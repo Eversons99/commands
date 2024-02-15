@@ -2,14 +2,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB 
-from maintenance_manager.static.common.utils import Utility
+from maintenance_manager.static.common.utils import GeneralUtility
 
 
 def home(request):
     """
     Renders the HTML index page
     """
-    return render(request, 'generatorIndex.html')
+    return render(request, 'homepageGenerator.html')
 
 
 def search_onts_via_snmp(request):
@@ -18,7 +18,7 @@ def search_onts_via_snmp(request):
     """
     if request.method == 'POST':
         db_model = GeneratorDB
-        onts_info = Utility.get_onts_via_snmp(request, db_model)
+        onts_info = GeneralUtility.get_onts_via_snmp(request, db_model)
         return onts_info
 
     return redirect(home)
@@ -31,7 +31,7 @@ def render_onts_table(request):
     if request.method == "GET":
         try:
             db_model = GeneratorDB
-            onts_info = Utility.get_onts_on_database(request, db_model)
+            onts_info = GeneralUtility.get_unchanged_onts_on_database(request, db_model)
 
             if onts_info.get('error'):
                 return render(request, 'error.html', context=onts_info)
@@ -45,6 +45,8 @@ def render_onts_table(request):
 
             return render(request, 'error.html', context=error_message)
 
+    return redirect(home)
+
 
 def get_commands(request):
     """
@@ -52,7 +54,7 @@ def get_commands(request):
     """
     if request.method == 'POST':
         db_model = GeneratorDB
-        commands = Utility.generate_commands(request, db_model)
+        commands = GeneralUtility.generate_commands(request, db_model)
 
         return commands
 
@@ -64,7 +66,7 @@ def search_onts_via_ssh(request):
     Renders the HTML page to make a new search of ONTs via SSH
     """
     db_model = GeneratorDB
-    query_info = Utility.get_gpon_info_to_query_ssh(request, db_model)
+    query_info = GeneralUtility.get_gpon_info_to_query_ssh(request, db_model)
     query_info['operation_mode'] = 'generator'
 
     if not query_info.get('error'):
@@ -78,7 +80,7 @@ def render_page_commands(request):
     Gets commands info and render commands pages
     """
     db_model = GeneratorDB
-    commands = Utility.get_urls_to_ready_commands(request, db_model)
+    commands = GeneralUtility.get_urls_to_ready_commands(request, db_model)
 
     if commands.get('error'):
         return render(request, 'error.html', context=commands)
@@ -93,9 +95,11 @@ def update_onts_in_database(request):
     """
     if request.method == "POST":
         db_model = GeneratorDB
-        update_status = Utility.update_onts_in_database(request, db_model)
+        update_status = GeneralUtility.update_onts_in_database(request, db_model)
 
         return update_status
+
+    return redirect(home)
 
 
 def render_error_page(request):
@@ -104,4 +108,3 @@ def render_error_page(request):
     """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
-
