@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Sinal</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="modal-loader">
+        <div class="loader"></div>
+        <h2 id="loader-message">Carregando dados...</h2>
+    </div>
+
+    {% csrf_token %}
+
+    <header>
+        <h1>Consulta sinal</h1>
+    </header>
+
+    <section id="query-mode-div">
+        <label for="select-query-mode">Escolha um modo de consulta</label>
+        <select name="select-query-mode" id="select-query-mode">
+            <option value=""></option>
+            <option value="ID do cliente">ID do cliente</option>
+            <option value="Localização PON">Localização PON</option>
+            <option value="CEP">CEP</option>
+        </select>
+        <button onclick="showQueryMode()">Próximo</button>
+    </section>
+
+    <section id="cep">
+        <label for="cep-input">Insira o cep (Apenas números)</label>
+        <input type="number" name="cep-input" id="cep-input">
+        <button onclick="makeSignalQuery('CEP')">Fazer Consulta</button>
+    </section>
+
+    <section id="client-id">
+        <label for="client-id-input">Insira o código do cliente</label>
+        <input type="number" name="client-id-input" id="client-id-input">
+        <button onclick="makeSignalQuery('ID do cliente')">Fazer Consulta</button>
+    </section>
+
+    <section id="pon">
+        <div id="olt">
+            <h2>Selecione a OLT desejada</h2>
+            <select id="select-olt">
+                <option></option>
+                <option class="options">OLT_CCDA_01</option>
+                <option class="options">OLT_COTIA_01</option>
+                <option class="options">OLT_COTIA_02</option>
+                <option class="options">OLT_COTIA_03</option>
+                <option class="options">OLT_COTIA_04</option>
+                <option class="options">OLT_EMBU_01</option>
+                <option class="options">OLT_GRVN_01</option>
+                <option class="options">OLT_ITPV_01</option>
+                <option class="options">OLT_TRMS_01</option>
+                <option class="options">OLT_TRMS_02</option>
+                <option class="options">OLT_VGPA_01</option>
+            </select>
+        </div>
+        <div id="gpon">
+            <h2>Selecione a localização PON desejada</h2>
+            <div id="selects-source-gpon">
+                <select id="select-frame">
+                    <option>0</option>
+                </select>
+                <select id="select-slot">
+                    <option value=""></option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                </select>
+                <select id="select-port">
+                    <option value=""></option>
+                    <option value="1">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <button onclick="makeSignalQuery('Localização PON')">Fazer Consulta</button>
+        </div>
+    </section>
+
+    <script type="text/javascript" src="{% static 'signal.js' %}"></script>
+</body>
+</html>

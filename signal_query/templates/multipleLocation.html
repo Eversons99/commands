@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Localizações PON</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="modal-loader">
+        <div class="loader"></div>
+        <h2 id="loader-message">Carregando dados...</h2>
+    </div>
+    <header>
+        <h3>O cliente tem mais de um login vinculado ao seu cadastro, selecione abaixo qual o login desejado</h3>
+    </div>
+    <section id="multiple-location-pon">
+        <table id="pon-table">
+            <tr id="table-header">
+                <td></td>
+                <td><b>OLT</b></td>
+                <td><b>PON</b></td>
+                <td><b>SN</b></td>
+                <td><b>ENDEREÇO</b></td>
+            </tr>
+            {% for location in locations_pon %}
+                <tr class="pon-table-row">
+                    <td><input type="checkbox" name="" id="checkbox-item"></td>
+                    <td id="loc-olt" >{{ location.olt }}</td>
+                    <td id="loc-pon" >{{ location.pon }}</td>
+                    <td id="loc-mac" >{{ location.mac }}</td>
+                    <td id="loc-address" >{{ location.address }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div>
+            <button onclick="makeSignalQueryByTable()" >Fazer consulta</button>
+        </div>
+    </section>
+
+    <script type="text/javascript" src="{% static 'signal.js' %}"></script>
+</body>
+</html>
