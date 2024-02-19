@@ -118,7 +118,7 @@ async function getSignalAverage(requestInfo) {
     const queryMode = requestInfo.queryMode
     const queryValue = requestInfo.queryValue
 
-    window.location = `http://10.0.30.252:8000/get-signal-information?queryMode=${queryMode}&queryValue=${queryValue}`
+    window.location = `http://10.0.30.252:8000/optical/get-signal-information?queryMode=${queryMode}&queryValue=${queryValue}`
 }
 
 /* 

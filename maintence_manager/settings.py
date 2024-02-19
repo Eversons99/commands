@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['10.0.30.252', 'localhost']
 
 INSTALLED_APPS = [
     #"attenuations_manager",
+    "signal_query",
     "commands_generator",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -123,6 +124,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
+    f'{ABSOLUTE_PATH}/signal_query/static',
     f'{ABSOLUTE_PATH}/commands_generator/static',
     f'{ABSOLUTE_PATH}/maintence_manager/static',
 ]

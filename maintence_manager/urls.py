@@ -19,5 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     #path("attenuation/", include("attenuations_manager.urls")),
     path("generator/", include("commands_generator.urls")),
+    path("optical/", include("signal_query.urls")),
     path("admin/", admin.site.urls),
 ]
