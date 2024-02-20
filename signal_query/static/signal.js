@@ -23,11 +23,7 @@ async function showQueryMode() {
 
     queryModeDiv.style.display = "none"
 
-    if (queryMode == 'CEP') {
-        const cepDiv = document.getElementById('cep')
-        cepDiv.style.display = 'flex'
-
-    } else if (queryMode == 'ID do cliente') {
+    if (queryMode == 'ID do cliente') {
         const clientIdDiv = document.getElementById('client-id')
         clientIdDiv.style.display = 'flex'
 
@@ -42,17 +38,7 @@ Verifica qual o modo de consulta selecionado e faz a chamada para a função que
 consulta de sinal
 */
 async function makeSignalQuery(queryMode){
-    if (queryMode == 'CEP') {
-        const validCep = validInputCep()
-        if (validCep.error) return alert(validCep.message)
-        
-        const requestInfo = {
-            queryMode: 'via_cep',
-            queryValue: validCep.cep
-        }
-        getSignalAverage(requestInfo)
-    
-    } else if (queryMode == 'ID do cliente') {
+    if (queryMode == 'ID do cliente') {
         const validClientId = validInputClientId()
         if (validClientId.error) return alert(validClientId.message)
 
@@ -74,13 +60,6 @@ async function makeSignalQuery(queryMode){
     }
 }
 
-// Valida a entrada do usuário
-function validInputCep() {
-    const cepInput = document.getElementById('cep-input').value
-    if (cepInput.length < 8) return { error: true, message: 'Preencha um cep válido (8 Digitos)' }
-
-    return { cep: cepInput}
-}
 
 // Valida a entrada do usuário
 function validInputClientId() {
@@ -118,7 +97,7 @@ async function getSignalAverage(requestInfo) {
     const queryMode = requestInfo.queryMode
     const queryValue = requestInfo.queryValue
 
-    window.location = `http://10.0.30.252:8000/optical/get-signal-information?queryMode=${queryMode}&queryValue=${queryValue}`
+    window.location = `http://10.0.30.157:8000/get-signal-information?queryMode=${queryMode}&queryValue=${queryValue}`
 }
 
 /* 

@@ -1,27 +1,28 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Erro</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <img src="{% static '/img/error.jfif' %}" alt="" srcset="">
-        <h1>Oops um erro ocorreu</h1>
+      <img src="{% static '/img/error.jfif' %}" alt="" srcset="">
+      <h1>Oops um erro ocorreu</h1>
     </header>
     <section id="message-error-div">
-        <p>{{ message }}</p>
+      <p>{{ message }}</p>
 
-        <div>
-            <button>
-                <a href="http://10.0.30.252:8000/optical/query-signal">
-                  Volte para homepage
-                </a>
-            </button>
-        </div>
+      <div>
+        <button>
+          <a href="http://10.0.30.157:8000/query-signal">
+            Volte para homepage
+          </a>
+        </button>
+      </div>
+
     </section>
 </body>
 </html>
