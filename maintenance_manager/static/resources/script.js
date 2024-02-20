@@ -376,22 +376,27 @@ async function showAttenuation(attenuationId) {
 
 function getOntsInAttenuation(attenuationId, allAttenuations) {
     const onts = []
-    const unchangedDevices = JSON.parse(allAttenuations.unchanged_devices.replaceAll("'", '"'))
+    const unchangedOnts = JSON.parse(allAttenuations.unchanged_onts.replaceAll("'", '"'))
     const attenuations = allAttenuations.attenuations
+
+    if (attenuationId == 0) {
+        return unchangedOnts
+    }
 
     attenuations.forEach((attenuation) => {
         if (attenuationId == attenuation.attenuation_id) {
-            unchangedDevices.forEach((device) => {
+
+            unchangedOnts.forEach((ont) => {
                 const allIdsInAttenuation = attenuation.onts
-                const ontId = device.id.toString()
+                const ontId = ont.id.toString()
 
                 if (allIdsInAttenuation.includes(ontId)){
-                    onts.push(device)
+                    onts.push(ont)
                 }
             })
         }
     })
-
+    console.log(onts)
     return onts
 }
 

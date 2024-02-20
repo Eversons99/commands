@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
 from maintenance_manager.static.common.utils import GeneralUtility
-from attenuations_service import AttenuationUtility
+from attenuations_manager.utils.attenuations_service import AttenuationUtility
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
 
@@ -127,7 +127,7 @@ def next_attenuation(request):
         db_model = AttenuatorDB
         next_attenuation_info = AttenuationUtility.get_next_attenuation(request, db_model)
         onts_in_current_attenuation = next_attenuation_info.get('onts')
-        all_attenuations =  next_attenuation_info.get('all_attenuations')
+        all_attenuations = next_attenuation_info.get('attenuations')
 
         if len(onts_in_current_attenuation) == 0:
             return render(request, 'nextAttenuationPage.html', context=next_attenuation_info)
@@ -144,3 +144,6 @@ def render_error_page(request):
     """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
+
+def end_attenuations(request):
+    pass

@@ -113,10 +113,10 @@ class AttenuationUtility:
         """
         Make a simple math operation to obtain the current attenuation ID
         """
-        if len(all_attenuations) == 1:
-            return 1
+        last_attenuation_id = all_attenuations[len(all_attenuations)-1].get('attenuation_id')
+        current_attenuation_id = last_attenuation_id + 1
 
-        return len(all_attenuations) - 1
+        return current_attenuation_id
 
     @staticmethod
     def save_attenuation(request, db_model, onts_in_current_attenuation, all_attenuations):
