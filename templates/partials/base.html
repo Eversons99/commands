@@ -13,7 +13,6 @@
         <link rel="stylesheet" href="{% static 'resources/style.css' %}">
     </head>
 
-
   <body>
     {% csrf_token %}
     <div class="modal-loader">
@@ -25,5 +24,6 @@
     </nav>
     {% block content %} {% endblock %} 
     <script type='text/javascript' src="{% static 'resources/script.js' %}"></script>
+  <script type='text/javascript' src="{% static 'attenuator.js' %}"></script>
   </body>
 </html>
