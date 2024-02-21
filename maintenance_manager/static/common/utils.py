@@ -163,65 +163,44 @@ class GeneralUtility:
             raise err
 
     @staticmethod
-    def generate_commands(request, db_model):
+    def generate_commands(register_id, db_model, info_to_generate_commands):
         """
         Gets selected devices on database and make a request to NMT to generate the commands
         """
-        body_request = json.loads(request.body)
-        id_devices_selected = body_request['idDevicesSelected']
-        destination_gpon = body_request['destinationGpon']
-        file_name = body_request['fileName']
-        register_id = body_request['tabId']
-        all_devices_selected = []
-
-        try:
-            maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-            unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
-
-            for ont in unchanged_onts:
-                if int(ont['id']) in id_devices_selected:
-                    all_devices_selected.append(ont)
-
-        except ObjectDoesNotExist as err:
-            message_error = {
-                'error': True,
-                'message': f'Ocorreu um erro ao recuperar informações no banco. Erro {err}'
-            }
-            return HttpResponse(json.dumps(message_error))
-
         try:
             url = 'https://nmt.nmultifibra.com.br/olt/migration-commands'
             headers_request = {"Content-Type": "application/json; charset=utf-8"}
             options_request = json.dumps({
-                'onts': all_devices_selected,
-                'gpon': destination_gpon['gpon'],
-                'host': destination_gpon['host'],
-                'name': file_name,
-                'oldGpon': maintenance_info.source_gpon['gpon'],
-                'oldHost': maintenance_info.source_gpon['host']
+                'onts': info_to_generate_commands.get('onts'),
+                'gpon': info_to_generate_commands.get('gpon'),
+                'host': info_to_generate_commands.get('host'),
+                'name': info_to_generate_commands.get('name'),
+                'oldGpon': info_to_generate_commands.get('old_gpon'),
+                'oldHost': info_to_generate_commands.get('old_host')
             })
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             commands_response = commands.json()
+
             data_to_update = {
-                'file_name': file_name,
-                'destination_gpon': destination_gpon,
-                'selected_devices': all_devices_selected,
+                'file_name': info_to_generate_commands.get('name'),
+                'destination_gpon': info_to_generate_commands.get('destination_gpon'),
+                'selected_devices': info_to_generate_commands.get('onts'),
                 'commands_url': commands_response
             }
 
             GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
-            return HttpResponse(json.dumps({
+            return {
                 "error": False,
                 'message': 'A requisição para o NMT ocorreu com sucesso'
-            }))
+            }
 
         except (requests.exceptions.RequestException, Exception) as err:
-            return HttpResponse(json.dumps({
+            return {
                 "error": True,
                 'message': f'Ocorreu um erro ao gerar os comandos no NMT. Error: {err}'
-            }))
+            }
 
     @staticmethod
     def update_maintenance_info_in_database(data_to_update, register_id, db_model):
@@ -240,8 +219,10 @@ class GeneralUtility:
         Make a query in the database to obtain the urls where the ready commands are stored
         """
         register_id = request.GET.get('tab_id')
+
         try:
             commands = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+
             all_commands = {
                 "error": False,
                 "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
@@ -252,6 +233,7 @@ class GeneralUtility:
             return all_commands
 
         except (requests.exceptions.RequestException, Exception) as err:
+
             error = {
                 "error": True,
                 "message": f'Ocorreu um erro ao renderizar a página de comandos. Error: {err}'
@@ -272,4 +254,3 @@ class GeneralUtility:
         GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
         return HttpResponse(status=200)
-

@@ -471,9 +471,17 @@ function nextAttenuation() {
     return window.location = `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${tabId}`
 }
 
-function endAttenuation() {
+async function endAttenuation() {
     loadingAnimation(true)
     const tabId = getIdentificator()
-    return window.location = `http://10.0.30.157:8000/attenuator/end_attenuations?tab_id=${tabId}`
+    let endAttenuations = await fetch(`http://10.0.30.157:8000/attenuator/end_attenuations?tab_id=${tabId}`)
+    endAttenuations = await endAttenuations.json()
+
+    if (endAttenuations.error) {
+        const messageError = endAttenuations.message
+        return window.location = `http://10.0.30.157:8000/attenuator/render_error_page?message=${messageError}`
+    }
+
+    return window.location = `http://10.0.30.157:8000/attenuator/render_page_commands?tab_id=${tabId}`
 }
 

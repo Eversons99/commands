@@ -1,8 +1,11 @@
+import json
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import GeneratorDB 
+from .models import GeneratorDB
+from django.http.response import HttpResponse
 from maintenance_manager.static.common.utils import GeneralUtility
+from commands_generator.utils.generator_service import CommandsUtility
 
 
 def home(request):
@@ -54,9 +57,15 @@ def get_commands(request):
     """
     if request.method == 'POST':
         db_model = GeneratorDB
-        commands = GeneralUtility.generate_commands(request, db_model)
+        info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
 
-        return commands
+        if info_to_generate_commands.get('error'):
+            return info_to_generate_commands
+
+        register_id = info_to_generate_commands.get('register_id')
+        commands = GeneralUtility.generate_commands(register_id, db_model, info_to_generate_commands)
+
+        return HttpResponse(json.dumps(commands))
 
     return redirect(home)
 

@@ -10,5 +10,6 @@ urlpatterns = [
     path('get_onts_to_render', views.get_onts_to_render, name="get_onts_to_render"),
     path('discard_attenuation', views.discard_attenuation, name="discard_attenuation"),
     path('next_attenuation', views.next_attenuation, name="next_attenuation"),
-    path('end_attenuations', views.end_attenuations, name="end_attenuations")
+    path('end_attenuations', views.end_attenuations, name="end_attenuations"),
+    path('render_page_commands', views.render_page_commands, name="render_page_commands")
 ]

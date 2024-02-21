@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
 from maintenance_manager.static.common.utils import GeneralUtility
-from attenuations_manager.utils.attenuations_service import AttenuationUtility
+from attenuations_manager.utils.attenuator_service import AttenuationUtility
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
 
@@ -58,7 +58,7 @@ def save_initial_attenuation_state(request):
     if request.method == 'POST':
         db_model = AttenuatorDB
         save_main_attenuation = AttenuationUtility.save_unchanged_onts_as_first_attenuation(request, db_model)
-        
+
         return HttpResponse(json.dumps(save_main_attenuation))
 
     return redirect(home)
@@ -139,29 +139,42 @@ def next_attenuation(request):
     return redirect(home)
 
 
+def end_attenuations(request):
+    """
+    Gets all onts in attenuations and call the function that generate the commands
+    """
+    if request.method == 'GET':
+        db_model = AttenuatorDB
+        info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
+
+        if info_to_generate_commands.get('error'):
+            return info_to_generate_commands
+
+        register_id = info_to_generate_commands.get('register_id')
+        commands = GeneralUtility.generate_commands(register_id, db_model, info_to_generate_commands)
+
+        return HttpResponse(json.dumps(commands))
+
+    return redirect(home)
+
+
+def render_page_commands(request):
+    """
+    Gets commands info and render commands pages
+    """
+    db_model = AttenuatorDB
+    commands = GeneralUtility.get_urls_to_ready_commands(request, db_model)
+
+    if commands.get('error'):
+        return render(request, 'error.html', context=commands)
+
+    return render(request, 'commands.html', context=commands)
+
+
 def render_error_page(request):
     """
     Renders error page, showing the personalised error message
     """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
-
-
-def end_attenuations(request):
-    """
-    Gets all onts in attenuations and call the function that generate the commands
-    """
-    if request.method == 'GET':
-        register_id = request.GET.get('tab_id')
-        db_model = AttenuatorDB
-        onts_to_generate_commands = AttenuationUtility.get_onts_to_generate_commands(register_id, db_model)
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        request_body = json.dumps({
-            'tabId': maintenance_info.tabId,
-            'destinationGpon': maintenance_info.destinationGpon,
-            'fileName': maintenance_info.fileName,
-            'idDevicesSelected': maintenance_info.idDevicesSelected
-        })
-
-
 

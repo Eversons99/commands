@@ -1,5 +1,7 @@
 import ast
 import json
+from django.http.response import HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
 from maintenance_manager.static.common.utils import GeneralUtility
 
 
@@ -37,7 +39,7 @@ class AttenuationUtility:
             body_request = json.loads(request.body)
             register_id = body_request.get('tabId')
             file_name = body_request.get('fileName')
-            destination_gpon = body_request.get('fileName')
+            destination_gpon = body_request.get('destinationGpon')
             all_onts_id = body_request.get('unchangedDevices')
 
             data_to_update = {
@@ -144,11 +146,40 @@ class AttenuationUtility:
         GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
     @staticmethod
-    def get_onts_to_generate_commands(register_id, db_model):
+    def separate_information_to_generate_commands(request, db_model):
+        try:
+            register_id = request.GET.get('tab_id')
+
+            maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+            onts = AttenuationUtility.get_onts_to_generate_commands(maintenance_info)
+
+            info_to_generate_commands = {
+                'onts': onts,
+                'gpon': maintenance_info.destination_gpon.get('gpon'),
+                'host': maintenance_info.destination_gpon.get('host'),
+                'name': maintenance_info.file_name,
+                'old_gpon': maintenance_info.source_gpon.get('gpon'),
+                'old_host': maintenance_info.source_gpon.get('host'),
+                'destination_gpon': maintenance_info.destination_gpon,
+                'register_id': register_id,
+                'mode': 'attenuator'
+            }
+
+            return info_to_generate_commands
+
+        except ObjectDoesNotExist as err:
+
+            message_error = {
+                'error': True,
+                'message': f'Ocorreu um erro ao recuperar informações no banco. Erro {err}'
+            }
+            return HttpResponse(json.dumps(message_error))
+
+    @staticmethod
+    def get_onts_to_generate_commands(maintenance_info):
         """
-        Separates the onts in attenuations and return it to the commands can be generated
+        Separates the onts in all attenuations and return it to the commands can be generated
         """
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         all_attenuations = maintenance_info.attenuations
         onts_info = ast.literal_eval(maintenance_info.unchanged_onts)
         all_onts_ids_in_attenuations = []
