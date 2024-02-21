@@ -142,3 +142,28 @@ class AttenuationUtility:
         }
 
         GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+
+    @staticmethod
+    def get_onts_to_generate_commands(register_id, db_model):
+        """
+        Separates the onts in attenuations and return it to the commands can be generated
+        """
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        all_attenuations = maintenance_info.attenuations
+        onts_info = ast.literal_eval(maintenance_info.unchanged_onts)
+        all_onts_ids_in_attenuations = []
+        onts_to_generate_commands = []
+
+        for index in range(1, len(all_attenuations)):
+            ids_onts_in_attenuation = all_attenuations[index].get('onts')
+
+            for id_ont in ids_onts_in_attenuation:
+                if id_ont not in all_onts_ids_in_attenuations:
+                    all_onts_ids_in_attenuations.append(id_ont)
+
+        for ont in onts_info:
+            id_ont = ont.get('id')
+            if id_ont in all_onts_ids_in_attenuations:
+                onts_to_generate_commands.append(ont)
+
+        return onts_to_generate_commands

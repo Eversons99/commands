@@ -1,3 +1,4 @@
+import ast
 import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
@@ -121,7 +122,7 @@ def discard_attenuation(request):
 
 def next_attenuation(request):
     """
-    Make a new query to get onts and analize to find changes on onts status
+    Make a new query to get onts and analyze to find changes on onts status
     """
     if request.method == 'GET':
         db_model = AttenuatorDB
@@ -145,5 +146,22 @@ def render_error_page(request):
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
 
+
 def end_attenuations(request):
-    pass
+    """
+    Gets all onts in attenuations and call the function that generate the commands
+    """
+    if request.method == 'GET':
+        register_id = request.GET.get('tab_id')
+        db_model = AttenuatorDB
+        onts_to_generate_commands = AttenuationUtility.get_onts_to_generate_commands(register_id, db_model)
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        request_body = json.dumps({
+            'tabId': maintenance_info.tabId,
+            'destinationGpon': maintenance_info.destinationGpon,
+            'fileName': maintenance_info.fileName,
+            'idDevicesSelected': maintenance_info.idDevicesSelected
+        })
+
+
+

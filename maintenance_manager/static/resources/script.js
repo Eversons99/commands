@@ -145,7 +145,8 @@ async function generateCommands() {
             'tabId': maintenanceInfo.tabId,
             'destinationGpon': maintenanceInfo.destinationGpon,
             'fileName': maintenanceInfo.fileName,
-            'idDevicesSelected': maintenanceInfo.idDevicesSelected
+            'idDevicesSelected': maintenanceInfo.idDevicesSelected,
+            'mode': 'generator'
         })
     }
 
@@ -396,7 +397,7 @@ function getOntsInAttenuation(attenuationId, allAttenuations) {
             })
         }
     })
-    console.log(onts)
+
     return onts
 }
 
@@ -449,7 +450,6 @@ async function discardAttenuation(attenuationId) {
 
     let discardSingleAttenuation = await fetch('http://10.0.30.157:8000/attenuator/discard_attenuation', requestOptions)
     discardSingleAttenuation = await discardSingleAttenuation.json()
-    console.log(discardSingleAttenuation)
 
     if (discardSingleAttenuation.error) {
         return alert('Ocorreu um erro ao remover a atenuação')
@@ -459,18 +459,21 @@ async function discardAttenuation(attenuationId) {
     return window.location.reload()
 }
 
-async function maintainAttenuation() {
+function maintainAttenuation() {
+    loadingAnimation(true)
     const tabId = getIdentificator()
     return window.location = `http://10.0.30.157:8000/attenuator/render_attenuations_page?tab_id=${tabId}`
 }
 
-async function nextAttenuation() {
+function nextAttenuation() {
     loadingAnimation(true)
     const tabId = getIdentificator()
     return window.location = `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${tabId}`
 }
 
-async function endAttenuation() {
-
+function endAttenuation() {
+    loadingAnimation(true)
+    const tabId = getIdentificator()
+    return window.location = `http://10.0.30.157:8000/attenuator/end_attenuations?tab_id=${tabId}`
 }
 
