@@ -22,7 +22,7 @@ async def server():
 
 
 try:
-    print('WS is running !!!')
+    print('WebSocket server is running !!!')
     asyncio.run(server())
 except KeyboardInterrupt:
     pass

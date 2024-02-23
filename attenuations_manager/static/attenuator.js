@@ -36,7 +36,6 @@ async function saveInitialAttenuationState() {
         messageError = saveAttenuationState.message
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
-
     return window.location = `${baseUrl}/render_attenuations_page?tab_id=${maintenanceInfo.tabId}`
 }
 
@@ -62,7 +61,6 @@ function getMaintenanceInfoFromForm() {
         tabId,
         idDevicesSelected: getIdDevicesSelected()
     }
-
     return gponInfo
 }
 
@@ -93,7 +91,7 @@ async function showAttenuation(attenuationId) {
 
     let allAttenuations = await fetch('http://10.0.30.157:8000/attenuator/get_onts_to_render', requestOptions)
     allAttenuations = await allAttenuations.json()
-    ontsInAttenuation = getOntsInAttenuation(attenuationId, allAttenuations)
+    let ontsInAttenuation = getOntsInAttenuation(attenuationId, allAttenuations)
 
     if(ontsInAttenuation.length == 0) return alert('Ocorreu um problema ao buscar as atenuações')
 
@@ -122,7 +120,6 @@ function getOntsInAttenuation(attenuationId, allAttenuations) {
             })
         }
     })
-
     return onts
 }
 
@@ -199,6 +196,15 @@ function nextAttenuation() {
 
 async function endAttenuation() {
     loadingAnimation(true)
+
+    const attenuationsTable = document.getElementById('attenuations-table')
+    const attenuations = attenuationsTable.childNodes[1].childNodes
+
+    if (attenuations.length == 2) {
+        loadingAnimation(false)
+        return alert('Nenhuma atenuação coletada, impossível prosseguir')
+    }
+
     const tabId = getIdentificator()
     let endAttenuations = await fetch(`http://10.0.30.157:8000/attenuator/end_attenuations?tab_id=${tabId}`)
     endAttenuations = await endAttenuations.json()
@@ -207,6 +213,5 @@ async function endAttenuation() {
         const messageError = endAttenuations.message
         return window.location = `http://10.0.30.157:8000/attenuator/render_error_page?message=${messageError}`
     }
-
     return window.location = `http://10.0.30.157:8000/attenuator/render_page_commands?tab_id=${tabId}`
 }

@@ -3,7 +3,12 @@
 {% block content %}
 {% include 'partials/attenuations_manager_title.html' %}
     <div>Manutenção: {{ name }}</div>
-    {% if total_offline_onts == 0 %}
+    {% if error %}
+        <h1>{{ message }}</h1>
+
+        {% include 'attenuationsPagePartial.html' %}
+
+    {% elif total_offline_onts == 0 and not error %}
         <h1>Nenhuma ont caiu nesta atenuação</h1>
 
         {% include 'attenuationsPagePartial.html' %}

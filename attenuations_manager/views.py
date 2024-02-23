@@ -129,7 +129,7 @@ def next_attenuation(request):
         next_attenuation_info = AttenuationUtility.get_next_attenuation(request, db_model)
         onts_in_current_attenuation = next_attenuation_info.get('onts')
         all_attenuations = next_attenuation_info.get('attenuations')
-
+   
         if len(onts_in_current_attenuation) == 0:
             return render(request, 'nextAttenuationPage.html', context=next_attenuation_info)
 

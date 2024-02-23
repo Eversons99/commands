@@ -76,24 +76,37 @@ class AttenuationUtility:
         all_onts = GeneralUtility.get_onts_info_on_nmt(host, pon_location)
         onts = all_onts.get('onts')
 
-        onts_in_current_attenuation = AttenuationUtility.separate_offline_onts_in_attenuation(old_onts, onts)
-        id_current_attenuation = AttenuationUtility.get_id_of_current_attenuation(all_attenuations)
+        onts_in_current_attenuation = AttenuationUtility.separate_offline_onts_in_attenuation(old_onts, onts, all_attenuations)
+        if onts_in_current_attenuation.get('error'):
+            next_attenuation_info = {
+                'error': True,
+                'message': onts_in_current_attenuation.get('message'),
+                'onts': [],
+                'name': maintenance_info.file_name,
+                'total_offline_onts': 0,
+                'attenuations': all_attenuations,
+            }
+            return next_attenuation_info
 
-        next_attenuation = {
-            'onts': onts_in_current_attenuation,
+        id_current_attenuation = AttenuationUtility.get_id_of_current_attenuation(all_attenuations)
+        next_attenuation_info = {
+            'error': False,
+            'onts': onts_in_current_attenuation.get('onts'),
             'name': maintenance_info.file_name,
-            'total_offline_onts': len(onts_in_current_attenuation),
+            'total_offline_onts': len(onts_in_current_attenuation.get('onts')),
             'attenuation_id': id_current_attenuation,
             'attenuations': all_attenuations
         }
 
-        return next_attenuation
+        return next_attenuation_info
 
     @staticmethod
-    def separate_offline_onts_in_attenuation(old_onts, onts):
+    def separate_offline_onts_in_attenuation(old_onts, onts, all_attenuations):
         """
         Obtain onts offline in the current attenuation and return it
         """
+        onts_id_in_last_attenuaton = all_attenuations[len(all_attenuations)-1]['onts']
+        onts_id_current_attenuation = []
         separated_off_onts = []
 
         for ont in onts:
@@ -106,9 +119,16 @@ class AttenuationUtility:
                     old_ont_sn = old_ont.get('sn')
 
                     if ont_sn == old_ont_sn and ont_status != old_ont_status:
+                        onts_id_current_attenuation.append(ont.get('id'))
                         separated_off_onts.append(ont)
 
-        return separated_off_onts
+        if onts_id_current_attenuation == onts_id_in_last_attenuaton:
+            return {
+                'error': True,
+                'message': 'As ONUs que cairam nessa atenuação são as mesmas da atenuação anterior'
+            }
+        
+        return {'error': False, 'onts': separated_off_onts }
 
     @staticmethod
     def get_id_of_current_attenuation(all_attenuations):
