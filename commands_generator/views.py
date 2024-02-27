@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB
 from django.http.response import HttpResponse
-from maintenance_manager.static.common.utils import GeneralUtility
+from maintenance_manager.static_maintenance.common.utils import GeneralUtility
 from commands_generator.utils.generator_service import CommandsUtility
 
 

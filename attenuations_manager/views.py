@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
-from maintenance_manager.static.common.utils import GeneralUtility
+from maintenance_manager.static_maintenance.common.utils import GeneralUtility
 from attenuations_manager.utils.attenuator_service import AttenuationUtility
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse

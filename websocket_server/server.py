@@ -3,7 +3,7 @@ import json
 import sys
 import websockets
 sys.path.append('C:/Users/Everson/Desktop/commands/')
-from maintenance_manager.static.common.olt_api import Olt
+from maintenance_manager.static_maintenance.common.olt_api import Olt
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -17,7 +17,7 @@ async def olt(websocket, path):
 
 
 async def server():
-    async with websockets.serve(olt, "10.0.30.157", 5678):
+    async with websockets.serve(olt, "10.0.30.252", 5678):
         await asyncio.Future()  # run forever
 
 

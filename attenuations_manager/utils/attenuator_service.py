@@ -2,7 +2,7 @@ import ast
 import json
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from maintenance_manager.static.common.utils import GeneralUtility
+from maintenance_manager.static_maintenance.common.utils import GeneralUtility
 
 
 class AttenuationUtility:

@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.157', '10.0.30.157', 'localhost']
+ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.252', '10.0.30.252', '168.0.96.11']
 
 
 # Application definition
@@ -87,7 +87,7 @@ WSGI_APPLICATION = "maintenance_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "commands",
+        "NAME": "generatorDB",
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'
@@ -128,11 +128,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    f'{ABSOLUTE_PATH}/attenuations_manager/static',
-    f'{ABSOLUTE_PATH}/maintenance_manager/static'
-    f'{ABSOLUTE_PATH}/signal_query/static',
-    f'{ABSOLUTE_PATH}/commands_generator/static',
-    f'{ABSOLUTE_PATH}/maintence_manager/static',
+    f'{ABSOLUTE_PATH}/attenuations_manager/static_attenuator',
+    f'{ABSOLUTE_PATH}/maintenance_manager/static_maintenance',
+    f'{ABSOLUTE_PATH}/signal_query/static_signal',
 ]
 
 STATIC_ROOT = f'{ABSOLUTE_PATH}/static'
