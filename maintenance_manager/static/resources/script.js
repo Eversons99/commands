@@ -33,10 +33,15 @@ async function getBoardsHost() {
     }
 }
 
-function fillElementsOptions(slots) {
+async function fillElementsOptions(slots) {
     const slotSelectElement = document.getElementById('select-slot')
     const portSelectElement = document.getElementById('select-port')
     let counterPorts = 0
+
+    slotSelectElement.textContent = ''
+    portSelectElement.textContent = ''
+    slotSelectElement.append(document.createElement('option'))
+    portSelectElement.append(document.createElement('option'))
 
     slots.forEach((slot) => {
         const optionPortElement = document.createElement('option')

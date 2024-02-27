@@ -34,7 +34,6 @@ ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.157', '10.0.30.157', 'localhost']
 INSTALLED_APPS = [
     "attenuations_manager",
     "commands_generator",
-    "shared_core",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
