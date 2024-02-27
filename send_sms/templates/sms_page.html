@@ -1,0 +1,22 @@
+{% extends 'base_sms.html' %}
+{% load static %}
+{% block content %}
+    <section id="source-container">
+        <h2>SMS enviados</h2>
+        <h3>Id: {{ id }}</h3>
+        <h3>Previsão: {{ previsao }}</h3>
+        <h3>Sucesso: {{ success }}</h3>
+        <h3>Falha: {{ failed }}</h3>
+    </section>
+
+    <section id="source-container">
+        <div class="search-btn">
+            <button>
+                <a href="http://localhost:8000/sms/home">
+                Inicio
+            </button>
+        </div>
+    </section>
+
+{% endblock %}
+

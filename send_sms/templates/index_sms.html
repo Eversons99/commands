@@ -1,0 +1,10 @@
+{% extends 'base_sms.html' %}
+{% load static %}
+{% block content %}
+    <section id="source-container">
+        {% include 'partials/gponForm.html' %}
+        <div class="search-btn">
+            <button onclick="searchOntsSms()">Buscar</button>
+        </div>
+    </section>
+{% endblock %}

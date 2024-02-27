@@ -24,10 +24,12 @@ def search_onts_via_snmp(request):
         onts_info = GeneralUtility.get_onts_via_snmp(request, db_model)
         return onts_info
 
+
     return redirect(home)
 
 
 def render_onts_table(request):
+
     """
     Render a table with all onts
     """

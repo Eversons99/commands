@@ -55,7 +55,7 @@ header {
     overflow: hidden;
 }
 
-#source-container, #olt, #gpon, #selects-source-gpon,  #file, .generate-btn {
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .logo, .generate-btn { 
     display: flex;
     width: 85%;
     align-items: center;
@@ -269,3 +269,74 @@ textarea {
 }
 
 
+
+#btn-warn {
+    background: #fbad18;
+    color: black;
+}
+
+#btn-discard {
+    background: rgb(250, 65, 65);
+    color: black;
+}
+
+#btn-discard:hover{
+    background: rgb(227, 107, 107);
+}
+
+#btn-warn:hover {
+    background: #efbe63;
+
+}
+
+object {
+    margin: 15px auto;
+}
+
+.name {
+    padding-left: 400px; 
+    padding-right: 400px; 
+    padding-bottom: 16px;
+}
+
+#input-previsao {
+    border: 2px solid; 
+}
+
+#input-tipo {
+    border: 2px solid; 
+}
+
+.error {
+    margin: 0;
+    padding: 0;
+    background-image: url('../img/error3.png'); 
+    background-size: cover;
+    background-position: center;
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.error-h1 {
+    color: #e74c3c;
+}
+
+p {
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+}

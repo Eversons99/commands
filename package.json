@@ -12,6 +12,6 @@
     "eslint": "^8.50.0"
   },
   "dependencies": {
-    "progressbar.js": "^1.1.1"
+    "node-fetch": "^3.3.2"
   }
 }

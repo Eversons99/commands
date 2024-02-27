@@ -29,10 +29,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.157', '10.0.30.157', 'localhost']
 
+
 # Application definition
 
 INSTALLED_APPS = [
     "attenuations_manager",
+    "send_sms",
+    "signal_query",
     "commands_generator",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -59,6 +62,7 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             f'{ABSOLUTE_PATH}/attenuations_manager/templates',
+            f'{ABSOLUTE_PATH}/signal_query/templates/',
             f'{ABSOLUTE_PATH}/commands_generator/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],
@@ -83,7 +87,7 @@ WSGI_APPLICATION = "maintenance_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "generatorDB",
+        "NAME": "commands",
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'
@@ -126,6 +130,9 @@ USE_TZ = True
 STATICFILES_DIRS = [
     f'{ABSOLUTE_PATH}/attenuations_manager/static',
     f'{ABSOLUTE_PATH}/maintenance_manager/static'
+    f'{ABSOLUTE_PATH}/signal_query/static',
+    f'{ABSOLUTE_PATH}/commands_generator/static',
+    f'{ABSOLUTE_PATH}/maintence_manager/static',
 ]
 
 STATIC_ROOT = f'{ABSOLUTE_PATH}/static'
