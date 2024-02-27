@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
 {% include 'partials/attenuations_manager_title.html' %}
-    <div>Manutenção: {{ name }}</div>
+    <div id="maintenance-name"><h3>Manutenção: {{ name }}</h3></div>
     {% if error %}
         <h1>{{ message }}</h1>
 
@@ -28,7 +28,7 @@
 
         <div>
             <button onclick="maintainAttenuation()">Manter Atenuação</button>
-            <button onclick="discardAttenuation({{ attenuation_id }})">Descartar Atenuação</button>
+            <button onclick="discardAttenuation('{{ attenuation_id }}')">Descartar Atenuação</button>
         </div>
     {% endif %}
 {% endblock %}
