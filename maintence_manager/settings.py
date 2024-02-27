@@ -27,13 +27,14 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.241', 'localhost']
+ALLOWED_HOSTS = ['10.0.30.252', 'localhost', '168.0.96.11']
 
 # Application definition
 
 INSTALLED_APPS = [
     "send_sms",
     #"attenuations_manager",
+    "signal_query",
     "commands_generator",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -59,6 +60,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
+            f'{ABSOLUTE_PATH}/signal_query/templates/',
             f'{ABSOLUTE_PATH}/commands_generator/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],
@@ -124,6 +126,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
+    f'{ABSOLUTE_PATH}/signal_query/static',
     f'{ABSOLUTE_PATH}/commands_generator/static',
     f'{ABSOLUTE_PATH}/maintence_manager/static',
 ]

@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Média de sinal</title>
+    <link rel="stylesheet" href="{% static 'signal.css' %}">
+</head>
+<body>
+    <header id="header-report">
+        <h1>
+            Relatório da média de sinal
+        </h1>
+    </header>
+
+    <section id="table-info">
+        <table>
+            <tr class="gray-row">
+                <td><b class="gray-color">Dispositivos online</b></td>
+                <td>{{ online }}</td>
+            </tr>
+            <tr>
+                <td><b>Dispositivos offline</b></td>
+                <td>{{ offline }}</td>
+            </tr>
+            <tr class="gray-row">
+                <td><b class="gray-color">Sinal médio de ida (TX)</b></td>
+                <td>{{ median.txPower }}</td>
+            </tr>
+            <tr>
+                <td><b>Sinal médio de volta (RX)</b></td>
+                <td>{{ median.rxPower }}</td>
+            </tr>
+            <tr class="gray-row">
+                <td><b class="gray-color">Pior sinal de ida (TX)</b></td>
+                <td>{{ worst.txPower }}</td>
+            </tr>
+            <tr>
+                <td><b>Pior sinal de volta (RX)</b></td>
+                <td>{{ worst.rxPower }}</td>
+            </tr>
+            <tr class="gray-row">
+                <td><b class="gray-color">Melhor sinal de ida (TX)</b></td>
+                <td>{{ best.txPower }}</td>
+            </tr>
+            <tr>
+                <td><b>Melhor sinal de volta (RX)</b></td>
+                <td >{{ best.rxPower }}</td>
+            </tr>
+        </table>
+    
+    </section>
+
+    <div>
+        <button>
+          <a href="http://168.0.96.11:50066/optical/query-signal">
+            Volte para homepage
+          </a>
+        </button>
+      </div>
+</body>
+</html>
