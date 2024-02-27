@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['10.0.30.252', 'localhost', '168.0.96.11']
 # Application definition
 
 INSTALLED_APPS = [
+    "send_sms",
     #"attenuations_manager",
     "signal_query",
     "commands_generator",
@@ -84,7 +85,7 @@ WSGI_APPLICATION = "maintence_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "generatorDB",
+        "NAME": "commands",
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'

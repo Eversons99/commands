@@ -66,15 +66,53 @@ async function searchOnts() {
         })
     }
 
-    const ontsRequest = await fetch('http://10.0.30.252:8000/generator/search_onts', requestOptions)
+    const ontsRequest = await fetch('http://10.0.30.241:8000/generator/search_onts', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
-    
-    if (responsOfontsRequest.error == true) {
+
+    if (responsOfontsRequest.save_maintence_info.error == true) {
         const messageError = responsOfontsRequest.message
-        return window.location = `http://10.0.30.252:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `http://10.0.30.241:8000/generator/render_error_page?message=${messageError}`
     }
 
-    return window.location = `http://10.0.30.252:8000/generator/render_onts_table?tab_id=${tabId}` 
+    return window.location = `http://10.0.30.241:8000/generator/render_onts_table?tab_id=${tabId}` 
+
+}
+
+async function searchOntsSms() {
+    setIdentificator()
+    const sourceHost = document.getElementById('select-olt').value
+    const sourceSlot = document.getElementById('select-slot').value
+    const sourcePort = document.getElementById('select-port').value
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const tabId = getIdentificator()
+    const sourceGpon = {
+        'host':  sourceHost,
+        'gpon': `0/${sourceSlot}/${sourcePort}`
+    }
+    
+    if (!sourceHost || !sourceSlot || !sourcePort) return alert("ATENÇÃO: Preencha o F/S/P!")
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            tabId,
+            sourceGpon
+        })
+    }
+    
+    const ontsRequest = await fetch('http://10.0.30.241:8000/sms/search_onts', requestOptions)
+    const responsOfontsRequest = await ontsRequest.json()
+
+    if (responsOfontsRequest.error == true) {
+        const messageError = responsOfontsRequest.message
+        return window.location = `http://10.0.30.241:8000/sms/render_error_page?message=${messageError}`
+    }
+
+    return window.location = `http://10.0.30.241:8000/sms/render_onts_table?tab_id=${tabId}` 
 }
 
 function getIdentificator() {
@@ -140,14 +178,14 @@ async function generateCommands() {
         })
     }
 
-    let getCommands = await fetch('http://10.0.30.252:8000/generator/get_commands', requestOptions)
+    let getCommands = await fetch('http://10.0.30.241:8000/generator/get_commands', requestOptions)
     getCommands = await getCommands.json()
     
     if (getCommands.error) {
         messageError =  getCommands.message
-        return window.location = `http://10.0.30.252:8000/generator/render_error_page?message=${messageError}`
+        return window.location = `http://10.0.30.241:8000/generator/render_error_page?message=${messageError}`
     }
-    return window.location = `http://10.0.30.252:8000/generator/render_page_commands?tab_id=${tabId}` 
+    return window.location = `http://10.0.30.241:8000/generator/render_page_commands?tab_id=${tabId}` 
 }
 
 function markSelectedItem() {
@@ -163,4 +201,97 @@ function markSelectedItem() {
             input.parentElement.parentElement.style.background = 'white'
         }
     })
+}
+
+async function getNumbersToSendSms() {
+    const allDevices = document.querySelectorAll('#cbx-single-item')
+    const serialNumbers = []
+
+    allDevices.forEach((device) => {
+        if (device.checked) {
+            const serialNumber = device.parentNode.parentNode.children[2].innerHTML
+            serialNumbers.push(serialNumber)
+        }
+    })
+
+    if (serialNumbers.length == 0) return alert('Selecione ao menos um dispositivo')
+
+    const tabId = getIdentificator()
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            tabId,
+            serialNumbers
+        })
+    }
+
+    let getContacts = await fetch('http://10.0.30.241:8000/sms/get_contacts', requestOptions)
+    getContacts = await getContacts.json()
+    
+    if (getContacts.error) {
+        messageError =  getContacts.message
+        return window.location = `http://10.0.30.241:8000/sms/render_error_page?message=${messageError}`
+    }
+    return window.location = `http://10.0.30.241:8000/sms/render_contacts_page?tab_id=${tabId}` 
+}
+
+async function createRupture() {
+    const previsao = document.getElementById('input-previsao').value
+    const tipoRompimento = document.getElementById('input-tipo').value
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const tabId = getIdentificator()
+
+    if (!previsao || !tipoRompimento) return alert("ATENÇÃO: Informe a Previsão e o tipo do rompimento!")
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            tabId,
+            previsao,
+            tipoRompimento
+        })
+    }
+
+    const createRuptureRequest = await fetch('http://10.0.30.241:8000/sms/create_rupture', requestOptions)
+    const ruptureResponse = await createRuptureRequest.json()
+
+    if (ruptureResponse.error) {
+        messageError =  ruptureResponse.message
+        return window.location = `http://10.0.30.241:8000/sms/render_error_page?message=${messageError}`
+    }
+    return window.location = `http://10.0.30.241:8000/sms/render_rupture_page?tab_id=${tabId}` 
+}
+
+async function sendSms() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    const tabId = getIdentificator()
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            tabId,
+        })
+    }
+
+    const sendSmsRequest = await fetch('http://10.0.30.241:8000/sms/send_sms', requestOptions)
+    const smsResponse = await sendSmsRequest.json()
+
+    if (smsResponse.error) {
+        messageError =  smsResponse.message
+        return window.location = `http://10.0.30.241:8000/sms/render_error_page?message=${messageError}`
+    }
+    return window.location = `http://10.0.30.241:8000/sms/render_sms_result_page?tab_id=${tabId}` 
 }

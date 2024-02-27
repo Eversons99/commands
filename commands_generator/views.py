@@ -15,6 +15,10 @@ def home(request):
 def search_onts(request):
     """Receive a request and call the function to get ONTS"""
     if request.method == 'POST':
+        source = request.META.get('HTTP_REFERER', 'Not available')
+        source = source.split('/')
+        source = source[3]
+
         body_request = json.loads(request.body)
         tab_id = body_request['tabId']
         source_gpon = body_request['sourceGpon']
@@ -45,7 +49,11 @@ def search_onts(request):
         }
 
         save_maintence_info = save_initial_maintenance_info_in_database(initial_maintenance_info)
-        return HttpResponse(json.dumps(save_maintence_info))
+
+        return HttpResponse(json.dumps({
+            "save_maintence_info": save_maintence_info,
+            "source": source
+        }))
 
     return redirect(home)
 
@@ -97,6 +105,10 @@ def save_initial_maintenance_info_in_database(initial_maintenance_info):
         }
 
 def render_onts_table(request):
+    source = request.META.get('HTTP_REFERER', 'Not available')
+    source = source.split('/')
+    source = source[3]
+
     """Render a table with all devices (ONT's)"""
     register_id = request.GET.get('tab_id')
 
@@ -113,6 +125,7 @@ def render_onts_table(request):
         onts_context = {
             'all_devices': onts
         }
+
         return render(request,'ontsTable.html', context=onts_context)
 
     except (Exception, ObjectDoesNotExist) as err:
