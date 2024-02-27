@@ -1,0 +1,12 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'partials/generator_commands_title.html' %}
+    <section id="source-container">
+        {% include 'partials/gponForm.html' %}
+        <div class="search-btn">
+            <button onclick="searchOnts('generator')">Buscar</button>
+        </div>
+    </section>
+{% endblock %}

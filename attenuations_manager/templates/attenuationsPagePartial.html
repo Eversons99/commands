@@ -1,0 +1,27 @@
+{% load static %}
+
+    <table id="attenuations-table">
+        {% for attenuation in attenuations %}
+            <tr>
+                <td>
+                    <button id="attenuation-{{ attenuation.attenuation_id }}" onclick="showAttenuation({{ attenuation.attenuation_id }})">
+                        Atenuação {{ attenuation.attenuation_id }}
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <div id="container-onts-table">
+        <table id="onts-table">
+            <tr>
+                <td>ID</td>
+                <td>Número de série</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="div-attenuation-buttons">
+        <button id="end-btn" onclick="endAttenuation()">Finalizar Atenuações</button>
+        <button id="next-btn"onclick="nextAttenuation()">Coletar Próxima Atenuação</button>
+    </div>

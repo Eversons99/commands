@@ -1,13 +1,11 @@
-commands_generator/__pycache__/
-attenuations_manager/__pycache__/
-maintence_manager/__pycache__/
-commands_generator/migrations/__pycache__/
-attenuations_manager/migrations/__pycache__/
+
 virtual_env/
 venv/
 node_modules/
 db.sqlite3
 commands.env
 virtual-env/
-maintence_manager/__pycache__/
+.idea/
+**.pyc
 **/__pycache__/
+*/__pycache__/
