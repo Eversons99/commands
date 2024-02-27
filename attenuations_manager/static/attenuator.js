@@ -178,8 +178,8 @@ async function discardAttenuation(attenuationId) {
     }
 
     alert(`Atenuação ${attenuationId} removida com sucesso`)
-    return window.location.reload()
-    //return window.location =  `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${getIdentificator()}`
+    //return window.location.reload()
+    return window.location = `http://10.0.30.157:8000/attenuator/render_attenuations_page?tab_id=${getIdentificator()}`
 }
 
 function maintainAttenuation() {

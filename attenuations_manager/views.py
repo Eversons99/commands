@@ -1,4 +1,3 @@
-import ast
 import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
@@ -66,7 +65,7 @@ def save_initial_attenuation_state(request):
 
 def render_attenuations_page(request):
     """
-    Get attenuations info on database then render it in an html template
+    Get attenuations info on database then render it in a html template
     """
     if request.method == 'GET':
         db_model = AttenuatorDB
@@ -105,7 +104,7 @@ def get_onts_to_render(request):
 
 def discard_attenuation(request):
     """
-    Query the database and delete one register (that is an specific attenuation)
+    Query the database and delete one register (that is a specific attenuation)
     """
     if request.method == 'POST':
         body_request = json.loads(request.body)
@@ -177,4 +176,3 @@ def render_error_page(request):
     """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
-
