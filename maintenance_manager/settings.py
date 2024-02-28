@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.252', '10.0.30.252', '168.0.96.11']
+ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.241', '168.0.96.11']
 
 
 # Application definition
@@ -87,7 +87,7 @@ WSGI_APPLICATION = "maintenance_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "generatorDB",
+        "NAME": "commands",
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'

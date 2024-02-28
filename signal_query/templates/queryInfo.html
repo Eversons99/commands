@@ -35,77 +35,7 @@
         <button onclick="makeSignalQuery('ID do cliente')">Fazer Consulta</button>
     </section>
 
-    <section id="pon">
-        <div id="olt">
-            <h2>Selecione a OLT desejada</h2>
-            <select id="select-olt">
-                <option></option>
-                <option class="options">OLT_CCDA_01</option>
-                <option class="options">OLT_COTIA_01</option>
-                <option class="options">OLT_COTIA_02</option>
-                <option class="options">OLT_COTIA_03</option>
-                <option class="options">OLT_COTIA_04</option>
-                <option class="options">OLT_EMBU_01</option>
-                <option class="options">OLT_GRVN_01</option>
-                <option class="options">OLT_ITPV_01</option>
-                <option class="options">OLT_TRMS_01</option>
-                <option class="options">OLT_TRMS_02</option>
-                <option class="options">OLT_VGPA_01</option>
-            </select>
-        </div>
-        <div id="gpon">
-            <h2>Selecione a localização PON desejada</h2>
-            <div id="selects-source-gpon">
-                <select id="select-frame">
-                    <option>0</option>
-                </select>
-                <select id="select-slot">
-                    <option value=""></option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="17">17</option>
-                    <option value="18">18</option>
-                    <option value="19">19</option>
-                </select>
-                <select id="select-port">
-                    <option value=""></option>
-                    <option value="1">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                </select>
-            </div>
-        </div>
-        <div>
-            <button onclick="makeSignalQuery('Localização PON')">Fazer Consulta</button>
-        </div>
-    </section>
+    {% include 'partials/gponPartial.html' %}
 
     <script type="text/javascript" src="{% static 'signal.js' %}"></script>
 </body>
