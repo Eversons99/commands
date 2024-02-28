@@ -233,6 +233,4 @@ def update_primary_description(request):
 
         olt_manager.update_primary_description(data_to_update)
 
-        print(data_to_update)
-
         return render(request, 'updated.html', context=data_to_update)
