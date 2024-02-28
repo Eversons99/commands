@@ -98,7 +98,7 @@ label {
     width: 100%;
 }
 
-#olt, #gpon {
+#olt, #gpon, #primary, #cable {
     width: 100%;
     text-align: center;
     display: flex;
@@ -124,7 +124,31 @@ label {
     margin: 0;
 }
 
-#olt {
+#select-primary {
+    width: 100%;
+    height: 43px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1.5px solid black;
+    padding: 0;
+    margin: 0;
+    background-color: #303245;
+    border: none;
+}
+
+#select-cable {
+    width: 100%;
+    height: 43px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1.5px solid black;
+    padding: 0;
+    margin: 0;
+    background-color: #303245;
+    border: none;
+}
+
+#olt, #primary, #cable {
     display: flex;
     width: 90%;
     align-items: center;

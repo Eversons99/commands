@@ -3,6 +3,7 @@ import requests
 from .utils.ixc_service import IxcApi
 from .enums.olts import KnownOlts
 from django.shortcuts import render, redirect
+from maintenance_manager.static_maintenance.common.olt_api import Olt
 
 
 def query_signal(request):
@@ -10,6 +11,12 @@ def query_signal(request):
     Renderiza a página de consultar o sinal
     """
     return render(request, "queryInfo.html")
+
+def update_desc(request):
+    """
+    Renderiza a página para coleta de informações
+    """
+    return render(request, "updateDesc.html")
 
 def get_signal_information(request):
     """
@@ -40,7 +47,7 @@ def get_signal_information(request):
             if signal_average_info.get('multiple_location_pon'):
                 context = signal_average_info.get('locations_pon')
                 return render(request, 'multipleLocation.html', context=context)
-            
+
             return render(request, 'opticalInfo.html', context=signal_average_info)
 
         if query_mode == 'via_pon':
@@ -88,11 +95,12 @@ def get_gpon_info_to_query_signal_via_id(id_client):
             }
 
         transmissor_id = client_fiber_information.get('registros')[0].get('id_transmissor')
+
         return {
             'error': False,
             'multiple_location_pon': False,
             'olt': KnownOlts(transmissor_id).name,
-            'pon': client_fiber_information.get('registros')[0].get('ponid')
+            'pon': client_fiber_information.get('registros')[0].get('ponid'),
         }
 
     if total_records_found >= 2:
@@ -165,11 +173,19 @@ def get_signal_information_by_pon_on_nmt(pon):
     }
 
     signal_average_info = requests.post(url, data=body_request, headers=headers)
+
+    olt = Olt()
+    desc = olt.get_primary_description(gpon_info={
+        'olt': pon.get('olt'),
+        'pon': pon.get('pon')
+    })
+ 
     signal_average_info = signal_average_info.json()
     devices_online = signal_average_info['online']
     devices_offline = signal_average_info['offline']
     median_tx = signal_average_info['median'].get('txPower')
     median_rx = signal_average_info['median'].get('rxPower')
+    signal_average_info["desc"] = desc
 
     if not devices_online or not devices_offline:
         return {
@@ -184,3 +200,39 @@ def get_signal_information_by_pon_on_nmt(pon):
         }
 
     return signal_average_info
+
+def update_primary_description(request):
+    """
+    Recebe a primária, cabo e informações GPON, após isso atualiza a descrição na OLT
+    """
+    if request.method == 'GET':
+        olt = request.GET.get('olt')
+        gpon = request.GET.get('gpon')
+        primary = request.GET.get('primary')
+        cable = request.GET.get('cable')
+
+        olt_manager = Olt()
+
+        data_to_update = {
+            "gpon_info": {
+                "olt": olt,
+                "pon": gpon
+            }, 
+            "desc_info": {
+                "primary": primary,
+                "cable": cable
+            }
+        }
+
+        old_desc = olt_manager.get_primary_description(gpon_info={
+            'olt': olt,
+            'pon': gpon
+        })
+
+        data_to_update["desc_info"]["old_desc"] = old_desc
+
+        olt_manager.update_primary_description(data_to_update)
+
+        print(data_to_update)
+
+        return render(request, 'updated.html', context=data_to_update)

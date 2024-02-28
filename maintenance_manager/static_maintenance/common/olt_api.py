@@ -111,6 +111,41 @@ class Olt:
 
         return amount_of_devices
 
+    def get_primary_description(self, gpon_info):
+        """
+        Connects via SSH and return gpon description "PRIMARIA XX--CABO XX"
+        """
+        olt_name = gpon_info.get('olt')
+        pon_location = gpon_info.get("pon")
+        ssh_connection = self.connect_olt(olt_name)
+        output = ssh_connection.send_command_timing(f'display port desc {pon_location}')
+        regex = r'\bPRIMARIA [0-9]+--[A-Z]+ [0-9]+\b' 
+        desc = re.findall(regex, output)
+        ssh_connection.disconnect()
+
+        if len(desc) < 1: 
+            return "PRIMÁRIA SEM DESCRIÇÃO"
+        
+        return desc[0]
+
+    def update_primary_description(self, data_to_update):
+        """
+        Connects via SSH and update primary description
+        """
+
+        olt_name = data_to_update["gpon_info"].get('olt')
+        pon_location = data_to_update["gpon_info"].get("pon")
+
+        primary = data_to_update["desc_info"].get('primary')
+        cable = data_to_update["desc_info"].get('cable')
+
+        ssh_connection = self.connect_olt(olt_name)
+
+        ssh_connection.send_command_timing(f'port desc {pon_location} description "PRIMARIA {primary}--CABO {cable}"')
+
+        ssh_connection.disconnect()
+
+        return
 
     def check_vlan(self, olt_name):
         pass

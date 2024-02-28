@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atualiza Primária</title>
+    <link rel="stylesheet" href="{% static 'signal.css' %}">
+</head>
+<body>
+    <div class="modal-loader">
+        <div class="loader"></div>
+        <h2 id="loader-message">Carregando dados...</h2>
+    </div>
+
+    {% csrf_token %}
+
+    <header>
+        <h1>Descrição atualizada</h1>
+    </header>
+
+    <section id="table-info">
+        <table>
+            <tr>
+                <td><b>OLT</b></td>
+                <td>{{ gpon_info.olt }}</td>
+            </tr>
+            <tr class="gray-row">
+                <td><b class="gray-color">Localização</b></td>
+                <td>{{ gpon_info.pon }}</td>
+            </tr>
+            <tr>
+                <td><b>Descrição Antiga</b></td>
+                <td>{{ desc_info.old_desc }}</td>
+            </tr>
+            <tr class="gray-row">
+                <td><b class="gray-color">Nova descrição</b></td>
+                <td>PRIMARIA {{ desc_info.primary }}--CABO {{ desc_info.cable }}</td>
+            </tr>
+        </table>
+    </section>
+
+    <button>
+        <a href="http://168.0.96.11:50066/optical/query-signal">
+          Volte para homepage
+        </a>
+    </button>
+    
+    <script type="text/javascript" src="{% static 'signal.js' %}"></script>
+</body>
+</html>

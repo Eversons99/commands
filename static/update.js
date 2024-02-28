@@ -1,0 +1,1 @@
+const teste = document.getElementById('pon').style.display = 'flex'
