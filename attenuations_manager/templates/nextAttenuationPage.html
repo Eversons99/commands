@@ -26,21 +26,28 @@
         {% include 'attenuationsPagePartial.html' %}
 
     {% else %}
-        <table>
-            {% for ont in onts %}
-            <tr>
-                <td>{{ ont.id }}</td>
-                <td>{{ ont.sn }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        <div id="total_off">
-            <p>Total de ont's offline nessa atenuação: {{ total_offline_onts }}</p>
+        <div id="current-attenuation">
+            <table id="onts-table">
+                <thead>
+                    <td>ID</td>
+                    <td>Número de série</td>
+                </thead>
+                {% for ont in onts %}
+                <tr>
+                    <td>{{ ont.id }}</td>
+                    <td>{{ ont.sn }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div id="total_off">
+                <p>Offline nessa atenuação: <b>{{ total_offline_onts }}</b></p>
+            </div>
+
+            <div>
+                <button onclick="maintainAttenuation()">Manter Atenuação</button>
+                <button onclick="discardAttenuation({{ attenuation_id }})">Descartar Atenuação</button>
+            </div>
         </div>
 
-        <div>
-            <button onclick="maintainAttenuation()">Manter Atenuação</button>
-            <button onclick="discardAttenuation({{ attenuation_id }})">Descartar Atenuação</button>
-        </div>
     {% endif %}
 {% endblock %}

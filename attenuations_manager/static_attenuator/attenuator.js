@@ -126,9 +126,10 @@ function getOntsInAttenuation(attenuationId, allAttenuations) {
 function renderAttenuationPage(ontsInAttenuation, attenuationId) {
     const table = document.getElementById('onts-table')
     const containerTable = document.getElementById('container-onts-table')
-    const attenuationsTable =document.getElementById('attenuations-table')
+    const attenuationsTable = document.getElementById('attenuations-table')
+    const divAttenuationBtn = document.getElementById('attenuations-btn')
 
-    containerTable.style.display = 'block'
+    containerTable.style.display = 'flex'
     attenuationsTable.style.display = 'none'
 
     ontsInAttenuation.forEach((ont) => {
@@ -145,13 +146,13 @@ function renderAttenuationPage(ontsInAttenuation, attenuationId) {
     const holdButton = document.createElement('button')
     holdButton.textContent = 'Manter'
     holdButton.setAttribute('onclick', 'maintainAttenuation()')
-    containerTable.appendChild(holdButton)
+    divAttenuationBtn.appendChild(holdButton)
 
     if (attenuationId != 0) {
         const discardButton = document.createElement('button')
         discardButton.textContent = 'Descartar'
         discardButton.setAttribute('onclick', `discardAttenuation(${attenuationId})`)
-        containerTable.appendChild(discardButton)
+        divAttenuationBtn.appendChild(discardButton)
     }
 }
 
