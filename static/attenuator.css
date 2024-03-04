@@ -20,3 +20,8 @@
 #end-btn {
     background-color: #fbad18;
 }
+
+.message {
+    width: 85%;
+    text-align: center;
+}

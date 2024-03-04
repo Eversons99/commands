@@ -20,3 +20,49 @@
 #end-btn {
     background-color: #fbad18;
 }
+
+.message {
+    width: 85%;
+    text-align: center;
+    display: flex;
+    margin: 4em auto;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+    border-radius: 0.25rem;
+}
+
+#alert-img, #error-img {
+    margin: 0 3em;
+    width: 50px;
+    height: 50px;
+}
+
+#error-message {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+#error-img {
+    background: #f8d7da;
+}
+
+.message h1 {
+    margin: 0;
+    text-align: center;
+}
+
+#attenuations-table {
+    margin: 3em auto;
+    display: flex;
+    width: 95%
+    align-items: center;
+    justify-content: center;
+}
+
+#attenuations-table tbody {
+    display: flex;
+    flex-direction: row;
+}

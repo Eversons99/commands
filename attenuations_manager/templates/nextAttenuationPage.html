@@ -2,14 +2,26 @@
 {% load static %}
 {% block content %}
 {% include 'partials/attenuations_manager_title.html' %}
+
     <div id="maintenance-name"><h3>Manutenção: {{ name }}</h3></div>
+
     {% if error %}
-        <h1>{{ message }}</h1>
+
+        <div class="message" id="error-message">
+            <img src="{% static '/img/error-i.png' %}" alt="Alert icon image" id="error-img">
+            <h1>{{ message }}</h1>
+            <img src="{% static '/img/error-i.png' %}" alt="Alert icon image" id="error-img">
+        </div>
 
         {% include 'attenuationsPagePartial.html' %}
 
     {% elif total_offline_onts == 0 and not error %}
-        <h1>Nenhuma ont caiu nesta atenuação</h1>
+
+        <div class="message">
+            <img src="{% static '/img/alert.png' %}" alt="Alert icon image" id="alert-img">
+            <h1>Nenhuma ont caiu nesta atenuação</h1>
+            <img src="{% static '/img/alert.png' %}" alt="Alert icon image" id="alert-img">
+        </div>
 
         {% include 'attenuationsPagePartial.html' %}
 
