@@ -184,3 +184,67 @@ def get_signal_information_by_pon_on_nmt(pon):
         }
 
     return signal_average_info
+<<<<<<< Updated upstream:signal_query_app/views.py
+=======
+
+def update_primary_description(request):
+    """
+    Recebe a primária, cabo e informações GPON, após isso atualiza a descrição na OLT
+    """
+    if request.method == 'GET':
+        olt = request.GET.get('olt')
+        gpon = request.GET.get('gpon')
+        primary = request.GET.get('primary')
+        cable = request.GET.get('cable')
+
+        data_to_update = {
+            "gpon_info": {
+                "olt": olt,
+                "pon": gpon
+            }, 
+            "desc_info": {
+                "primary": primary,
+                "cable": cable
+            }
+        }
+
+        data_to_update['desc_info']["old_desc"] = get_primary_description(gpon, host=olt)
+
+        url = 'https://nmt.nmultifibra.com.br/olt/update-gpon-desc'
+        body_request = json.dumps({
+            "gpon": gpon,
+            "host": olt,
+            "value": f'PRIMARIA {primary}--CABO {cable}'
+        })
+
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        update = requests.post(url, data=body_request, headers=headers)
+        update = update.json()
+
+        if update["success"] == True:
+            return render(request, 'updated.html', context=data_to_update)
+        else:
+            return render(request, 'error.html')
+    
+def get_primary_description(gpon, host):
+    """
+    Faz uma requisição para o NMT para obter informações sobre a descrição da localização
+    """
+    url = 'https://nmt.nmultifibra.com.br/olt/get-gpon-desc'
+    body_request = json.dumps({
+        "gpon": gpon,
+        "host": host
+    })
+
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    desc = requests.post(url, data=body_request, headers=headers)
+    desc = desc.json()
+
+    return desc["desc"]
+>>>>>>> Stashed changes:signal_query/views.py
