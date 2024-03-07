@@ -87,7 +87,7 @@ WSGI_APPLICATION = "maintenance_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "commands",
+        "NAME": "generatorDB",
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASS'),
         'HOST': 'localhost'

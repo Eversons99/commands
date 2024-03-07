@@ -97,7 +97,7 @@ async function getSignalAverage(requestInfo) {
     const queryMode = requestInfo.queryMode
     const queryValue = requestInfo.queryValue
 
-    window.location = `http://10.0.30.241:8000/optical/get-signal-information?queryMode=${queryMode}&queryValue=${queryValue}`
+    window.location = `http://168.0.96.11:50066/optical/get-signal-information?queryMode=${queryMode}&queryValue=${queryValue}`
 }
 
 /* 
@@ -177,5 +177,5 @@ function updateDescription() {
         cable = `0${cable}`
     }
 
-    window.location = `http://10.0.30.241:8000/optical/update-primary-description?olt=${olt}&gpon=${gpon}&primary=${primary}&cable=${cable}`
+    window.location = `http://168.0.96.11:50066/optical/update-primary-description?olt=${olt}&gpon=${gpon}&primary=${primary}&cable=${cable}`
 }
