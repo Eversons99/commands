@@ -177,7 +177,7 @@ def get_signal_information_by_pon_on_nmt(pon):
     median_tx = signal_average_info['median'].get('txPower')
     median_rx = signal_average_info['median'].get('rxPower')
 
-    if not devices_online or not devices_offline:
+    if devices_online == 0 and devices_offline == 0:
         return {
             'error': True,
             'message': "Nenhum cliente nessa localização PON"
