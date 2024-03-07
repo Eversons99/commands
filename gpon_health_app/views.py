@@ -171,11 +171,15 @@ def get_signal_information_by_pon_on_nmt(pon):
     }
 
     signal_average_info = requests.post(url, data=body_request, headers=headers)
+
+    desc = get_primary_description(gpon, host)
+
     signal_average_info = signal_average_info.json()
     devices_online = signal_average_info['online']
     devices_offline = signal_average_info['offline']
     median_tx = signal_average_info['median'].get('txPower')
     median_rx = signal_average_info['median'].get('rxPower')
+    signal_average_info["desc"] = desc
 
     if devices_online == 0 and devices_offline == 0:
         return {

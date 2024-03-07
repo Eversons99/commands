@@ -172,11 +172,54 @@ function updateDescription() {
 
 
     if(cable < 1 || cable > 13) {
-        loadingAnimation(false)
         return window.alert('Número do cabo inválido, por favor, insira um número entre 1 e 13!')
     } else if (cable < 10) {
         cable = `0${cable}`
     }
 
     window.location = `http://168.0.96.11:50066/gpon/update-primary-description?olt=${olt}&gpon=${gpon}&primary=${primary}&cable=${cable}`
+}
+
+async function getBoardsHost() {
+    try {
+        loadingAnimation(true)
+        const sourceHost = document.getElementById('select-olt').value
+        let hostSlots = await fetch(`https://nmt.nmultifibra.com.br/files/hosts?olt=${sourceHost}`)
+        hostSlots = await hostSlots.json()
+    
+        if (hostSlots.message == 'Host not Found') {
+            loadingAnimation(false)
+            return alert(`Ocorreu um erro ao buscar as informações da ${sourceHost} no NMT`)
+        }
+        fillElementsOptions(hostSlots)
+        loadingAnimation(false)
+    } catch (error) {
+        loadingAnimation(false)
+        return alert(`Ocorreu um erro ao consultar o NMT (Verifique a rede). Error ${error}`)
+    }
+}
+
+async function fillElementsOptions(slots) {
+    const slotSelectElement = document.getElementById('select-slot')
+    const portSelectElement = document.getElementById('select-port')
+    let counterPorts = 0
+
+    slotSelectElement.textContent = ''
+    portSelectElement.textContent = ''
+    slotSelectElement.append(document.createElement('option'))
+    portSelectElement.append(document.createElement('option'))
+
+    slots.forEach((slot) => {
+        const optionPortElement = document.createElement('option')
+        const currentPortValue = slot.split('/')[1]
+        optionPortElement.textContent = currentPortValue
+        slotSelectElement.append(optionPortElement)
+    })
+
+    while (counterPorts < 16) {
+        const optionPortElement = document.createElement('option')
+        optionPortElement.textContent = counterPorts
+        portSelectElement.append(optionPortElement)
+        counterPorts++
+    }
 }
