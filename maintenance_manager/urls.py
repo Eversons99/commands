@@ -20,6 +20,6 @@ urlpatterns = [
     path("attenuator/", include("attenuations_manager_app.urls")),
     path("generator/", include("commands_generator_app.urls")),
     path("sms/", include("send_sms_app.urls")),
-    path("optical/", include("signal_query_app.urls")),
+    path("gpon/", include("gpon_health_app.urls")),
     path("admin/", admin.site.urls),
 ]

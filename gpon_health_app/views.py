@@ -5,6 +5,12 @@ from .enums.olts import KnownOlts
 from django.shortcuts import render, redirect
 
 
+def update_desc(request):
+    """
+    Renderiza a página para coleta de informações
+    """
+    return render(request, "updateDesc.html")
+
 def query_signal(request):
     """
     Renderiza a página de consultar o sinal
@@ -184,8 +190,6 @@ def get_signal_information_by_pon_on_nmt(pon):
         }
 
     return signal_average_info
-<<<<<<< Updated upstream:signal_query_app/views.py
-=======
 
 def update_primary_description(request):
     """
@@ -247,4 +251,3 @@ def get_primary_description(gpon, host):
     desc = desc.json()
 
     return desc["desc"]
->>>>>>> Stashed changes:signal_query/views.py
