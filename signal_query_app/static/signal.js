@@ -140,3 +140,42 @@ function makeSignalQueryByTable() {
 
     getSignalAverage(requestInfo)
 }
+
+function updateDescription() {
+    loadingAnimation(true)
+
+    const olt = document.getElementById('select-olt').value
+    const gpon = `0/${document.getElementById('select-slot').value}/${document.getElementById('select-port').value}`
+    let primary = document.getElementById('select-primary').value
+    let cable = document.getElementById('select-cable').value
+
+    if (!document.getElementById('select-slot').value || !document.getElementById('select-port').value ) {
+        loadingAnimation(false)
+        return window.alert('Preecha o F/S/P para prosseguir')
+    } else if (!olt) {
+        loadingAnimation(false)
+        return window.alert('Selecione a OLT para prosseguir')
+    } else if (!primary) {
+        loadingAnimation(false)
+        return window.alert('Selecione a PRIMÁRIA para prosseguir')
+    } else if (!cable) {
+        loadingAnimation(false)
+        return window.alert('Selecione o CABO para prosseguir')
+    }
+
+    if(primary < 1 || primary > 72) {
+        loadingAnimation(false)
+        return window.alert('Número da primária inválido, por favor, insira um número entre 1 e 72!')
+    } else if (primary < 10) {
+        primary = `0${primary}`
+    }
+
+
+    if(cable < 1 || cable > 13) {
+        return window.alert('Número do cabo inválido, por favor, insira um número entre 1 e 13!')
+    } else if (cable < 10) {
+        cable = `0${cable}`
+    }
+
+    window.location = `http://168.0.96.11:50066/optical/update-primary-description?olt=${olt}&gpon=${gpon}&primary=${primary}&cable=${cable}`
+}
