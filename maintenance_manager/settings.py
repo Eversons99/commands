@@ -27,16 +27,16 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.241', '168.0.96.11']
+ALLOWED_HOSTS = ['10.0.30.157', '10.0.30.157', '10.0.30.157', '168.0.96.11']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "attenuations_manager",
-    "send_sms",
-    "signal_query",
-    "commands_generator",
+    "attenuations_manager_app",
+    "commands_generator_app",
+    "signal_query_app",
+    "send_sms_app",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -61,9 +61,10 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            f'{ABSOLUTE_PATH}/attenuations_manager/templates',
-            f'{ABSOLUTE_PATH}/signal_query/templates/',
-            f'{ABSOLUTE_PATH}/commands_generator/templates/',
+            f'{ABSOLUTE_PATH}/attenuations_manager_app/templates',
+            f'{ABSOLUTE_PATH}/commands_generator_app/templates/',
+            f'{ABSOLUTE_PATH}/signal_query_app/templates/',
+            f'{ABSOLUTE_PATH}/send_sms_app/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],
         "APP_DIRS": True,
@@ -128,13 +129,16 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    f'{ABSOLUTE_PATH}/attenuations_manager/static_attenuator',
-    f'{ABSOLUTE_PATH}/maintenance_manager/static_maintenance',
-    f'{ABSOLUTE_PATH}/signal_query/static_signal',
+    f'{ABSOLUTE_PATH}/attenuations_manager_app/static',
+    f'{ABSOLUTE_PATH}/commands_generator_app/static',
+    f'{ABSOLUTE_PATH}/send_sms_app/static',
+    f'{ABSOLUTE_PATH}/signal_query_app/static',
+    f'{ABSOLUTE_PATH}/maintenance_manager/static'
 ]
 
-STATIC_ROOT = f'{ABSOLUTE_PATH}/static'
 STATIC_URL = "static/"
+STATIC_ROOT = f'{ABSOLUTE_PATH}/assets'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

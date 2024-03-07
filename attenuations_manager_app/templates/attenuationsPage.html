@@ -1,0 +1,11 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+
+{% include 'attenuations_manager_title.html' %}
+<div id="maintenance-name"><h3>Manutenção: {{ name }}</h3></div>
+{% include 'attenuationsPagePartial.html'%}
+
+<script type='text/javascript' src="{% static 'attenuations_manager/staticattenuator.js' %}"></script>
+{% endblock %}

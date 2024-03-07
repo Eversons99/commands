@@ -1,30 +1,33 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        {% if "/generator/" in request.path %}
-            <title>Gerador de Comandos</title>
-        {% else  %}
-            <title>Gerenciador de Atenuações</title>
-        {% endif %}
-
-        <link rel="stylesheet" href="{% static 'resources/style.css' %}">
-        <link rel="stylesheet" href="{% static 'attenuator.css' %}">
-    </head>
-
-  <body>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    {% if "/generator/" in request.path %}
+        <title>Gerador de Comandos</title>
+    {% else  %}
+        <title>Gerenciador de Atenuações</title>
+    {% endif %}
+    
+    <link rel="stylesheet" href="{% static 'attenuator.css' %}"> 
+    <link rel="stylesheet" href="{% static 'shared_staticfiles/maintenance.css' %}">
+</head>
+<body>
     {% csrf_token %}
     <div class="modal-loader">
       <div class="loader"></div>
       <h2 id="loader-message">Carregando dados...</h2>
     </div>
+
     <nav class="logo">
         <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
     </nav>
+
     {% block content %} {% endblock %} 
-    <script type='text/javascript' src="{% static 'resources/script.js' %}"></script>
-  <script type='text/javascript' src="{% static 'attenuator.js' %}"></script>
-  </body>
+
+    <script type='text/javascript' src="{% static 'attenuator.js' %}"></script>
+    <script type='text/javascript' src="{% static 'commands.js' %}"></script>
+    <script type='text/javascript' src="{% static 'shared_staticfiles/maintenance.js' %}"></script>
+</body>
 </html>

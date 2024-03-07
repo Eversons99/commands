@@ -1,0 +1,12 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'attenuations_manager_title.html' %}
+    <section id="source-container">
+        {% include 'partials/gponForm.html' %}
+        <div class="search-btn">
+            <button onclick="searchOnts('attenuator')">Buscar</button>
+        </div>
+    </section>
+{% endblock %}
