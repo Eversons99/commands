@@ -1,0 +1,274 @@
+* { 
+    padding: 0;
+    margin: 0.3em auto;
+    font-family: sans-serif, Arial, Helvetica;
+    border: none;
+    margin-top: 0;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+}
+
+.logo {
+    display: block;
+}
+
+.logo img {
+    width: 12%;
+    margin: 0.5em 0 0.5em 1em;
+}
+
+.modal-loader {
+    display: none;
+    align-items: center;
+    background-color: #8b8b8b;
+    flex-direction: column;
+    font-family: Arial;
+    font-weight: 900;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.6;
+    margin: 0;
+    justify-content: center;
+}
+  
+.loader {  
+    animation: is-rotating 1s infinite;
+    width: 50px;
+    height: 50px;
+    border: 6px solid #e5e5e5;
+    border-top-color: #51d4db;
+    border-radius: 50%;
+}
+  
+@keyframes is-rotating {
+    to {
+        transform: rotate(1turn);
+    }
+}
+
+.disable-scroll {
+    overflow: hidden;
+}
+
+#source-container, #olt, #gpon, #selects-source-gpon,  #file, .generate-btn {
+    display: flex;
+    width: 85%;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+#source-container, #olt, #gpon, #file, .ready-commands {
+    flex-direction: column;
+}
+
+#selects-source-gpon, object {
+    width: 100%;
+}
+
+select, input {
+    width: 100%;
+    padding: 15px; 
+    margin: 0 4px;  
+    border: 2px solid;
+    border-color: white;
+    border-radius: 10px;
+    font-size: 20px;
+    background-color: #f7f9fd;
+    box-sizing: border-box;
+}
+
+select:hover, input:hover {
+    border-color: #fbad18;
+    border: 2px solid;
+}
+
+button {
+    padding: 12px 50px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #000000;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover{
+    background: #959da1;
+}
+
+table {
+    text-align: center;
+    font-size: 18px;
+    width: 85%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 6px;
+}
+
+td { 
+    padding: 8px;
+}
+
+#table-head {
+    background: #4e9ff4;
+    color: white;
+}
+
+table th:last-child {
+    border-radius: 0 16px 0 0;    
+}
+
+table th:first-child {
+    border-radius: 16px 0 0 0;
+}
+
+#file, #olt, #gpon { 
+    margin: 15px auto;
+}
+
+#title {
+    margin:0.1em auto;
+}
+
+#btn-warn {
+    background: #fbad18;
+    color: black;
+}
+
+#btn-discard {
+    background: rgb(250, 65, 65);
+    color: black;
+}
+
+#btn-save {
+    background: rgb(4, 168, 39);
+    color: black;
+}
+
+#btn-discard:hover{
+    background: rgb(227, 107, 107);
+}
+
+#btn-warn:hover {
+    background: #efbe63;
+
+}
+
+#btn-save:hover {
+    background: rgb(132, 231, 153);
+}
+
+textarea {
+    width: 100%;
+    height: 30em;
+    font-size: 16px;
+    padding: 1em;
+    border-radius: 0 0 10px 10px;
+    border: none;
+    resize: none;
+    background: black;
+    margin: 0;
+    color: white;
+}
+
+
+.inactive-result {
+    display: none;
+}
+
+.ready-commands { 
+    display: block;
+    width: 85%;
+}
+
+.commands, .result-buttuns {
+    display: flex;
+    width: 100%;
+    margin: 0;
+}
+
+.result-buttuns {
+    background-color: #8b8b8b;
+}
+
+#interface-button {
+    border-top-left-radius: 0;
+}
+
+.action-buttuns { 
+    display: flex;
+    width: 85%;
+    margin: 1em auto;
+    justify-content: flex-end;
+}
+
+.action-buttuns button {
+    margin: 0 0.3em;
+    padding: 0.5em 1em;
+    font-size: 16px;
+    font-weight: bold;
+    background: #000000;
+    border-radius: 10px;
+    color: white;
+}
+
+.result-buttuns button { 
+    padding: 12px 50px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 15px 15px 0 0;
+    color: #ffffff ;
+    margin: 0;
+}
+
+.active-btn {
+    background: #757474;
+}
+
+.inactive-btn {
+    background: #000000;
+
+}
+
+.new-search-ssh {
+    display: flex;
+    width: 85%;
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#qinfo-table-head {
+    background: #4e9ff4;
+    color: white;
+}
+
+.new-search-ssh * {
+    padding: 0.6em;
+}
+
+#qinfo-table-head > :first-child {
+    border-radius: 10px 0 0 0;
+}
+
+#qinfo-table-head > :last-child {
+    border-radius: 0 10px 0 0;
+}
+
+#error {
+    color: red;
+}
+
+
+#container-onts-table {
+    display: none;
+}
