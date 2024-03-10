@@ -3,7 +3,7 @@
         {
             "name": "commands",
             "script": "manage.py",
-            "args": "runserver 10.0.30.157:8000",
+            "args": "runserver 10.0.30.252:8000",
             "interpreter": "python3.11",
             "watch": true
         }

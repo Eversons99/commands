@@ -47,7 +47,7 @@ def search_onts(request):
         }
 
         save_sms_info = save_sms_infos_in_database(initial_sms_info)
-
+    
         return HttpResponse(json.dumps(save_sms_info))
 
     return redirect(home)
@@ -55,7 +55,7 @@ def search_onts(request):
 def get_onts_snmp_in_nmt(host, pon_location):
     """Make a request to NMT to get ONT"""
     try:
-        api_url = 'http://10.0.30.163:3333/olt/onts-infos-command-generator'
+        api_url = 'https://nmt.nmultifibra.com.br/olt/onts-sms-table'
         request_options = {
             'headers' : {'Content-Type': 'application/json; charset=utf-8'},
             'body': json.dumps({
@@ -98,7 +98,7 @@ def save_sms_infos_in_database(initial_sms_info):
             'error': True,
             'message': f'Erro de integridade, {err}'
         }
-
+    
 def render_onts_table(request):
     """Render a table with all devices (ONT's)"""
     register_id = request.GET.get('tab_id')
@@ -113,7 +113,6 @@ def render_onts_table(request):
     try:
         device_info = get_sms_info_in_database(register_id)
         onts = ast.literal_eval(device_info.unchanged_devices)
-
         onts_context = {
             'all_devices': onts
         }
@@ -151,8 +150,10 @@ def get_numbers_to_send_sms(request):
         serial_numbers_selecteds = body_request['serialNumbers']
         register_id =  body_request['tabId']
 
+        print(serial_numbers_selecteds)
+
         try:
-            url = 'http://10.0.30.163:3333/ruptures/partial-rupture-contacts/'
+            url = 'https://nmt.nmultifibra.com.br/rompimentos/parcial'
             headers_request = {"Content-Type": "application/json; charset=utf-8"}
             options_request = json.dumps({
                 "serialNumbers": serial_numbers_selecteds

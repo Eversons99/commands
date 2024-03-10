@@ -5,6 +5,12 @@ from .enums.olts import KnownOlts
 from django.shortcuts import render, redirect
 
 
+def update_desc(request):
+    """
+    Renderiza a página para coleta de informações
+    """
+    return render(request, "updateDesc.html")
+
 def query_signal(request):
     """
     Renderiza a página de consultar o sinal
@@ -165,13 +171,17 @@ def get_signal_information_by_pon_on_nmt(pon):
     }
 
     signal_average_info = requests.post(url, data=body_request, headers=headers)
+
+    desc = get_primary_description(gpon, host)
+
     signal_average_info = signal_average_info.json()
     devices_online = signal_average_info['online']
     devices_offline = signal_average_info['offline']
     median_tx = signal_average_info['median'].get('txPower')
     median_rx = signal_average_info['median'].get('rxPower')
+    signal_average_info["desc"] = desc
 
-    if not devices_online or not devices_offline:
+    if devices_online == 0 and devices_offline == 0:
         return {
             'error': True,
             'message': "Nenhum cliente nessa localização PON"
@@ -184,8 +194,6 @@ def get_signal_information_by_pon_on_nmt(pon):
         }
 
     return signal_average_info
-<<<<<<< Updated upstream:signal_query_app/views.py
-=======
 
 def update_primary_description(request):
     """
@@ -247,4 +255,3 @@ def get_primary_description(gpon, host):
     desc = desc.json()
 
     return desc["desc"]
->>>>>>> Stashed changes:signal_query/views.py

@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.157', '10.0.30.157', '10.0.30.157', '168.0.96.11']
+ALLOWED_HOSTS = ['10.0.30.252', '10.0.30.252', '10.0.30.252', '168.0.96.11']
 
 
 # Application definition
@@ -35,7 +35,7 @@ ALLOWED_HOSTS = ['10.0.30.157', '10.0.30.157', '10.0.30.157', '168.0.96.11']
 INSTALLED_APPS = [
     "attenuations_manager_app",
     "commands_generator_app",
-    "signal_query_app",
+    "gpon_health_app",
     "send_sms_app",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -63,7 +63,7 @@ TEMPLATES = [
         "DIRS": [
             f'{ABSOLUTE_PATH}/attenuations_manager_app/templates',
             f'{ABSOLUTE_PATH}/commands_generator_app/templates/',
-            f'{ABSOLUTE_PATH}/signal_query_app/templates/',
+            f'{ABSOLUTE_PATH}/gpon_health_app/templates/',
             f'{ABSOLUTE_PATH}/send_sms_app/templates/',
             f'{ABSOLUTE_PATH}/templates/'
         ],
@@ -132,7 +132,7 @@ STATICFILES_DIRS = [
     f'{ABSOLUTE_PATH}/attenuations_manager_app/static',
     f'{ABSOLUTE_PATH}/commands_generator_app/static',
     f'{ABSOLUTE_PATH}/send_sms_app/static',
-    f'{ABSOLUTE_PATH}/signal_query_app/static',
+    f'{ABSOLUTE_PATH}/gpon_health_app/static',
     f'{ABSOLUTE_PATH}/maintenance_manager/static'
 ]
 

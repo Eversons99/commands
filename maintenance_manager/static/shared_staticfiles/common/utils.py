@@ -229,7 +229,8 @@ class GeneralUtility:
                 "error": False,
                 "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
                 "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
-                "global_commands": requests.get(commands.commands_url.get("globalCommands")).text
+                "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
+                'maintenance_name': commands.file_name
             }
 
             return all_commands

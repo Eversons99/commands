@@ -167,7 +167,7 @@ def render_page_commands(request):
     if commands.get('error'):
         return render(request, 'error.html', context=commands)
 
-    return render(request, 'commands.html', context=commands)
+    return render(request, 'attenuationsCommands.html', context=commands)
 
 
 def render_error_page(request):

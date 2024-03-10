@@ -1,0 +1,8 @@
+{
+    "apps": [{
+        "name": "ws-server",
+        "script": "server.py",
+        "interpreter": "python3.11",
+        "watch": true
+    }]
+}
