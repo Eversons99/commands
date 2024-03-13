@@ -39,7 +39,7 @@ def render_onts_table(request):
             onts_info = GeneralUtility.get_unchanged_onts_on_database(request, db_model)
             
             if onts_info.get('error'):
-                return render(request, 'error.html', context=onts_info)
+                return render(request, 'errorPage.html', context=onts_info)
 
             return render(request, 'devicesTable.html', context=onts_info)
 
@@ -48,7 +48,7 @@ def render_onts_table(request):
                 'message': f'Ocorreu um erro ao buscar registro no banco. Error: {err}'
             }
 
-            return render(request, 'error.html', context=error_message)
+            return render(request, 'errorPage.html', context=error_message)
 
     return redirect(home)
 
@@ -83,7 +83,7 @@ def search_onts_via_ssh(request):
     if not query_info.get('error'):
         return render(request, 'ssh_search_generator.html', context=query_info)
 
-    return render(request, 'error.html', context=query_info)
+    return render(request, 'errorPage.html', context=query_info)
 
 
 def render_page_commands(request):
@@ -94,7 +94,7 @@ def render_page_commands(request):
     commands = GeneralUtility.get_urls_to_ready_commands(request, db_model)
 
     if commands.get('error'):
-        return render(request, 'error.html', context=commands)
+        return render(request, 'errorPage.html', context=commands)
 
     return render(request, 'commands.html', context=commands)
 
@@ -118,4 +118,4 @@ def render_error_page(request):
     Renders error page, showing the personalised error message
     """
     error_message = {'message': request.GET.get('message')}
-    return render(request, 'error.html', context=error_message)
+    return render(request, 'errorPage.html', context=error_message)

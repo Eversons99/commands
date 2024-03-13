@@ -272,3 +272,7 @@ textarea {
 #container-onts-table {
     display: none;
 }
+
+#maintenance-title {
+    display: flex;
+}

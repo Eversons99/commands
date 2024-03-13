@@ -66,7 +66,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.252:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -96,7 +96,16 @@ async function searchOnts(operationMode) {
     const ontsRequest = await fetch(`${baseUrl}/search_onts_via_snmp`, requestOptions)
     const responseRequest = await ontsRequest.json()
     
-    if (responseRequest.error == true) {
+    if (operationMode == 'attenuator' && responseRequest.error == true) {
+        let messageError = responseRequest.message
+
+        if (messageError == 'No onts were found') {
+            messageError = 'Nenhuma ONU na porta informada'
+        }
+
+        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
+    }
+    else if (responseRequest.error == true) {
         return window.location = `${baseUrl}/search_onts_via_ssh?tab_id=${tabId}`
     }
 
@@ -110,7 +119,7 @@ function getIdentificator() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.252:8000/generator"
+    const baseUrl = "http://10.0.30.157:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {

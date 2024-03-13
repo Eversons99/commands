@@ -28,7 +28,7 @@ class GeneralUtility:
 
         initial_maintenance_info = {
             "register_id": register_id,
-            "source_gpon": source_gpon,
+            "source_gpon": source_gpon
         }
 
         ont_devices = GeneralUtility.get_onts_info_on_nmt(source_host, source_pon)
@@ -63,14 +63,23 @@ class GeneralUtility:
                 data=request_options['body'],
                 timeout=60
             )
-            onts = get_all_onts.json()
 
-            if len(onts) == 0 or isinstance(onts, dict):
+            onts = get_all_onts.json()
+            
+            if not isinstance(onts, list) and onts.get('error'):
+                return {
+                    "error": True,
+                    "onts": 0,
+                    "message": onts.get('error')
+                }
+            
+            elif len(onts) == 0 or isinstance(onts, dict):
                 return {
                     "error": True,
                     "onts": 0,
                     "message": 'A busca via SNMP não retornou nenhuma informação'
                 }
+                
 
             return {
                 "error": False,
@@ -152,7 +161,6 @@ class GeneralUtility:
 
         try:
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-            print(maintenance_info.unchanged_onts)
             onts = ast.literal_eval(maintenance_info.unchanged_onts)
 
             onts_info = {

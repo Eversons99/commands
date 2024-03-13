@@ -21,5 +21,6 @@ urlpatterns = [
     path("generator/", include("commands_generator_app.urls")),
     path("sms/", include("send_sms_app.urls")),
     path("gpon/", include("gpon_health_app.urls")),
+    path("apply/", include("apply_commands_app.urls")),
     path("admin/", admin.site.urls),
 ]
