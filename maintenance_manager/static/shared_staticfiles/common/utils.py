@@ -224,7 +224,7 @@ class GeneralUtility:
             raise Exception from err
 
     @staticmethod
-    def get_urls_to_ready_commands(request, db_model):
+    def get_urls_to_ready_commands(request, db_model, operation_mode):
         """
         Make a query in the database to obtain the urls where the ready commands are stored
         """
@@ -238,7 +238,8 @@ class GeneralUtility:
                 "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
                 "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
                 "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
-                'maintenance_name': commands.file_name
+                "maintenance_name": commands.file_name,
+                "operation_mode": operation_mode
             }
 
             return all_commands
@@ -265,3 +266,17 @@ class GeneralUtility:
         GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
         return HttpResponse(status=200)
+
+    @staticmethod
+    def get_maintenance_info_to_apply_commands(request, db_model):
+        body_request = json.loads(request.body)
+        register_id = body_request.get('tabId')
+        maintenance = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = {
+            'commands_url': maintenance.commands_url,
+            'source_gpon': maintenance.source_gpon,
+            'destination_gpon': maintenance.destination_gpon,
+            'file_name': maintenance.file_name
+        }
+        
+        return maintenance_info

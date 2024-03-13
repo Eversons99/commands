@@ -1,4 +1,5 @@
 import json
+from django.core.serializers import serialize
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -23,7 +24,6 @@ def search_onts_via_snmp(request):
         db_model = GeneratorDB
         onts_info = GeneralUtility.get_onts_via_snmp(request, db_model)
         return onts_info
-
 
     return redirect(home)
 
@@ -91,7 +91,8 @@ def render_page_commands(request):
     Gets commands info and render commands pages
     """
     db_model = GeneratorDB
-    commands = GeneralUtility.get_urls_to_ready_commands(request, db_model)
+    operation_mode = 'generator'
+    commands = GeneralUtility.get_urls_to_ready_commands(request, db_model, operation_mode)
 
     if commands.get('error'):
         return render(request, 'errorPage.html', context=commands)
@@ -113,6 +114,14 @@ def update_onts_in_database(request):
     return redirect(home)
 
 
+def get_maintenance_info(request):
+    
+    if request.method == 'POST':
+        db_model = GeneratorDB
+        maintenance_info = GeneralUtility.get_maintenance_info_to_apply_commands(request, db_model)
+
+        return HttpResponse(json.dumps(maintenance_info))
+        
 def render_error_page(request):
     """
     Renders error page, showing the personalised error message
