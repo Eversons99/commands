@@ -276,3 +276,48 @@ textarea {
 #maintenance-title {
     display: flex;
 }
+
+#error{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: #000000;
+    align-items: center;
+    justify-content: center;
+}
+
+#error a {
+    text-decoration: none;
+    color: white;
+}
+
+#error-title-h1 {
+    font-size: 230px;
+    font-weight: 900;
+    background: url('../img/galaxy.jpg') no-repeat;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+}
+
+#error-title-h2 {
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+#bnt-error {
+    background-color: #0046d5; 
+    font-weight: 700;
+    font-size: 16px;
+    -webkit-box-shadow: 0px 4px 15px -5px #0046d5;
+            box-shadow: 0px 4px 15px -5px #0046d5;
+
+}
+
+#error-title-h2, #bnt-error, #error-message {
+    margin: 0 0 1em 0;
+}

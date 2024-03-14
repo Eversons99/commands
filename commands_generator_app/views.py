@@ -115,7 +115,6 @@ def update_onts_in_database(request):
 
 
 def get_maintenance_info(request):
-    
     if request.method == 'POST':
         db_model = GeneratorDB
         maintenance_info = GeneralUtility.get_maintenance_info_to_apply_commands(request, db_model)

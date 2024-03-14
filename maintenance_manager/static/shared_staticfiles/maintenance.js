@@ -213,9 +213,42 @@ function getIdDevicesSelected() {
 async function apllyCommands(operationMode) {
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
-    await startApplicationOfCommands(maintenanceInfo)
+    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
+    const loadingText = document.getElementById('loader-message')
+    let operationStatus
+    const commandsApplied = []
 
-    loadingAnimation(false)
+    try {
+        socket.onopen = () => {
+            socket.send(JSON.stringify({
+                maintenanceInfo
+            }))
+            console.log('Sessão com o servidor Websocket iniciada')
+        }
+
+        socket.onmessage = (event) => {
+            const currentMessage = JSON.parse(event.data)
+
+            if (currentMessage.command) {
+                let commandLog = currentMessage.command
+                loadingText.textContent = `Aplicando comando: ${commandLog}`
+                commandsApplied.push(currentMessage)
+            }
+        }
+
+        socket.onclose = () => {
+            loadingAnimation(false)
+            showLogs(commandsApplied)
+            console.log('Sessão com o servidor Websocket finalizada')
+            return operationStatus
+        }
+
+        socket.onerror = (e) => {
+            alert(JSON.parse(e))
+        }
+    } catch (error) {
+        return alert(error)
+    }
 }
 
 async function getMaintenanceInfo(operationMode) {
@@ -237,32 +270,6 @@ async function getMaintenanceInfo(operationMode) {
     return maintenanceInfo
 }
 
-async function startApplicationOfCommands (maintenanceInfo) {
-    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
-    const loadingText = document.getElementById('loader-message')
-    let operationStatus
-
-    try {
-        socket.onopen = () => {
-            socket.send(JSON.stringify({
-                maintenanceInfo
-            }))
-            console.log('Sessão com o servidor Websocket iniciada')
-        }
-
-        socket.onmessage = (event) => {
-            const currentMessage = json.parse(event.data)
-
-            if (currentMessage.finished) {
-                operationStatus = currentMessage 
-            }
-        }
-
-        socket.onclose = () => {
-            console.log('Sessão com o servidor Websocket finalizada')
-            return operationStatus
-        }
-    } catch (error) {
-        return alert(error)
-    }
+function showLogs(logs) {
+    console.log(logs)
 }

@@ -100,7 +100,7 @@ async function searchOnts(operationMode) {
         let messageError = responseRequest.message
 
         if (messageError == 'No onts were found') {
-            messageError == 'Nenhuma ONU na porta informada'
+            messageError = 'Nenhuma ONU na porta informada'
         }
 
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
@@ -208,4 +208,63 @@ function getIdDevicesSelected() {
         }
     })
     return idDevicesSelected
+}
+
+async function apllyCommands(operationMode) {
+    loadingAnimation(true)
+    const maintenanceInfo = await getMaintenanceInfo(operationMode)
+    await startApplicationOfCommands(maintenanceInfo)
+
+    loadingAnimation(false)
+    showLogs()
+}
+
+async function getMaintenanceInfo(operationMode) {
+    const url = `http://10.0.30.157:8000/${operationMode}/get_maintenance_info`
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator()
+        })
+    }
+     
+    let maintenanceInfo = await fetch(url, requestOptions)
+    maintenanceInfo = await maintenanceInfo.json()
+
+    return maintenanceInfo
+}
+
+async function startApplicationOfCommands (maintenanceInfo) {
+    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
+    const loadingText = document.getElementById('loader-message')
+    let operationStatus
+
+    try {
+        socket.onopen = () => {
+            socket.send(JSON.stringify({
+                maintenanceInfo
+            }))
+            console.log('Sessão com o servidor Websocket iniciada')
+        }
+
+        socket.onmessage = (event) => {
+            const currentMessage = json.parse(event.data)
+
+            if (currentMessage.command) {
+                let commandLog = currentMessage.command
+                loadingText.textContent = `Aplicando comando: ${commandLog}`
+            }
+        }
+
+        socket.onclose = () => {
+            console.log('Sessão com o servidor Websocket finalizada')
+            return operationStatus
+        }
+    } catch (error) {
+        return alert(error)
+    }
 }

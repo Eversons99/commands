@@ -1,0 +1,55 @@
+<---------------------------- DELETAR ------------------------------>
+Applied: undo service-port port 0/6/15 ont 8 
+
+LOG:   Warning: The operation will delete multiple or all service ports and cause 
+interruptions of many user services.
+  It will take several minutes, and console may timeout, please use command 
+idle-timeout to set time limit 
+  Are you sure to release service virtual port(s)? (y/n)[n]: 
+
+Applied: y 
+
+LOG:   Service virtual ports on the ONT are being deleted, please wait: 100%
+  The number of total service virtual port which need be deleted:   1
+  The number of total service virtual port which have been deleted: 1
+ 
+
+Applied:  
+
+LOG:  
+
+Applied: interface gpon 0/6 
+
+LOG:  
+
+Applied: ont delete 15 8 
+
+LOG:   Number of ONTs that can be deleted: 1, success: 1
+ 
+
+<---------------------------- PROVISIONAMENTO - INTERFACE ------------------------------>
+Applied: ont add 0 0 sn-auth 46524b57278300aa omci ont-lineprofile-id 1 ont-srvprofile-id 1 desc "xgponhw" 
+
+LOG:   Failure: The ONT ID has already existed
+ 
+
+Applied: ont port native-vlan 0 0 eth 1 vlan 100 priority 0 
+
+LOG:   Failure: Make configuration repeatedly
+ 
+
+Applied:  
+
+LOG:  
+
+<---------------------------- PROVISIONAMENTO - GLOBAL ------------------------------>
+Applied: service-port vlan 1001 gpon 0/1/0 ont 0 gemport 1 multi-service user-vlan 100 tag-transform translate 
+
+LOG:   Failure: Service virtual port has existed already
+  Conflicted service virtual port index: 865
+ 
+
+Applied:  
+
+LOG:  
+

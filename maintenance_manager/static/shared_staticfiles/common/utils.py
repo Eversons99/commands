@@ -65,7 +65,7 @@ class GeneralUtility:
             )
 
             onts = get_all_onts.json()
-            
+
             if not isinstance(onts, list) and onts.get('error'):
                 return {
                     "error": True,
