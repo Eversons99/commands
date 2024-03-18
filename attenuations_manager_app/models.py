@@ -13,4 +13,5 @@ class AttenuatorDB(models.Model):
     selected_devices = models.TextField(null=True)
     commands_url = models.JSONField(null=True)
     attenuations = models.JSONField(null=True)
+    logs = models.JSONField(null=True)
     created_date = models.DateTimeField(default=timezone.now, null=True)

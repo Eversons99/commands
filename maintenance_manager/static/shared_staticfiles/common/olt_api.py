@@ -212,7 +212,7 @@ class Olt:
         ssh_connection = self.connect_olt(source_host) 
         
         for command in delete_commands:
-            log_file.write(f'Applied: {command} \n\n')  
+            log_file.write(f'APPLIED: {command} \n\n')  
             send_command_rm = ssh_connection.send_command_timing(command)
             log_file.write(f'LOG: {send_command_rm} \n\n')
             await asyncio.sleep(0.5)
@@ -227,21 +227,21 @@ class Olt:
         ssh_connection.send_command_timing(interface_command)
         
         for command in interface_commands:
-            log_file.write(f'Applied: {command} \n\n')
+            log_file.write(f'APPLIED: {command} \n\n')
             send_command_int = ssh_connection.send_command_timing(command)
 
             if 'SN already exists' in send_command_int:
-                log_file.write(f'SN DUPLICADO LOCALIZADO EM {command}')
+                log_file.write(f'ERROR: SN DUPLICADO LOCALIZADO EM {command}')
                 delete_old_sn = self.delete_sn_duplicate(command, ssh_connection)
 
                 if not delete_old_sn["success"]:
                     ssh_connection.send_command_timing(interface_command)
-                    log_file.write(f'Erro ao deletear ONU duplicada: {delete_old_sn["message"]}')
+                    log_file.write(f'ERROR: Erro ao deletear ONU duplicada: {delete_old_sn["message"]}')
 
                 elif delete_old_sn["success"]:
                     ssh_connection.send_command_timing(interface_command)
                     send_command_int = ssh_connection.send_command_timing(command)
-                    log_file.write('O SN duplicado foi deletado e o comando foi aplicado novamente')
+                    log_file.write('INFO: O SN duplicado foi deletado e o comando foi aplicado novamente')
 
             log_file.write(f'LOG: {send_command_int} \n\n')
             await asyncio.sleep(0.5)
@@ -251,7 +251,7 @@ class Olt:
         ssh_connection.send_command_timing('quit')
         
         for command in global_commands:
-            log_file.write(f'Applied: {command} \n\n')
+            log_file.write(f'APPLIED: {command} \n\n')
             send_command_gbl = ssh_connection.send_command_timing(command)
             log_file.write(f'LOG: {send_command_gbl} \n\n')
             await asyncio.sleep(0.5)

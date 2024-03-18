@@ -35,7 +35,6 @@ ALLOWED_HOSTS = ['10.0.30.157', '10.0.30.157', '10.0.30.157', '168.0.96.11']
 INSTALLED_APPS = [
     "attenuations_manager_app",
     "commands_generator_app",
-    "apply_commands_app",
     "gpon_health_app",
     "send_sms_app",
     "django.contrib.admin",

@@ -236,9 +236,9 @@ async function apllyCommands(operationMode) {
             }
         }
 
-        socket.onclose = () => {
+        socket.onclose = async () => {
             loadingAnimation(false)
-            showLogs(commandsApplied)
+            await showLogs(commandsApplied, operationMode)
             console.log('Sessão com o servidor Websocket finalizada')
             return operationStatus
         }
@@ -270,6 +270,27 @@ async function getMaintenanceInfo(operationMode) {
     return maintenanceInfo
 }
 
-function showLogs(logs) {
-    console.log(logs)
+async function showLogs(logs, operationMode) {
+    // Fazer um post para o APP e salvar os logs no banco
+    // Fazer um get para o APP para renderizar os comandos aplicados
+    const tabId = getIdentificator()
+    const baseUrl = `http://10.0.30.157:8000/${operationMode}`
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': tabId,
+            'logs': logs
+        })
+    }
+    
+    let saveCommands = await fetch(`${baseUrl}/save_logs`, requestOptions)
+    saveCommands = await saveCommands.json()
+
+    if (saveCommands.error) return alert(saveCommands.message)
+
+    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
 }

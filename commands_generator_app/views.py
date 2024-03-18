@@ -120,6 +120,25 @@ def get_maintenance_info(request):
         maintenance_info = GeneralUtility.get_maintenance_info_to_apply_commands(request, db_model)
 
         return HttpResponse(json.dumps(maintenance_info))
+
+
+def save_logs(request):
+    if request.method == 'POST':
+        db_model = GeneratorDB
+        save_logs_on_db = GeneralUtility.save_logs(request, db_model)
+        
+        return HttpResponse(json.dumps(save_logs_on_db))
+
+
+def render_logs(request):
+    if request.method == 'GET':
+        register_id = request.GET.get('tab_id')
+        db_model = GeneratorDB
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name}
+
+        return render(request, 'commandsLogs.html', context=logs)
+
         
 def render_error_page(request):
     """
