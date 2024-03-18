@@ -72,13 +72,13 @@ def get_onts_snmp_in_nmt(host, pon_location):
         onts = get_all_onts.json()
 
         return {
-            "error": False,
-            "onts": onts
+            'error': False,
+            'onts': onts
         }
     except requests.exceptions.RequestException as err:
         return {
-            "error": True,
-            "message": f'Ocorreu um erro ao buscar as ONTs no NMT.  '
+            'error': True,
+            'message': f'Ocorreu um erro ao buscar as ONTs no NMT. Err: {err}'
         }
 
 def render_error_page(request):
@@ -156,30 +156,30 @@ def get_numbers_to_send_sms(request):
             url = 'https://nmt.nmultifibra.com.br/rompimentos/parcial'
             headers_request = {"Content-Type": "application/json; charset=utf-8"}
             options_request = json.dumps({
-                "serialNumbers": serial_numbers_selecteds
+                'serialNumbers': serial_numbers_selecteds
             })
 
             contacts = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             contact_response = contacts.json()
 
             data_to_update = {
-                "contacts": {
-                    "assinantes": contact_response["assinantes"],
-                    "contacts": contact_response["contatos"]
+                'contacts': {
+                    'assinantes': contact_response['assinantes'],
+                    'contacts': contact_response['contatos']
                 }
             }
 
             update_sms_info_in_database(data_to_update, register_id)
 
             return HttpResponse(json.dumps({
-                "error": False, 
+                'error': False, 
                 'message': 'A requisição para o NMT ocorreu com sucesso'
             }))
 
         except (requests.exceptions.RequestException, Exception) as err:
             return HttpResponse(json.dumps({
-                "error": True, 
-                'message': f'Ocorreu um erro ao coletar os contatos no NMT.  '
+                'error': True, 
+                'message': f'Ocorreu um erro ao coletar os contatos no NMT. Err: {err}'
             }))
 
     return redirect(home)
@@ -193,15 +193,15 @@ def render_contacts_page(request):
         sms_infos = sms_infos.contacts
 
         contacts_context = {
-            'contatos': len(sms_infos["contacts"]),
-            'assinantes': len(sms_infos["assinantes"])
+            'contatos': len(sms_infos['contacts']),
+            'assinantes': len(sms_infos['assinantes'])
         }
 
         return render(request, 'contact_page.html', context=contacts_context)
 
     except (requests.exceptions.RequestException, Exception) as err:
         error_message = {
-            "message" :  f'ocorreu um erro ao renderizar a página de comandos.  '
+            'message' :  f'ocorreu um erro ao renderizar a página de comandos. Err: {err}'
         }
 
         return render(request, 'error.html', context=error_message)
@@ -215,59 +215,59 @@ def create_rupture(request):
         tipo_rompimento =  body_request['tipoRompimento']
 
         OLTs = {
-            "OLT_COTIA_01": [],
-            "OLT_COTIA_02": [],
-            "OLT_COTIA_03": [],
-            "OLT_COTIA_04": [],
-            "OLT_EMBU_01": [],
-            "OLT_ITPV_01": [],
-            "OLT_TRMS_01": [],
-            "OLT_TRMS_02": [],
-            "OLT_CCDA_01": [],
-            "OLT_VGPA_01": [],
-            "OLT_GRVN_01": []
+            'OLT_COTIA_01': [],
+            'OLT_COTIA_02': [],
+            'OLT_COTIA_03': [],
+            'OLT_COTIA_04': [],
+            'OLT_EMBU_01': [],
+            'OLT_ITPV_01': [],
+            'OLT_TRMS_01': [],
+            'OLT_TRMS_02': [],
+            'OLT_CCDA_01': [],
+            'OLT_VGPA_01': [],
+            'OLT_GRVN_01': []
         }
 
         sms_infos = get_sms_info_in_database(register_id)
 
         gpon = sms_infos.source_gpon
 
-        OLTs[gpon["host"]].append(gpon["gpon"])
+        OLTs[gpon['host']].append(gpon['gpon'])
 
         try:
             url = 'https://nmt.nmultifibra.com.br/rompimentos/pon'
-            headers_request = {"Content-Type": "application/json; charset=utf-8"}
+            headers_request = {'Content-Type': 'application/json; charset=utf-8'}
             options_request = json.dumps({
-                "previsao": previsao,
-                "OLTs": OLTs,
-                "tipo": tipo_rompimento
+                'previsao': previsao,
+                'OLTs': OLTs,
+                'tipo': tipo_rompimento
             })
 
             rupture = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             rupture_response = rupture.json()
 
             data_to_update = {
-                "rupture": {
-                    'id': rupture_response["newRupture"]["id"],
-                    'previsao': rupture_response["newRupture"]["previsao"],
-                    'assinantes_afetados': rupture_response["newRupture"]["quantidade_assinantes"],
-                    'contatos': rupture_response["newRupture"]["sms"]["quantidade_contatos"],
-                    'sms_enviado': rupture_response["newRupture"]["sms"]["sms_enviado"],
-                    'tipo': rupture_response["newRupture"]["tipo"]
+                'rupture': {
+                    'id': rupture_response['newRupture']['id'],
+                    'previsao': rupture_response['newRupture']['previsao'],
+                    'assinantes_afetados': rupture_response['newRupture']['quantidade_assinantes'],
+                    'contatos': rupture_response['newRupture']['sms']['quantidade_contatos'],
+                    'sms_enviado': rupture_response['newRupture']['sms']['sms_enviado'],
+                    'tipo': rupture_response['newRupture']['tipo']
                 }
             }
 
             update_sms_info_in_database(data_to_update, register_id)
 
             return HttpResponse(json.dumps({
-                "error": False, 
+                'error': False, 
                 'message': 'A requisição para o NMT ocorreu com sucesso'
             }))
 
         except (requests.exceptions.RequestException, Exception) as err:
             return HttpResponse(json.dumps({
-                "error": True, 
-                'message': f'Ocorreu um erro ao criar o rompimento no NMT.'
+                'error': True, 
+                'message': f'Ocorreu um erro ao criar o rompimento no NMT. Err: {err}'
             }))
 
 def render_rupture_page(request):
@@ -279,12 +279,12 @@ def render_rupture_page(request):
         sms_infos = sms_infos.rupture
 
         rupture_context = {
-            'id': sms_infos["id"],
-            'previsao': sms_infos["previsao"],
-            'assinantes_afetados': sms_infos["assinantes_afetados"],
-            'contatos': sms_infos["contatos"],
-            'sms_enviado': sms_infos["sms_enviado"],
-            'tipo': sms_infos["tipo"]
+            'id': sms_infos['id'],
+            'previsao': sms_infos['previsao'],
+            'assinantes_afetados': sms_infos['assinantes_afetados'],
+            'contatos': sms_infos['contatos'],
+            'sms_enviado': sms_infos['sms_enviado'],
+            'tipo': sms_infos['tipo']
         }
 
 
@@ -292,7 +292,7 @@ def render_rupture_page(request):
 
     except (requests.exceptions.RequestException, Exception) as err:
         error_message = {
-            "message" :  f'ocorreu um erro ao renderizar a página de rompimento.'
+            'message' :  f'ocorreu um erro ao renderizar a página de rompimento. Err: {err}'
         }
 
         return render(request, 'error.html', context=error_message)
@@ -307,31 +307,31 @@ def send_sms(request):
 
     try:
         url = 'https://nmt.nmultifibra.com.br/rompimentos/sms'
-        headers_request = {"Content-Type": "application/json; charset=utf-8"}
+        headers_request = {'Content-Type': 'application/json; charset=utf-8'}
         options_request = json.dumps({
-            "mensagem": (
-                f'N-Multifibra: Identificamos um rompimento de fibra em seu bairro. '
+            'mensagem': (
+                'N-Multifibra: Identificamos um rompimento de fibra em seu bairro. '
                 f'Nossa equipe ja esta no local para efetuar o reparo. Previsao de retorno: {sms_infos["previsao"]}'
-                if sms_infos["tipo"].lower() == 'rompimento'
+                if sms_infos['tipo'].lower() == 'rompimento'
                 else f'N-Multifibra: Ola, informamos que realizaremos uma manutencao de emergencia em seu bairro para melhoria da conexao. '
                 f'Previsao de retorno: {sms_infos["previsao"]}'
             ),
-            "index": sms_infos["id"]
+            'index': sms_infos['id']
         })
 
         sms = requests.post(url, headers=headers_request, data=options_request, timeout=60)
         sms_response = sms.json()
 
         data_to_update = {
-            "sms_result": {
-                "result": sms_response
+            'sms_result': {
+                'result': sms_response
             }
         }
 
         update_sms_info_in_database(data_to_update, register_id)
 
         return HttpResponse(json.dumps({
-            "error": False, 
+            'error': False, 
             'message': 'A requisição para o NMT ocorreu com sucesso'
         }))
 
@@ -350,17 +350,17 @@ def render_sms_result_page(request):
         rupture_infos = sms_infos_database.rupture
 
         rupture_context = {
-            "success": sms_result["result"]["success"],
-            "failed": sms_result["result"]["failed"],
-            "previsao": rupture_infos["previsao"],
-            "id": rupture_infos["id"]
+            'success': sms_result['result']['success'],
+            'failed': sms_result['result']['failed'],
+            'previsao': rupture_infos['previsao'],
+            'id': rupture_infos['id']
         }
 
         return render(request, 'sms_page.html', context=rupture_context)
 
     except (requests.exceptions.RequestException, Exception) as err:
         error_message = {
-            "message" :  f'ocorreu um erro ao renderizar a página de SMS.'
+            'message' :  f'ocorreu um erro ao renderizar a página de SMS. Err: {err}'
         }
 
         return render(request, 'error.html', context=error_message)

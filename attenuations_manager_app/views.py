@@ -30,7 +30,7 @@ def render_onts_table(request):
     """
     Render a table with all onts
     """
-    if request.method == "GET":
+    if request.method == 'GET':
         try:
             db_model = AttenuatorDB
             onts_info = GeneralUtility.get_unchanged_onts_on_database(request, db_model)
@@ -73,8 +73,8 @@ def render_attenuations_page(request):
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
 
         attenuations_context = {
-            "attenuations": maintenance_info.attenuations,
-            "name": maintenance_info.file_name
+            'attenuations': maintenance_info.attenuations,
+            'name': maintenance_info.file_name
         }
 
         return render(request, 'attenuationsPage.html', context=attenuations_context)
@@ -93,8 +93,8 @@ def get_onts_to_render(request):
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
 
         onts = {
-            "attenuations": maintenance_info.attenuations,
-            "unchanged_onts": maintenance_info.unchanged_onts
+            'attenuations': maintenance_info.attenuations,
+            'unchanged_onts': maintenance_info.unchanged_onts
         }
 
         return HttpResponse(json.dumps(onts))

@@ -65,7 +65,7 @@ class GeneralUtility:
             )
 
             onts = get_all_onts.json()
-            
+
             if not isinstance(onts, list) and onts.get('error'):
                 return {
                     "error": True,
@@ -219,7 +219,6 @@ class GeneralUtility:
         """
         try:
             db_model.objects.filter(register_id=register_id).update(**data_to_update)
-
         except Exception as err:
             raise Exception from err
 
@@ -280,3 +279,17 @@ class GeneralUtility:
         }
         
         return maintenance_info
+    
+    @staticmethod
+    def save_logs(request, db_model):
+        try: 
+            body_request = json.loads(request.body)
+            register_id = body_request.get('tabId')
+            logs = body_request.get('logs')
+            
+            logs_to_save = {'logs': logs}
+            GeneralUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
+
+            return {'error': False}
+        except Exception as err:
+            return {'error': True, 'message': f'Ocorreu um erro ao salvar os logs. Err: {err}'}

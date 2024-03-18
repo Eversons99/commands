@@ -321,3 +321,26 @@ textarea {
 #error-title-h2, #bnt-error, #error-message {
     margin: 0 0 1em 0;
 }
+
+#logs-container {
+    background: black;
+    width: 90%;
+    font-size: 16px;
+    color: white;
+    padding: 1.5em;
+    height: 30em;
+    overflow-y: scroll;
+    border-radius: 0 0 10px 10px;
+}
+
+#logs-container p {
+    padding: 0.2em;
+}
+
+#applied {
+    color:rgb(4, 168, 39)
+}
+
+#log {
+    color: rgb(205, 226, 108);
+}

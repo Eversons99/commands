@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "commands_generator_app",
     "gpon_health_app",
     "send_sms_app",
+    "core_app",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

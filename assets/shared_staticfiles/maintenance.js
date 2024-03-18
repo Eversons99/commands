@@ -213,10 +213,42 @@ function getIdDevicesSelected() {
 async function apllyCommands(operationMode) {
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
-    await startApplicationOfCommands(maintenanceInfo)
+    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
+    const loadingText = document.getElementById('loader-message')
+    let operationStatus
+    const commandsApplied = []
 
-    loadingAnimation(false)
-    showLogs()
+    try {
+        socket.onopen = () => {
+            socket.send(JSON.stringify({
+                maintenanceInfo
+            }))
+            console.log('Sessão com o servidor Websocket iniciada')
+        }
+
+        socket.onmessage = (event) => {
+            const currentMessage = JSON.parse(event.data)
+
+            if (currentMessage.command) {
+                let commandLog = currentMessage.command
+                loadingText.textContent = `Aplicando comando: ${commandLog}`
+                commandsApplied.push(currentMessage)
+            }
+        }
+
+        socket.onclose = async () => {
+            loadingAnimation(false)
+            await showLogs(commandsApplied, operationMode)
+            console.log('Sessão com o servidor Websocket finalizada')
+            return operationStatus
+        }
+
+        socket.onerror = (e) => {
+            alert(JSON.parse(e))
+        }
+    } catch (error) {
+        return alert(error)
+    }
 }
 
 async function getMaintenanceInfo(operationMode) {
@@ -238,33 +270,27 @@ async function getMaintenanceInfo(operationMode) {
     return maintenanceInfo
 }
 
-async function startApplicationOfCommands (maintenanceInfo) {
-    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
-    const loadingText = document.getElementById('loader-message')
-    let operationStatus
-
-    try {
-        socket.onopen = () => {
-            socket.send(JSON.stringify({
-                maintenanceInfo
-            }))
-            console.log('Sessão com o servidor Websocket iniciada')
-        }
-
-        socket.onmessage = (event) => {
-            const currentMessage = json.parse(event.data)
-
-            if (currentMessage.command) {
-                let commandLog = currentMessage.command
-                loadingText.textContent = `Aplicando comando: ${commandLog}`
-            }
-        }
-
-        socket.onclose = () => {
-            console.log('Sessão com o servidor Websocket finalizada')
-            return operationStatus
-        }
-    } catch (error) {
-        return alert(error)
+async function showLogs(logs, operationMode) {
+    // Fazer um post para o APP e salvar os logs no banco
+    // Fazer um get para o APP para renderizar os comandos aplicados
+    const tabId = getIdentificator()
+    const baseUrl = `http://10.0.30.157:8000/${operationMode}`
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': tabId,
+            'logs': logs
+        })
     }
+    
+    let saveCommands = await fetch(`${baseUrl}/save_logs`, requestOptions)
+    saveCommands = await saveCommands.json()
+
+    if (saveCommands.error) return alert(saveCommands.message)
+
+    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
 }

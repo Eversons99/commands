@@ -33,7 +33,7 @@ def render_onts_table(request):
     """
     Render a table with all onts
     """
-    if request.method == "GET":
+    if request.method == 'GET':
         try:
             db_model = GeneratorDB
             onts_info = GeneralUtility.get_unchanged_onts_on_database(request, db_model)
@@ -105,7 +105,7 @@ def update_onts_in_database(request):
     """
     Updates unchanged devices on database
     """
-    if request.method == "POST":
+    if request.method == 'POST':
         db_model = GeneratorDB
         update_status = GeneralUtility.update_onts_in_database(request, db_model)
 
