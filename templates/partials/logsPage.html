@@ -1,12 +1,12 @@
 {% load static %}
 
 <header>
-    <h3>Manutenção: {{ name }}</h3>
+    <h3>Logs da Manutenção: {{ name }}</h3>
 </header>
-<section>
+<section id="logs-container">
     {% for log in logs %}
-        <p><b>APLICADO: </b>{{log.command}}</p>
-        <p><b>LOG: </b>{{log.log}}</p>
+        <p><b id="applied">COMANDO APLICADO: </b>{{log.command}}</p>
+        <p><b id="log">OUTPUT: </b>{{log.log}}</p>
     {% endfor %}
 </section>
 

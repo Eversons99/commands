@@ -194,7 +194,7 @@ def render_logs(request):
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name}
 
-        return render(request, 'commandsLogs.html', context=logs)
+        return render(request, 'attenuatorLogs.html', context=logs)
 
 
 def render_error_page(request):
