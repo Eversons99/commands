@@ -344,3 +344,48 @@ textarea {
 #log {
     color: rgb(205, 226, 108);
 }
+
+#apps {
+    display: flex;
+    width: 90%;
+}
+
+.app-title {
+    padding: 0.5em;
+    text-align: center;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border: solid 2px #f0eded;
+    margin: 3em;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+    
+}
+
+.app a {
+    text-decoration: none;
+    color: black;
+}
+
+.app-explanation {
+    padding: 0.5em;
+    text-align: justify;
+}
+
+#title-homepage {
+    margin: 0.1em auto;
+    text-align: center;
+}
+.btn-app {
+    background-color: #08d;
+}
+
+.btn-app:hover {
+    background-color: rgb(63, 171, 238);
+    cursor: pointer;
+}
