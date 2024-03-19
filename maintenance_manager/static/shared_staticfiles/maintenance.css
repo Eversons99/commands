@@ -152,6 +152,10 @@ table th:first-child {
     color: black;
 }
 
+#btn-home {
+    background: #08d;
+}
+
 #btn-discard:hover{
     background: rgb(227, 107, 107);
 }
@@ -163,6 +167,10 @@ table th:first-child {
 
 #btn-save:hover {
     background: rgb(132, 231, 153);
+}
+
+#btn-home:hover {
+    background: rgb(21, 149, 228);
 }
 
 textarea {
