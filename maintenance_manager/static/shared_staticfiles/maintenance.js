@@ -294,3 +294,16 @@ async function showLogs(logs, operationMode) {
 
     return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
 }
+
+async function downloadCommandsFile(operationMode) {
+    const tab_id = getIdentificator()
+    const url = `http://10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
+    const div = document.querySelector('.action-buttuns')
+    const link = document.createElement('a')
+    link.setAttribute('href', url)
+    link.setAttribute('id', 'link-download')
+    div.appendChild(link)
+
+    const elementLink = document.getElementById('link-download')
+    elementLink.click()
+}

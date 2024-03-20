@@ -1,5 +1,5 @@
 import json
-from django.core.serializers import serialize
+import mimetypes
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
@@ -93,6 +93,7 @@ def render_page_commands(request):
     db_model = GeneratorDB
     operation_mode = 'generator'
     commands = GeneralUtility.get_urls_to_ready_commands(request, db_model, operation_mode)
+    GeneralUtility.make_file_commands(request, db_model)
 
     if commands.get('error'):
         return render(request, 'errorPage.html', context=commands)
@@ -146,3 +147,10 @@ def render_error_page(request):
     """
     error_message = {'message': request.GET.get('message')}
     return render(request, 'errorPage.html', context=error_message)
+
+
+def download_command_file(request):
+    if request.method == 'GET':
+        db_model = GeneratorDB
+        file_commands = GeneralUtility.download_commands(request, db_model)
+        return file_commands

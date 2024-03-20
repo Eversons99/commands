@@ -164,6 +164,7 @@ def render_page_commands(request):
     db_model = AttenuatorDB
     operation_mode = 'attenuator'
     commands = GeneralUtility.get_urls_to_ready_commands(request, db_model, operation_mode)
+    GeneralUtility.make_file_commands(request, db_model)
 
     if commands.get('error'):
         return render(request, 'errorPage.html', context=commands)

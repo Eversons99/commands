@@ -1,7 +1,8 @@
 import ast
 import json
 import requests
-from django.http.response import HttpResponse
+import pandas as pd
+from django.http.response import HttpResponse, FileResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -293,3 +294,41 @@ class GeneralUtility:
             return {'error': False}
         except Exception as err:
             return {'error': True, 'message': f'Ocorreu um erro ao salvar os logs. Err: {err}'}
+
+    @staticmethod
+    def make_file_commands(request, db_model):
+        register_id = request.GET.get('tab_id')
+   
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        file_name = maintenance_info.file_name
+
+        interface_commands = requests.get(maintenance_info.commands_url.get('interfaceCommands')).text
+        global_commands = requests.get(maintenance_info.commands_url.get('globalCommands')).text
+        delete_commands = requests.get(maintenance_info.commands_url.get('deleteCommands')).text
+
+        file = pd.ExcelWriter(f'C:/Users/Everson/Desktop/commands/public/files/{file_name}.xlsx')
+
+        df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))
+        df_interface_commands = pd.DataFrame(interface_commands.split('\n'))
+        df_global_commands = pd.DataFrame(global_commands.split('\n'))
+        df_delete_commands = pd.DataFrame(delete_commands.split('\n'))
+
+        df_unchanged_onts.to_excel(file, index=False, header=False, sheet_name="UNCHANGED ONT'S")
+        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='INTERFACE COMMANDS')
+        df_global_commands.to_excel(file, index=False, header=False, sheet_name='GLOBAL COMMANDS')
+        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='DELETE COMMANDS')
+
+        file.close()
+
+    @staticmethod
+    def download_commands(request, db_model):
+        register_id = request.GET.get('tab_id')
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        file_name = f'{maintenance_info.file_name}.xlsx'
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+        print(file_path)
+        with open(file_path, 'rb') as file:
+            response = FileResponse(file)
+            print(response)
+            response['Content-Disposition'] = f'attachment; filename={file_name}'
+            return response
