@@ -2,6 +2,7 @@ import ast
 import json
 import requests
 import pandas as pd
+from attenuations_manager_app.models import AttenuatorDB
 from django.http.response import HttpResponse, FileResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
@@ -308,15 +309,36 @@ class GeneralUtility:
 
         file = pd.ExcelWriter(f'C:/Users/Everson/Desktop/commands/public/files/{file_name}.xlsx')
 
-        df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))
+        df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))     
+        df_unchanged_onts['status'] = df_unchanged_onts['status'].apply(lambda x: 'online' if x == 1 else 'offline')
+        df_unchanged_onts.loc[df_unchanged_onts['status'] == '1', 'status'] = 'online'
+        df_unchanged_onts = df_unchanged_onts.drop(['type','description'], axis=1)
+        df_unchanged_onts.to_excel(file, index=False, sheet_name="Main")
+
         df_interface_commands = pd.DataFrame(interface_commands.split('\n'))
         df_global_commands = pd.DataFrame(global_commands.split('\n'))
         df_delete_commands = pd.DataFrame(delete_commands.split('\n'))
+        
+        if db_model == AttenuatorDB:
+            attenuations = maintenance_info.attenuations
+            df_attenuations = pd.DataFrame()
+            
+            for attenuation in attenuations[1:]:
+                onts_id = attenuation.get('onts')
+                onts_in_attenuation = []
+                unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
+                for ont in unchanged_onts:
+                    if ont.get('id') in onts_id:
+                        onts_in_attenuation.append(ont)
+                
+                df_attenuations = pd.DataFrame(onts_in_attenuation)
+                attenuation_id = attenuation.get('attenuation_id')
+                df_attenuations = df_attenuations.drop(['type', 'status', 'description'], axis=1)
+                df_attenuations.to_excel(file, index=False, header=False, sheet_name=f'Atenuação {attenuation_id}')
 
-        df_unchanged_onts.to_excel(file, index=False, header=False, sheet_name="UNCHANGED ONT'S")
-        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='INTERFACE COMMANDS')
-        df_global_commands.to_excel(file, index=False, header=False, sheet_name='GLOBAL COMMANDS')
-        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='DELETE COMMANDS')
+        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Comandos da interface')
+        df_global_commands.to_excel(file, index=False, header=False, sheet_name='Comandos globais')
+        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Comandos de deletar')
 
         file.close()
 
@@ -326,9 +348,9 @@ class GeneralUtility:
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = f'{maintenance_info.file_name}.xlsx'
         file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
-        print(file_path)
-        with open(file_path, 'rb') as file:
-            response = FileResponse(file)
-            print(response)
-            response['Content-Disposition'] = f'attachment; filename={file_name}'
-            return response
+
+        file = open(file_path, 'rb')
+        response = FileResponse(file)
+        response['Content-Disposition'] = f'attachment; filename={file_name}'
+
+        return response

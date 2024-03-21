@@ -300,6 +300,7 @@ async function downloadCommandsFile(operationMode) {
     const url = `http://10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
     const div = document.querySelector('.action-buttuns')
     const link = document.createElement('a')
+    
     link.setAttribute('href', url)
     link.setAttribute('id', 'link-download')
     div.appendChild(link)

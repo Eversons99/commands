@@ -206,3 +206,8 @@ def render_error_page(request):
     return render(request, 'errorPage.html', context=error_message)
 
 
+def download_command_file(request):
+    if request.method == 'GET':
+        db_model = AttenuatorDB
+        file_commands = GeneralUtility.download_commands(request, db_model)
+        return file_commands

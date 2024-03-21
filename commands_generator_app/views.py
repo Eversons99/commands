@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, FileResponse
 from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
 from commands_generator_app.utils.generator_service import CommandsUtility
 

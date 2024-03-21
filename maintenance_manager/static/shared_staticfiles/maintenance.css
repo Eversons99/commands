@@ -397,3 +397,7 @@ textarea {
     background-color: rgb(63, 171, 238);
     cursor: pointer;
 }
+
+#link-download {
+    display: none;
+}

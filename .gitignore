@@ -10,3 +10,4 @@ virtual-env/
 **/__pycache__/
 */__pycache__/
 /logs
+/public/files
