@@ -187,7 +187,6 @@ def save_logs(request):
     """
     Save logs on database
     """
-    
     if request.method == 'POST':
         db_model = AttenuatorDB
         save_logs_on_db = GeneralUtility.save_logs(request, db_model)
@@ -234,3 +233,4 @@ def discard_commands(request):
         db_model = AttenuatorDB
         commands_response = GeneralUtility.discard_commands_file(request, db_model)
         return commands_response
+    
