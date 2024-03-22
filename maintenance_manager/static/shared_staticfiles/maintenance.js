@@ -300,11 +300,37 @@ async function downloadCommandsFile(operationMode) {
     const url = `http://10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
     const div = document.querySelector('.action-buttuns')
     const link = document.createElement('a')
-    
+
     link.setAttribute('href', url)
     link.setAttribute('id', 'link-download')
     div.appendChild(link)
 
     const elementLink = document.getElementById('link-download')
     elementLink.click()
+}
+
+async function discardCommands(operationMode) {
+    const donwloadButton = document.getElementById('btn-save')
+    const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator()
+        })
+    }
+
+    let removeCommands = await fetch(url, requestOptions)
+    removeCommands = await removeCommands.json()
+    donwloadButton.disabled = true
+
+    if (!removeCommands.error) {
+        const removeButton = document.getElementById('btn-discard')
+        removeButton.disabled = true
+    }
+
+    return alert(removeCommands.message)
 }

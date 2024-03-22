@@ -166,11 +166,23 @@ table th:first-child {
 }
 
 #btn-save:hover {
-    background: rgb(132, 231, 153);
+    background: rgb(163, 247, 181);
 }
 
 #btn-home:hover {
     background: rgb(21, 149, 228);
+}
+
+#btn-save:disabled {
+    background-color: rgb(214, 248, 221);
+    color: rgb(133, 133, 133);
+    cursor: default;
+}
+
+#btn-discard:disabled {
+    background-color: rgb(223, 156, 156);
+    color: rgb(133, 133, 133);
+    cursor: default;
 }
 
 textarea {

@@ -173,6 +173,9 @@ def render_page_commands(request):
 
 
 def get_maintenance_info(request):
+    """
+    Gets maintenance info on database and return it
+    """
     if request.method == 'POST':
         db_model = AttenuatorDB
         maintenance_info = GeneralUtility.get_maintenance_info_to_apply_commands(request, db_model)
@@ -181,6 +184,10 @@ def get_maintenance_info(request):
 
 
 def save_logs(request):
+    """
+    Save logs on database
+    """
+    
     if request.method == 'POST':
         db_model = AttenuatorDB
         save_logs_on_db = GeneralUtility.save_logs(request, db_model)
@@ -189,6 +196,9 @@ def save_logs(request):
 
 
 def render_logs(request):
+    """
+    Gets logs on database and render a templete with all logs
+    """
     if request.method == 'GET':
         register_id = request.GET.get('tab_id')
         db_model = AttenuatorDB
@@ -207,7 +217,20 @@ def render_error_page(request):
 
 
 def download_command_file(request):
+    """
+    Make an xlsx file and return it to download
+    """
     if request.method == 'GET':
         db_model = AttenuatorDB
         file_commands = GeneralUtility.download_commands(request, db_model)
         return file_commands
+    
+
+def discard_commands(request):
+    """
+    Delete file commands
+    """
+    if request.method == 'DELETE':
+        db_model = AttenuatorDB
+        commands_response = GeneralUtility.discard_commands_file(request, db_model)
+        return commands_response

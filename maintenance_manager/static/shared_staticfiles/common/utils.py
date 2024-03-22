@@ -1,6 +1,7 @@
 import ast
 import json
 import requests
+import os
 import pandas as pd
 from attenuations_manager_app.models import AttenuatorDB
 from django.http.response import HttpResponse, FileResponse
@@ -298,6 +299,9 @@ class GeneralUtility:
 
     @staticmethod
     def make_file_commands(request, db_model):
+        """
+        Generates a xlsx file with ready commands and attenuation if there's
+        """
         register_id = request.GET.get('tab_id')
    
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
@@ -344,6 +348,9 @@ class GeneralUtility:
 
     @staticmethod
     def download_commands(request, db_model):
+        """
+        Reads a commands file and return your content to download
+        """
         register_id = request.GET.get('tab_id')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = f'{maintenance_info.file_name}.xlsx'
@@ -354,3 +361,27 @@ class GeneralUtility:
         response['Content-Disposition'] = f'attachment; filename={file_name}'
 
         return response
+    
+    @staticmethod
+    def discard_commands_file(request, db_model):
+        body_request = json.loads(request.body)
+        register_id = body_request.get('tabId')
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        file_name = f'{maintenance_info.file_name}.xlsx'
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+
+        try:
+            os.unlink(file_path)
+        except FileNotFoundError:
+            error_response = {
+                'error': True,
+                'message': f'Erro ao deletar o arquivo {file_name}, arquivo não encontrado'
+            }
+            return HttpResponse(json.dumps(error_response))
+
+        success_respons = {
+            'error': False,
+            'message': f'Arquivo {file_name} removido com sucesso'
+        }
+        return HttpResponse(json.dumps(success_respons))
+
