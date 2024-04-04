@@ -11,7 +11,7 @@ class IxcApi:
         Método de listar (buscar) informações em uma tabela do IXC 
         """
         url = f'https://assinante.nmultifibra.com.br/webservice/v1/{table}'
-        token = "Basic MTYzOjk3NmRmZjlkNGZkNjExODdhNzUyNWQ3NGVkZmFkZGRkNTUwMzI0MGRkOTVhOTMyYjE3YjlkODRjNWU2ZGFjNTc="
+        token = 'Basic MTYzOjk3NmRmZjlkNGZkNjExODdhNzUyNWQ3NGVkZmFkZGRkNTUwMzI0MGRkOTVhOTMyYjE3YjlkODRjNWU2ZGFjNTc='
         
         payload = json.dumps({
             'qtype': query_field,

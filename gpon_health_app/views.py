@@ -9,20 +9,20 @@ def update_desc(request):
     """
     Renderiza a página para coleta de informações
     """
-    return render(request, "updateDesc.html")
+    return render(request, 'updateDesc.html')
 
 def query_signal(request):
     """
     Renderiza a página de consultar o sinal
     """
-    return render(request, "queryInfo.html")
+    return render(request, 'queryInfo.html')
 
 def get_signal_information(request):
     """
     Verifica qual o modo de consulta selecionado e trata os dados de acordo com cada modo,
     no fim renderiza a tabela de as informações da consulta de sinal
     """
-    if request.method == "GET":
+    if request.method == 'GET':
         query_mode = request.GET.get('queryMode')
 
         if query_mode == 'via_id':
@@ -76,7 +76,7 @@ def get_gpon_info_to_query_signal_via_id(id_client):
     if total_records_found == 0:
         return {
             'error': True,
-            'message': "Erro ao consultar o ID do cliente, nenhum cadastro foi localizado"    
+            'message': 'Erro ao consultar o ID do cliente, nenhum cadastro foi localizado'
         }
 
     if total_records_found == 1:
@@ -179,18 +179,18 @@ def get_signal_information_by_pon_on_nmt(pon):
     devices_offline = signal_average_info['offline']
     median_tx = signal_average_info['median'].get('txPower')
     median_rx = signal_average_info['median'].get('rxPower')
-    signal_average_info["desc"] = desc
+    signal_average_info['desc'] = desc
 
     if devices_online == 0 and devices_offline == 0:
         return {
             'error': True,
-            'message': "Nenhum cliente nessa localização PON"
+            'message': 'Nenhum cliente nessa localização PON'
         }
 
     if not median_tx or not median_rx:
         return {
             'error': True,
-            'message': "Nenhum cliente online nessa localização PON"
+            'message': 'Nenhum cliente online nessa localização PON'
         }
 
     return signal_average_info
@@ -206,23 +206,23 @@ def update_primary_description(request):
         cable = request.GET.get('cable')
 
         data_to_update = {
-            "gpon_info": {
-                "olt": olt,
-                "pon": gpon
+            'gpon_info': {
+                'olt': olt,
+                'pon': gpon
             }, 
-            "desc_info": {
-                "primary": primary,
-                "cable": cable
+            'desc_info': {
+                'primary': primary,
+                'cable': cable
             }
         }
 
-        data_to_update['desc_info']["old_desc"] = get_primary_description(gpon, host=olt)
+        data_to_update['desc_info']['old_desc'] = get_primary_description(gpon, host=olt)
 
         url = 'https://nmt.nmultifibra.com.br/olt/update-gpon-desc'
         body_request = json.dumps({
-            "gpon": gpon,
-            "host": olt,
-            "value": f'PRIMARIA {primary}--CABO {cable}'
+            'gpon': gpon,
+            'host': olt,
+            'value': f'PRIMARIA {primary}--CABO {cable}'
         })
 
         headers = {
@@ -232,7 +232,7 @@ def update_primary_description(request):
         update = requests.post(url, data=body_request, headers=headers)
         update = update.json()
 
-        if update["success"] == True:
+        if update['success']:
             return render(request, 'updated.html', context=data_to_update)
         else:
             return render(request, 'error.html')
@@ -243,8 +243,8 @@ def get_primary_description(gpon, host):
     """
     url = 'https://nmt.nmultifibra.com.br/olt/get-gpon-desc'
     body_request = json.dumps({
-        "gpon": gpon,
-        "host": host
+        'gpon': gpon,
+        'host': host
     })
 
     headers = {
@@ -254,4 +254,4 @@ def get_primary_description(gpon, host):
     desc = requests.post(url, data=body_request, headers=headers)
     desc = desc.json()
 
-    return desc["desc"]
+    return desc['desc']

@@ -152,6 +152,10 @@ table th:first-child {
     color: black;
 }
 
+#btn-home {
+    background: #08d;
+}
+
 #btn-discard:hover{
     background: rgb(227, 107, 107);
 }
@@ -162,7 +166,23 @@ table th:first-child {
 }
 
 #btn-save:hover {
-    background: rgb(132, 231, 153);
+    background: rgb(163, 247, 181);
+}
+
+#btn-home:hover {
+    background: rgb(21, 149, 228);
+}
+
+#btn-save:disabled {
+    background-color: rgb(214, 248, 221);
+    color: rgb(133, 133, 133);
+    cursor: default;
+}
+
+#btn-discard:disabled {
+    background-color: rgb(223, 156, 156);
+    color: rgb(133, 133, 133);
+    cursor: default;
 }
 
 textarea {
@@ -275,4 +295,121 @@ textarea {
 
 #maintenance-title {
     display: flex;
+}
+
+#error{
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: #000000;
+    align-items: center;
+    justify-content: center;
+}
+
+#error a {
+    text-decoration: none;
+    color: white;
+}
+
+#error-title-h1 {
+    font-size: 230px;
+    font-weight: 900;
+    background: url('../img/galaxy.jpg') no-repeat;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+}
+
+#error-title-h2 {
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+#bnt-error {
+    background-color: #0046d5; 
+    font-weight: 700;
+    font-size: 16px;
+    -webkit-box-shadow: 0px 4px 15px -5px #0046d5;
+            box-shadow: 0px 4px 15px -5px #0046d5;
+
+}
+
+#error-title-h2, #bnt-error, #error-message {
+    margin: 0 0 1em 0;
+}
+
+#logs-container {
+    background: black;
+    width: 90%;
+    font-size: 16px;
+    color: white;
+    padding: 1.5em;
+    height: 30em;
+    overflow-y: scroll;
+    border-radius: 0 0 10px 10px;
+}
+
+#logs-container p {
+    padding: 0.2em;
+}
+
+#applied {
+    color:rgb(4, 168, 39)
+}
+
+#log {
+    color: rgb(205, 226, 108);
+}
+
+#apps {
+    display: flex;
+    width: 90%;
+}
+
+.app-title {
+    padding: 0.5em;
+    text-align: center;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border: solid 2px #f0eded;
+    margin: 3em;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+    
+}
+
+.app a {
+    text-decoration: none;
+    color: black;
+}
+
+.app-explanation {
+    padding: 0.5em;
+    text-align: justify;
+}
+
+#title-homepage {
+    margin: 0.1em auto;
+    text-align: center;
+}
+.btn-app {
+    background-color: #08d;
+}
+
+.btn-app:hover {
+    background-color: rgb(63, 171, 238);
+    cursor: pointer;
+}
+
+#link-download {
+    display: none;
 }

@@ -30,11 +30,11 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.252:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
-    const socket = new WebSocket('ws://10.0.30.252:5678/get-onts')
+    const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
     const tabId = getIdentificator()
     const onts = []
     let total_number_onts = 0

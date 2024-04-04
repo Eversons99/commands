@@ -1,9 +1,10 @@
 import json
+import mimetypes
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, FileResponse
 from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
 from commands_generator_app.utils.generator_service import CommandsUtility
 
@@ -24,7 +25,6 @@ def search_onts_via_snmp(request):
         onts_info = GeneralUtility.get_onts_via_snmp(request, db_model)
         return onts_info
 
-
     return redirect(home)
 
 
@@ -33,13 +33,13 @@ def render_onts_table(request):
     """
     Render a table with all onts
     """
-    if request.method == "GET":
+    if request.method == 'GET':
         try:
             db_model = GeneratorDB
             onts_info = GeneralUtility.get_unchanged_onts_on_database(request, db_model)
             
             if onts_info.get('error'):
-                return render(request, 'error.html', context=onts_info)
+                return render(request, 'errorPage.html', context=onts_info)
 
             return render(request, 'devicesTable.html', context=onts_info)
 
@@ -48,7 +48,7 @@ def render_onts_table(request):
                 'message': f'Ocorreu um erro ao buscar registro no banco. Error: {err}'
             }
 
-            return render(request, 'error.html', context=error_message)
+            return render(request, 'errorPage.html', context=error_message)
 
     return redirect(home)
 
@@ -83,7 +83,7 @@ def search_onts_via_ssh(request):
     if not query_info.get('error'):
         return render(request, 'ssh_search_generator.html', context=query_info)
 
-    return render(request, 'error.html', context=query_info)
+    return render(request, 'errorPage.html', context=query_info)
 
 
 def render_page_commands(request):
@@ -91,10 +91,12 @@ def render_page_commands(request):
     Gets commands info and render commands pages
     """
     db_model = GeneratorDB
-    commands = GeneralUtility.get_urls_to_ready_commands(request, db_model)
+    operation_mode = 'generator'
+    commands = GeneralUtility.get_urls_to_ready_commands(request, db_model, operation_mode)
+    GeneralUtility.make_file_commands(request, db_model)
 
     if commands.get('error'):
-        return render(request, 'error.html', context=commands)
+        return render(request, 'errorPage.html', context=commands)
 
     return render(request, 'commands.html', context=commands)
 
@@ -104,7 +106,7 @@ def update_onts_in_database(request):
     """
     Updates unchanged devices on database
     """
-    if request.method == "POST":
+    if request.method == 'POST':
         db_model = GeneratorDB
         update_status = GeneralUtility.update_onts_in_database(request, db_model)
 
@@ -113,9 +115,42 @@ def update_onts_in_database(request):
     return redirect(home)
 
 
+def get_maintenance_info(request):
+    if request.method == 'POST':
+        db_model = GeneratorDB
+        maintenance_info = GeneralUtility.get_maintenance_info_to_apply_commands(request, db_model)
+
+        return HttpResponse(json.dumps(maintenance_info))
+
+
+def save_logs(request):
+    if request.method == 'POST':
+        db_model = GeneratorDB
+        save_logs_on_db = GeneralUtility.save_logs(request, db_model)
+        
+        return HttpResponse(json.dumps(save_logs_on_db))
+
+
+def render_logs(request):
+    if request.method == 'GET':
+        register_id = request.GET.get('tab_id')
+        db_model = GeneratorDB
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name}
+
+        return render(request, 'commandsLogs.html', context=logs)
+
+        
 def render_error_page(request):
     """
     Renders error page, showing the personalised error message
     """
     error_message = {'message': request.GET.get('message')}
-    return render(request, 'error.html', context=error_message)
+    return render(request, 'errorPage.html', context=error_message)
+
+
+def download_command_file(request):
+    if request.method == 'GET':
+        db_model = GeneratorDB
+        file_commands = GeneralUtility.download_commands(request, db_model)
+        return file_commands
