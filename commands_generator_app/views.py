@@ -145,7 +145,7 @@ def render_logs(request):
         register_id = request.GET.get('tab_id')
         db_model = GeneratorDB
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name}
+        logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name, 'operation_mode': 'generator'}
 
         return render(request, 'commandsLogs.html', context=logs)
 

@@ -211,6 +211,10 @@ function getIdDevicesSelected() {
 }
 
 async function apllyCommands(operationMode) {
+    const confirmApply = confirm('Confirme a aplicação dos comandos')
+
+    if (!confirmApply) return
+
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
     const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
@@ -310,6 +314,10 @@ async function downloadCommandsFile(operationMode) {
 }
 
 async function discardCommands(operationMode) {
+    const confirmDelete = confirm('Realmente deseja deletar os comandos ?')
+
+    if (!confirmDelete) return
+
     const donwloadButton = document.getElementById('btn-save')
     const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
     const requestOptions = {
@@ -333,4 +341,25 @@ async function discardCommands(operationMode) {
     }
 
     return alert(removeCommands.message)
+}
+
+async function makeRoolBack(operationMode) {
+    const confirmRoolback = confirm('Deseja realmente fazer o roolback ?')
+
+    if (!confirmRoolback) return
+ 
+    const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
+
+    // Onde, quando e como vou salvar os comandos de roolback ?
+        // 1° Quando eu for gerar os comandos no NMT vou gerar os commandos de roolback, basta chamar a função novamente passando as localizações
+        // 2° Quando eu eu for verificar a vlan eu dou o comando display current-configurations porque já vou estar com a sessão aberta na OLT, então eu salvo o output no banco apenas para se der qualquer merda
+        // 3° Quando eu tiver gerando a plinha devo incluir os comandos de rollback, independente.
+
+    // Aplicar os comandos de roolback:
+        // 1° Me conecto ao websocket, busco as informações no banco e os comandos necessários
+        // 2° Aplico os comandos e renderizo
+
+    // Quando a pessoa clicar em aplicar comandos eu poderia, gerar os comandos de roolback atráves do websocket e apenas editar os arquivos existentes
+
+
 }

@@ -156,6 +156,14 @@ table th:first-child {
     background: #08d;
 }
 
+#btn-rollback {
+    background: rgb(240, 28, 28);
+}
+
+#btn-rollback:hover {
+    background: rgb(196, 107, 107);
+}
+
 #btn-discard:hover{
     background: rgb(227, 107, 107);
 }
@@ -344,7 +352,7 @@ textarea {
 
 #logs-container {
     background: black;
-    width: 90%;
+    width: 85%;
     font-size: 16px;
     color: white;
     padding: 1.5em;

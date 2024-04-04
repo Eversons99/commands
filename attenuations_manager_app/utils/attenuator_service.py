@@ -175,8 +175,13 @@ class AttenuationUtility:
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
             onts = AttenuationUtility.get_onts_to_generate_commands(maintenance_info)
 
+            onts_checked = olt_api.check_vlan(onts, maintenance_info)
+            port_config = { 'source_port_config': onts_checked.get('port_configuration')}
+
+            GeneralUtility.update_maintenance_info_in_database(data_to_update=port_config, register_id=register_id, db_model=db_model)
+            
             info_to_generate_commands = {
-                'onts': olt_api.check_vlan(onts, maintenance_info),
+                'onts': onts_checked.get('onts'),
                 'gpon': maintenance_info.destination_gpon.get('gpon'),
                 'host': maintenance_info.destination_gpon.get('host'),
                 'name': maintenance_info.file_name,

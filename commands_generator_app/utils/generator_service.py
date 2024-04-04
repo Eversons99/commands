@@ -24,9 +24,14 @@ class CommandsUtility:
             for ont in unchanged_onts:
                 if int(ont['id']) in id_devices_selected:
                     onts.append(ont)
-
+            
+            onts_checked = olt_api.check_vlan(onts, maintenance_info)
+            port_config = { 'source_port_config': onts_checked.get('port_configuration')}
+            
+            GeneralUtility.update_maintenance_info_in_database(data_to_update=port_config, register_id=register_id, db_model=db_model)
+            
             info_to_generate_commands = {
-                'onts': olt_api.check_vlan(onts, maintenance_info),
+                'onts': onts_checked.get('onts'),
                 'gpon': destination_gpon['gpon'],
                 'host': destination_gpon['host'],
                 'name': file_name,
