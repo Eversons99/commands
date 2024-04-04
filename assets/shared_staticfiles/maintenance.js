@@ -66,7 +66,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.252:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -96,7 +96,16 @@ async function searchOnts(operationMode) {
     const ontsRequest = await fetch(`${baseUrl}/search_onts_via_snmp`, requestOptions)
     const responseRequest = await ontsRequest.json()
     
-    if (responseRequest.error == true) {
+    if (operationMode == 'attenuator' && responseRequest.error == true) {
+        let messageError = responseRequest.message
+
+        if (messageError == 'No onts were found') {
+            messageError = 'Nenhuma ONU na porta informada'
+        }
+
+        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
+    }
+    else if (responseRequest.error == true) {
         return window.location = `${baseUrl}/search_onts_via_ssh?tab_id=${tabId}`
     }
 
@@ -110,7 +119,7 @@ function getIdentificator() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.252:8000/generator"
+    const baseUrl = "http://10.0.30.157:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {
@@ -199,4 +208,89 @@ function getIdDevicesSelected() {
         }
     })
     return idDevicesSelected
+}
+
+async function apllyCommands(operationMode) {
+    loadingAnimation(true)
+    const maintenanceInfo = await getMaintenanceInfo(operationMode)
+    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
+    const loadingText = document.getElementById('loader-message')
+    let operationStatus
+    const commandsApplied = []
+
+    try {
+        socket.onopen = () => {
+            socket.send(JSON.stringify({
+                maintenanceInfo
+            }))
+            console.log('Sessão com o servidor Websocket iniciada')
+        }
+
+        socket.onmessage = (event) => {
+            const currentMessage = JSON.parse(event.data)
+
+            if (currentMessage.command) {
+                let commandLog = currentMessage.command
+                loadingText.textContent = `Aplicando comando: ${commandLog}`
+                commandsApplied.push(currentMessage)
+            }
+        }
+
+        socket.onclose = async () => {
+            loadingAnimation(false)
+            await showLogs(commandsApplied, operationMode)
+            console.log('Sessão com o servidor Websocket finalizada')
+            return operationStatus
+        }
+
+        socket.onerror = (e) => {
+            alert(JSON.parse(e))
+        }
+    } catch (error) {
+        return alert(error)
+    }
+}
+
+async function getMaintenanceInfo(operationMode) {
+    const url = `http://10.0.30.157:8000/${operationMode}/get_maintenance_info`
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator()
+        })
+    }
+     
+    let maintenanceInfo = await fetch(url, requestOptions)
+    maintenanceInfo = await maintenanceInfo.json()
+
+    return maintenanceInfo
+}
+
+async function showLogs(logs, operationMode) {
+    // Fazer um post para o APP e salvar os logs no banco
+    // Fazer um get para o APP para renderizar os comandos aplicados
+    const tabId = getIdentificator()
+    const baseUrl = `http://10.0.30.157:8000/${operationMode}`
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': tabId,
+            'logs': logs
+        })
+    }
+    
+    let saveCommands = await fetch(`${baseUrl}/save_logs`, requestOptions)
+    saveCommands = await saveCommands.json()
+
+    if (saveCommands.error) return alert(saveCommands.message)
+
+    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
 }

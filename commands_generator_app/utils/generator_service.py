@@ -1,5 +1,6 @@
 import ast
 import json
+from maintenance_manager.static.shared_staticfiles.common.olt_api import Olt
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
@@ -14,6 +15,7 @@ class CommandsUtility:
         file_name = body_request['fileName']
         register_id = body_request['tabId']
         onts = []
+        olt_api = Olt()
 
         try:
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
@@ -24,7 +26,7 @@ class CommandsUtility:
                     onts.append(ont)
 
             info_to_generate_commands = {
-                'onts': onts,
+                'onts': olt_api.check_vlan(onts, maintenance_info),
                 'gpon': destination_gpon['gpon'],
                 'host': destination_gpon['host'],
                 'name': file_name,

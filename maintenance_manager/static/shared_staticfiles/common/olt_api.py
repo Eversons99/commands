@@ -90,7 +90,7 @@ class Olt:
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        requests.post('http://10.0.30.252:8000/generator/update_onts_in_database', headers=headers, data=body)
+        requests.post('http://10.0.30.157:8000/generator/update_onts_in_database', headers=headers, data=body)
 
         await websocket_connection.close()
         ssh_connection.disconnect()
@@ -111,41 +111,200 @@ class Olt:
 
         return amount_of_devices
 
-    def get_primary_description(self, gpon_info):
-        """
-        Connects via SSH and return gpon description "PRIMARIA XX--CABO XX"
-        """
-        olt_name = gpon_info.get('olt')
-        pon_location = gpon_info.get("pon")
-        ssh_connection = self.connect_olt(olt_name)
-        output = ssh_connection.send_command_timing(f'display port desc {pon_location}')
-        regex = r'\bPRIMARIA [0-9]+--[A-Z]+ [0-9]+\b' 
-        desc = re.findall(regex, output)
-        ssh_connection.disconnect()
+    def check_vlan(self, onts, maintenance_info):
+        slot = maintenance_info.source_gpon.get('gpon').split('/')[1]
+        port = maintenance_info.source_gpon.get('gpon').split('/')[2]
+        source_host = maintenance_info.source_gpon.get('host')
 
-        if len(desc) < 1: 
-            return "PRIMÁRIA SEM DESCRIÇÃO"
+        ssh_connection = self.connect_olt(source_host)
+
+        search_vlans = ssh_connection.send_command_timing(f'display service-port port 0/{slot}/{port}')
+        output_olt = search_vlans.splitlines()
+
+        exclusive_vlan = ['110', '286', '1500','1501', '1503', '1504', '1505', '1513', '1514', '1515', '1520']
+        separatted_outputs_olt = [] 
+        vlans_found = []
+        vlans_not_found = []
+
+        for output in output_olt:
+            if 'common' in output:
+                separatted_outputs_olt.append(output)
+
+        for output in separatted_outputs_olt:
+
+            for vlan in exclusive_vlan:
+
+                if f'{vlan} common' in output:
+                    
+                    standard = re.compile(r'gpon 0/[1-9]{0,2} {0,1}/[0-9]{0,2} {0,2}[0-9]{0,3}')
+                    search_id = standard.search(output)
+
+                    if search_id:
+                        get_id = search_id.group().split(' ')
+
+                        id = get_id[len(get_id) - 1]
+
+                        vlans_found.append({ "id": id, "vlan": vlan})
+
+                    else:
+                        vlans_not_found.append({"uutput": output, "vlan": vlan})
+
+        for ont in onts:
+            for s_vlan in vlans_found:
+                if ont["id"] == s_vlan["id"]:
+                    ont["vlan"] = s_vlan["vlan"]
+
+            keys = ont.keys()
+            if 'vlan' not in keys:
+                ont["vlan"] = ""
+            
+        ssh_connection.disconnect() # Finalizado a sessão
+        return onts 
+
+    async def apply_commands(self, websocket, maintenance_info):
+        file_name = maintenance_info.get('maintenanceInfo').get('file_name')
+        commands_urls =  maintenance_info.get('maintenanceInfo').get('commands_url')
+        formatted_commands = self.format_commands(commands_urls)
         
-        return desc[0]
-
-    def update_primary_description(self, data_to_update):
-        """
-        Connects via SSH and update primary description
-        """
-
-        olt_name = data_to_update["gpon_info"].get('olt')
-        pon_location = data_to_update["gpon_info"].get("pon")
-
-        primary = data_to_update["desc_info"].get('primary')
-        cable = data_to_update["desc_info"].get('cable')
-
-        ssh_connection = self.connect_olt(olt_name)
-
-        ssh_connection.send_command_timing(f'port desc {pon_location} description "PRIMARIA {primary}--CABO {cable}"')
+        source_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
+        destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
+        destination_host = maintenance_info.get('maintenanceInfo').get('destination_gpon').get('host')
+        
+        interface_commands = formatted_commands.get('interface_commands')
+        global_commands = formatted_commands.get('global_commands')
+        delete_commands = formatted_commands.get('delete_commands')
+        log_file = open(f'C:/Users/Everson/Desktop/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
+        
+        ssh_connection = self.connect_olt(destination_host)
+        
+        await self.apply_delete_commands(source_info_maintenance, delete_commands, log_file, websocket)
+        await self.apply_interface_and_global_commands(destination_info_maintenance, ssh_connection, interface_commands, global_commands, log_file, websocket)
 
         ssh_connection.disconnect()
+        log_file.close()
+        await websocket.close()
 
-        return
+    def format_commands(self, commands_url):
+        interface_commands = requests.get(commands_url.get('interfaceCommands')).text
+        global_commands = requests.get(commands_url.get('globalCommands')).text
+        delete_commands = requests.get(commands_url.get('deleteCommands')).text
+        
+        list_of_commands = [
+            interface_commands.splitlines(),
+            global_commands.splitlines(),
+            delete_commands.splitlines()
+        ]
+        
+        for commands in list_of_commands:
+            for index, command in enumerate(commands):
+                if command == '':
+                    commands.pop(index)
+        
+        return { 
+            "interface_commands": list_of_commands[0],
+            "global_commands": list_of_commands[1],
+            "delete_commands" : list_of_commands[2]
+        }    
 
-    def check_vlan(self, olt_name):
-        pass
+    async def apply_delete_commands(self, source_info_maintenance, delete_commands, log_file, websocket):
+        log_file.write('<---------------------------- DELETAR ------------------------------>\n')
+        source_host = source_info_maintenance.get('host')
+        ssh_connection = self.connect_olt(source_host) 
+        
+        for command in delete_commands:
+            log_file.write(f'APPLIED: {command} \n\n')  
+            send_command_rm = ssh_connection.send_command_timing(command)
+            log_file.write(f'LOG: {send_command_rm} \n\n')
+            await asyncio.sleep(0.5)
+            await websocket.send(json.dumps({'command': f'{command}', 'log': send_command_rm}))
+
+        ssh_connection.disconnect()
+        
+    async def apply_interface_and_global_commands(self, destination_info_maintenance, ssh_connection, interface_commands, global_commands, log_file, websocket):
+        log_file.write('<---------------------------- PROVISIONAMENTO - INTERFACE ------------------------------>\n')
+        slot = destination_info_maintenance.get('gpon').split('/')[1]
+        interface_command = f'interface gpon 0/{slot}'
+        ssh_connection.send_command_timing(interface_command)
+        
+        for command in interface_commands:
+            log_file.write(f'APPLIED: {command} \n\n')
+            send_command_int = ssh_connection.send_command_timing(command)
+
+            if 'SN already exists' in send_command_int:
+                log_file.write(f'ERROR: SN DUPLICADO LOCALIZADO EM {command}')
+                delete_old_sn = self.delete_sn_duplicate(command, ssh_connection)
+
+                if not delete_old_sn["success"]:
+                    ssh_connection.send_command_timing(interface_command)
+                    log_file.write(f'ERROR: Erro ao deletear ONU duplicada: {delete_old_sn["message"]}')
+
+                elif delete_old_sn["success"]:
+                    ssh_connection.send_command_timing(interface_command)
+                    send_command_int = ssh_connection.send_command_timing(command)
+                    log_file.write('INFO: O SN duplicado foi deletado e o comando foi aplicado novamente')
+
+            log_file.write(f'LOG: {send_command_int} \n\n')
+            await asyncio.sleep(0.5)
+            await websocket.send(json.dumps({'command': f'{command}', 'log': send_command_int}))
+        
+        log_file.write('<---------------------------- PROVISIONAMENTO - GLOBAL ------------------------------>\n')
+        ssh_connection.send_command_timing('quit')
+        
+        for command in global_commands:
+            log_file.write(f'APPLIED: {command} \n\n')
+            send_command_gbl = ssh_connection.send_command_timing(command)
+            log_file.write(f'LOG: {send_command_gbl} \n\n')
+            await asyncio.sleep(0.5)
+            await websocket.send(json.dumps({'command': f'{command}', 'log': send_command_gbl}))
+
+    def delete_sn_duplicate(self, command, ssh_connection):
+        pattern_re = re.compile('4[a-zA-Z\d]{15}') # SN
+        search_sn = pattern_re.search(command)  # Search sn in command
+        location = ''
+        ont_id = ''
+
+        # If find sn
+        if search_sn:
+            ssh_connection.send_command_timing('quit')
+            get_location = ssh_connection.send_command_timing(f'display ont info by-sn {search_sn.group()}')
+            
+            for location_and_id in get_location.splitlines():
+                if 'F/S/P' in location_and_id:
+                    location = location_and_id.split(':')[1].strip()
+
+                if 'ONT-ID' in location_and_id:
+                    ont_id = location_and_id.split(':')[1].strip()
+
+            if location and ont_id:
+                list_of_commands = self.format_delete_commands(location, ont_id)
+                delete_ont = ssh_connection.send_multiline_timing(list_of_commands)
+
+                if 'success: 1' in delete_ont:
+                    return {
+                        "success": True,
+                        "message": 'SN was removed'
+                    }
+
+            return {
+                "success": False,
+                "message": 'Unable to get location and device id'
+            }   
+
+        return {
+            "success": False,
+            "message": 'The regex did not match'
+        }
+        
+    def format_delete_commands(self, location, ont_id):        
+        location_splited = location.split('/')
+        slot = location_splited[1]
+        port = location_splited[2]
+
+        list_of_delete_commands = [
+            f'undo service-port port 0/{slot}/{port} ont {ont_id}',
+            'y',
+            f'interface gpon 0/{slot}',
+            f'ont delete {port} {ont_id}',
+        ]
+
+        return list_of_delete_commands

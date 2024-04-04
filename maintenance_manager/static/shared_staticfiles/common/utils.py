@@ -1,7 +1,10 @@
 import ast
 import json
 import requests
-from django.http.response import HttpResponse
+import os
+import pandas as pd
+from attenuations_manager_app.models import AttenuatorDB
+from django.http.response import HttpResponse, FileResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -28,7 +31,7 @@ class GeneralUtility:
 
         initial_maintenance_info = {
             "register_id": register_id,
-            "source_gpon": source_gpon,
+            "source_gpon": source_gpon
         }
 
         ont_devices = GeneralUtility.get_onts_info_on_nmt(source_host, source_pon)
@@ -63,14 +66,23 @@ class GeneralUtility:
                 data=request_options['body'],
                 timeout=60
             )
+
             onts = get_all_onts.json()
 
-            if len(onts) == 0 or isinstance(onts, dict):
+            if not isinstance(onts, list) and onts.get('error'):
+                return {
+                    "error": True,
+                    "onts": 0,
+                    "message": onts.get('error')
+                }
+            
+            elif len(onts) == 0 or isinstance(onts, dict):
                 return {
                     "error": True,
                     "onts": 0,
                     "message": 'A busca via SNMP não retornou nenhuma informação'
                 }
+                
 
             return {
                 "error": False,
@@ -152,7 +164,6 @@ class GeneralUtility:
 
         try:
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-            print(maintenance_info.unchanged_onts)
             onts = ast.literal_eval(maintenance_info.unchanged_onts)
 
             onts_info = {
@@ -211,12 +222,11 @@ class GeneralUtility:
         """
         try:
             db_model.objects.filter(register_id=register_id).update(**data_to_update)
-
         except Exception as err:
             raise Exception from err
 
     @staticmethod
-    def get_urls_to_ready_commands(request, db_model):
+    def get_urls_to_ready_commands(request, db_model, operation_mode):
         """
         Make a query in the database to obtain the urls where the ready commands are stored
         """
@@ -230,7 +240,8 @@ class GeneralUtility:
                 "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
                 "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
                 "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
-                'maintenance_name': commands.file_name
+                "maintenance_name": commands.file_name,
+                "operation_mode": operation_mode
             }
 
             return all_commands
@@ -257,3 +268,120 @@ class GeneralUtility:
         GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
         return HttpResponse(status=200)
+
+    @staticmethod
+    def get_maintenance_info_to_apply_commands(request, db_model):
+        body_request = json.loads(request.body)
+        register_id = body_request.get('tabId')
+        maintenance = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = {
+            'commands_url': maintenance.commands_url,
+            'source_gpon': maintenance.source_gpon,
+            'destination_gpon': maintenance.destination_gpon,
+            'file_name': maintenance.file_name
+        }
+        
+        return maintenance_info
+    
+    @staticmethod
+    def save_logs(request, db_model):
+        try: 
+            body_request = json.loads(request.body)
+            register_id = body_request.get('tabId')
+            logs = body_request.get('logs')
+            
+            logs_to_save = {'logs': logs}
+            GeneralUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
+
+            return {'error': False}
+        except Exception as err:
+            return {'error': True, 'message': f'Ocorreu um erro ao salvar os logs. Err: {err}'}
+
+    @staticmethod
+    def make_file_commands(request, db_model):
+        """
+        Generates a xlsx file with ready commands and attenuation if there's
+        """
+        register_id = request.GET.get('tab_id')
+   
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        file_name = maintenance_info.file_name
+
+        interface_commands = requests.get(maintenance_info.commands_url.get('interfaceCommands')).text
+        global_commands = requests.get(maintenance_info.commands_url.get('globalCommands')).text
+        delete_commands = requests.get(maintenance_info.commands_url.get('deleteCommands')).text
+
+        file = pd.ExcelWriter(f'C:/Users/Everson/Desktop/commands/public/files/{file_name}.xlsx')
+
+        df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))     
+        df_unchanged_onts['status'] = df_unchanged_onts['status'].apply(lambda x: 'online' if x == 1 else 'offline')
+        df_unchanged_onts.loc[df_unchanged_onts['status'] == '1', 'status'] = 'online'
+        df_unchanged_onts = df_unchanged_onts.drop(['type','description'], axis=1)
+        df_unchanged_onts.to_excel(file, index=False, sheet_name="Main")
+
+        df_interface_commands = pd.DataFrame(interface_commands.split('\n'))
+        df_global_commands = pd.DataFrame(global_commands.split('\n'))
+        df_delete_commands = pd.DataFrame(delete_commands.split('\n'))
+        
+        if db_model == AttenuatorDB:
+            attenuations = maintenance_info.attenuations
+            df_attenuations = pd.DataFrame()
+            
+            for attenuation in attenuations[1:]:
+                onts_id = attenuation.get('onts')
+                onts_in_attenuation = []
+                unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
+                for ont in unchanged_onts:
+                    if ont.get('id') in onts_id:
+                        onts_in_attenuation.append(ont)
+                
+                df_attenuations = pd.DataFrame(onts_in_attenuation)
+                attenuation_id = attenuation.get('attenuation_id')
+                df_attenuations = df_attenuations.drop(['type', 'status', 'description'], axis=1)
+                df_attenuations.to_excel(file, index=False, header=False, sheet_name=f'Atenuação {attenuation_id}')
+
+        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Comandos da interface')
+        df_global_commands.to_excel(file, index=False, header=False, sheet_name='Comandos globais')
+        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Comandos de deletar')
+
+        file.close()
+
+    @staticmethod
+    def download_commands(request, db_model):
+        """
+        Reads a commands file and return your content to download
+        """
+        register_id = request.GET.get('tab_id')
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        file_name = f'{maintenance_info.file_name}.xlsx'
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+
+        file = open(file_path, 'rb')
+        response = FileResponse(file)
+        response['Content-Disposition'] = f'attachment; filename={file_name}'
+
+        return response
+    
+    @staticmethod
+    def discard_commands_file(request, db_model):
+        body_request = json.loads(request.body)
+        register_id = body_request.get('tabId')
+        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        file_name = f'{maintenance_info.file_name}.xlsx'
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+
+        try:
+            os.unlink(file_path)
+        except FileNotFoundError:
+            error_response = {
+                'error': True,
+                'message': f'Erro ao deletar o arquivo {file_name}, arquivo não encontrado'
+            }
+            return HttpResponse(json.dumps(error_response))
+
+        success_respons = {
+            'error': False,
+            'message': f'Arquivo {file_name} removido com sucesso'
+        }
+        return HttpResponse(json.dumps(success_respons))
+

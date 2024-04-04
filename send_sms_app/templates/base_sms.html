@@ -9,16 +9,17 @@
   </head>
   <body>
     {% csrf_token %}
+    
+    <div class="modal-loader">
+      <div class="loader"></div>
+    </div>
+
+    <div class="logo">
+        <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+    </div>
+
     <header>
-      <div class="modal-loader">
-        <div class="loader"></div>
-      </div>
-      <div class="logo">
-          <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
-      </div>
-
       <h1 id="title">SS - SMS Sender</h1>
-
     </header>
     {% block content %} {% endblock %} 
     <script type='text/javascript' src="{% static 'sendSms.js' %}"></script>

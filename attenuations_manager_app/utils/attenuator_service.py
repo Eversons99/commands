@@ -3,6 +3,7 @@ import json
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
+from maintenance_manager.static.shared_staticfiles.common.olt_api import Olt
 
 
 class AttenuationUtility:
@@ -168,13 +169,14 @@ class AttenuationUtility:
     @staticmethod
     def separate_information_to_generate_commands(request, db_model):
         try:
+            olt_api = Olt()
             register_id = request.GET.get('tab_id')
 
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
             onts = AttenuationUtility.get_onts_to_generate_commands(maintenance_info)
 
             info_to_generate_commands = {
-                'onts': onts,
+                'onts': olt_api.check_vlan(onts, maintenance_info),
                 'gpon': maintenance_info.destination_gpon.get('gpon'),
                 'host': maintenance_info.destination_gpon.get('host'),
                 'name': maintenance_info.file_name,
