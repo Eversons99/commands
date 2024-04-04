@@ -307,6 +307,7 @@ class GeneralUtility:
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = maintenance_info.file_name
 
+        source_port_config = maintenance_info.source_port_config
         interface_commands = requests.get(maintenance_info.commands_url.get('interfaceCommands')).text
         global_commands = requests.get(maintenance_info.commands_url.get('globalCommands')).text
         delete_commands = requests.get(maintenance_info.commands_url.get('deleteCommands')).text
@@ -319,6 +320,7 @@ class GeneralUtility:
         df_unchanged_onts = df_unchanged_onts.drop(['type','description'], axis=1)
         df_unchanged_onts.to_excel(file, index=False, sheet_name="Main")
 
+        df_source_port_config = pd.DataFrame(source_port_config.splitlines())
         df_interface_commands = pd.DataFrame(interface_commands.split('\n'))
         df_global_commands = pd.DataFrame(global_commands.split('\n'))
         df_delete_commands = pd.DataFrame(delete_commands.split('\n'))
@@ -339,7 +341,8 @@ class GeneralUtility:
                 attenuation_id = attenuation.get('attenuation_id')
                 df_attenuations = df_attenuations.drop(['type', 'status', 'description'], axis=1)
                 df_attenuations.to_excel(file, index=False, header=False, sheet_name=f'Atenuação {attenuation_id}')
-
+        
+        df_source_port_config.to_excel(file, index=False, header=False, sheet_name='Config originais da porta')
         df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Comandos da interface')
         df_global_commands.to_excel(file, index=False, header=False, sheet_name='Comandos globais')
         df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Comandos de deletar')

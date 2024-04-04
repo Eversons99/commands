@@ -350,9 +350,11 @@ async function makeRoolBack(operationMode) {
  
     const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
 
+    // Salvei os comandos originais da porta durante a checagem de vlan, salvei no banco e adicionei no arquivo de comandos -- OK
+
     // Onde, quando e como vou salvar os comandos de roolback ?
         // 1° Quando eu for gerar os comandos no NMT vou gerar os commandos de roolback, basta chamar a função novamente passando as localizações
-        // 2° Quando eu eu for verificar a vlan eu dou o comando display current-configurations porque já vou estar com a sessão aberta na OLT, então eu salvo o output no banco apenas para se der qualquer merda
+        // 2° Quando eu eu for verificar a vlan eu dou o comando display current-configurations porque já vou estar com a sessão aberta na OLT, então eu salvo o output no banco apenas para se der qualquer merda  -- OK
         // 3° Quando eu tiver gerando a plinha devo incluir os comandos de rollback, independente.
 
     // Aplicar os comandos de roolback:
