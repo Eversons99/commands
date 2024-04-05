@@ -12,6 +12,7 @@ class AttenuatorDB(models.Model):
     unchanged_onts = models.TextField(null=True)
     selected_devices = models.TextField(null=True)
     commands_url = models.JSONField(null=True)
+    rollback_commands_url = models.JSONField(null=True)
     attenuations = models.JSONField(null=True)
     logs = models.JSONField(null=True)
     source_port_config = models.TextField(null=True)

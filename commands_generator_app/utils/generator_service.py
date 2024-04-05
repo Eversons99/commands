@@ -21,25 +21,43 @@ class CommandsUtility:
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
             unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
 
-            for ont in unchanged_onts:
+            onts_checked = olt_api.check_vlan(unchanged_onts, maintenance_info)
+            port_config = { 'source_port_config': onts_checked.get('port_configuration')}
+
+            GeneralUtility.update_maintenance_info_in_database(
+                data_to_update=port_config,
+                register_id=register_id,
+                db_model=db_model
+            )
+
+            for ont in onts_checked.get('onts'):
                 if int(ont['id']) in id_devices_selected:
                     onts.append(ont)
-            
-            onts_checked = olt_api.check_vlan(onts, maintenance_info)
-            port_config = { 'source_port_config': onts_checked.get('port_configuration')}
-            
-            GeneralUtility.update_maintenance_info_in_database(data_to_update=port_config, register_id=register_id, db_model=db_model)
-            
+
             info_to_generate_commands = {
-                'onts': onts_checked.get('onts'),
-                'gpon': destination_gpon['gpon'],
-                'host': destination_gpon['host'],
-                'name': file_name,
-                'old_gpon': maintenance_info.source_gpon['gpon'],
-                'old_host': maintenance_info.source_gpon['host'],
-                'destination_gpon': destination_gpon,
                 'register_id': register_id,
-                'mode': 'generator'
+                'commands': {
+                    'onts': onts,
+                    'gpon': destination_gpon['gpon'],
+                    'host': destination_gpon['host'],
+                    'name': f'{file_name}',
+                    'old_gpon': maintenance_info.source_gpon['gpon'],
+                    'old_host': maintenance_info.source_gpon['host'],
+                    'destination_gpon': destination_gpon,
+                    'rollback': False,
+                    'mode': 'generator'
+                }, 
+                'rollback': {
+                    'onts': onts_checked.get('onts'),
+                    'gpon': maintenance_info.source_gpon['gpon'],
+                    'host': maintenance_info.source_gpon['host'],
+                    'name': f'{file_name}-rollback',
+                    'old_gpon': maintenance_info.source_gpon['gpon'],
+                    'old_host': maintenance_info.source_gpon['host'],
+                    'destination_gpon': maintenance_info.source_gpon,
+                    'rollback': True,
+                    'mode': 'generator'
+                }
             }
 
             return info_to_generate_commands

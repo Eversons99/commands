@@ -343,7 +343,7 @@ async function discardCommands(operationMode) {
     return alert(removeCommands.message)
 }
 
-async function makeRoolBack(operationMode) {
+async function makeRollBack(operationMode) {
     const confirmRoolback = confirm('Deseja realmente fazer o roolback ?')
 
     if (!confirmRoolback) return
@@ -351,6 +351,10 @@ async function makeRoolBack(operationMode) {
     const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
 
     // Salvei os comandos originais da porta durante a checagem de vlan, salvei no banco e adicionei no arquivo de comandos -- OK
+    // Gerar comandos de rollback -- OK
+    // Aplicar commandos
+    // Registrar logs
+    // Apresentar logs
 
     // Onde, quando e como vou salvar os comandos de roolback ?
         // 1° Quando eu for gerar os comandos no NMT vou gerar os commandos de roolback, basta chamar a função novamente passando as localizações

@@ -150,7 +150,12 @@ def end_attenuations(request):
             return info_to_generate_commands
 
         register_id = info_to_generate_commands.get('register_id')
-        commands = GeneralUtility.generate_commands(register_id, db_model, info_to_generate_commands)
+        
+        commands_info = info_to_generate_commands.get('commands')
+        rollback_commands_info = info_to_generate_commands.get('rollback')
+        
+        commands = GeneralUtility.generate_commands(register_id, db_model, commands_info)
+        GeneralUtility.generate_commands(register_id, db_model, rollback_commands_info)
 
         return HttpResponse(json.dumps(commands))
 

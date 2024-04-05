@@ -174,7 +174,7 @@ class GeneralUtility:
 
         except ObjectDoesNotExist as err:
             raise err
-
+        
     @staticmethod
     def generate_commands(register_id, db_model, info_to_generate_commands):
         """
@@ -195,17 +195,20 @@ class GeneralUtility:
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             commands_response = commands.json()
 
-            data_to_update = {
-                'file_name': info_to_generate_commands.get('name'),
-                'destination_gpon': info_to_generate_commands.get('destination_gpon'),
-                'selected_devices': info_to_generate_commands.get('onts'),
-                'commands_url': commands_response
-            }
+            data_to_update = {}
+            
+            if info_to_generate_commands.get('rollback'):
+                data_to_update['rollback_commands_url'] = commands_response
+            else:
+                data_to_update['file_name'] = info_to_generate_commands.get('name')
+                data_to_update['commands_url'] = commands_response
+                data_to_update['destination_gpon'] = info_to_generate_commands.get('destination_gpon')
+                data_to_update['selected_devices'] = info_to_generate_commands.get('onts')
 
             GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
             return {
-                "error": False,
+                'error': False,
                 'message': 'A requisição para o NMT ocorreu com sucesso'
             }
 
