@@ -48,7 +48,7 @@ class CommandsUtility:
                     'mode': 'generator'
                 }, 
                 'rollback': {
-                    'onts': onts_checked.get('onts'),
+                    'onts': onts,
                     'gpon': maintenance_info.source_gpon['gpon'],
                     'host': maintenance_info.source_gpon['host'],
                     'name': f'{file_name}-rollback',

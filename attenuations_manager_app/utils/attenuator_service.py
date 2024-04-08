@@ -203,7 +203,7 @@ class AttenuationUtility:
                     'mode': 'attenuator'
                 }, 
                 'rollback': {
-                    'onts': onts_checked.get('onts'),
+                    'onts': onts_to_generate_commands,
                     'gpon': maintenance_info.source_gpon['gpon'],
                     'host': maintenance_info.source_gpon['host'],
                     'name': f'{maintenance_info.file_name}-rollback',

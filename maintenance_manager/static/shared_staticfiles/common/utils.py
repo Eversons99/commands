@@ -189,7 +189,8 @@ class GeneralUtility:
                 'host': info_to_generate_commands.get('host'),
                 'name': info_to_generate_commands.get('name'),
                 'oldGpon': info_to_generate_commands.get('old_gpon'),
-                'oldHost': info_to_generate_commands.get('old_host')
+                'oldHost': info_to_generate_commands.get('old_host'),
+                'rollback': info_to_generate_commands.get('rollback')
             })
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
@@ -306,7 +307,6 @@ class GeneralUtility:
         Generates a xlsx file with ready commands and attenuation if there's
         """
         register_id = request.GET.get('tab_id')
-   
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = maintenance_info.file_name
 
@@ -314,6 +314,9 @@ class GeneralUtility:
         interface_commands = requests.get(maintenance_info.commands_url.get('interfaceCommands')).text
         global_commands = requests.get(maintenance_info.commands_url.get('globalCommands')).text
         delete_commands = requests.get(maintenance_info.commands_url.get('deleteCommands')).text
+        interface_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('interfaceCommands')).text
+        global_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('globalCommands')).text
+        delete_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('deleteCommands')).text
 
         file = pd.ExcelWriter(f'C:/Users/Everson/Desktop/commands/public/files/{file_name}.xlsx')
 
@@ -327,6 +330,9 @@ class GeneralUtility:
         df_interface_commands = pd.DataFrame(interface_commands.split('\n'))
         df_global_commands = pd.DataFrame(global_commands.split('\n'))
         df_delete_commands = pd.DataFrame(delete_commands.split('\n'))
+        df_interface_commands_rollback = pd.DataFrame(interface_commands_rollback.split('\n'))
+        df_global_commands_rollback = pd.DataFrame(global_commands_rollback.split('\n'))
+        df_delete_commands_rollback = pd.DataFrame(delete_commands_rollback.split('\n'))
         
         if db_model == AttenuatorDB:
             attenuations = maintenance_info.attenuations
@@ -345,10 +351,13 @@ class GeneralUtility:
                 df_attenuations = df_attenuations.drop(['type', 'status', 'description'], axis=1)
                 df_attenuations.to_excel(file, index=False, header=False, sheet_name=f'Atenuação {attenuation_id}')
         
-        df_source_port_config.to_excel(file, index=False, header=False, sheet_name='Config originais da porta')
-        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Comandos da interface')
-        df_global_commands.to_excel(file, index=False, header=False, sheet_name='Comandos globais')
-        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Comandos de deletar')
+        df_source_port_config.to_excel(file, index=False, header=False, sheet_name='Configs originais da porta')
+        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Interface')
+        df_global_commands.to_excel(file, index=False, header=False, sheet_name='Global')
+        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Deletar')
+        df_interface_commands_rollback.to_excel(file, index=False, header=False, sheet_name='Interface - Rollback')
+        df_global_commands_rollback.to_excel(file, index=False, header=False, sheet_name='Global - Rollback')
+        df_delete_commands_rollback.to_excel(file, index=False, header=False, sheet_name='Deletar - Rollback')
 
         file.close()
 
