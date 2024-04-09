@@ -204,11 +204,11 @@ class AttenuationUtility:
                 }, 
                 'rollback': {
                     'onts': onts_to_generate_commands,
-                    'gpon': maintenance_info.source_gpon['gpon'],
-                    'host': maintenance_info.source_gpon['host'],
+                    'gpon': maintenance_info.source_gpon.get('gpon'),
+                    'host': maintenance_info.source_gpon.get('host'),
                     'name': f'{maintenance_info.file_name}-rollback',
-                    'old_gpon': maintenance_info.source_gpon['gpon'],
-                    'old_host': maintenance_info.source_gpon['host'],
+                    'old_gpon': maintenance_info.destination_gpon.get('gpon'),
+                    'old_host': maintenance_info.destination_gpon.get('host'),
                     'destination_gpon': maintenance_info.source_gpon,
                     'rollback': True,
                     'mode': 'attenuator'

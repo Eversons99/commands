@@ -28,7 +28,6 @@ def search_onts_via_snmp(request):
 
 
 def render_onts_table(request):
-
     """
     Render a table with all onts
     """
@@ -69,6 +68,7 @@ def get_commands(request):
         rollback_commands_info = info_to_generate_commands.get('rollback')
 
         commands = GeneralUtility.generate_commands(register_id, db_model, commands_info)
+        rollback_commands_info['used_ids'] = commands['response'].get('idsSelecteds')
         GeneralUtility.generate_commands(register_id, db_model, rollback_commands_info)
 
         return HttpResponse(json.dumps(commands))

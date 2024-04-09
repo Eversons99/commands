@@ -52,8 +52,8 @@ class CommandsUtility:
                     'gpon': maintenance_info.source_gpon['gpon'],
                     'host': maintenance_info.source_gpon['host'],
                     'name': f'{file_name}-rollback',
-                    'old_gpon': maintenance_info.source_gpon['gpon'],
-                    'old_host': maintenance_info.source_gpon['host'],
+                    'old_gpon': destination_gpon['gpon'],
+                    'old_host': destination_gpon['host'],
                     'destination_gpon': maintenance_info.source_gpon,
                     'rollback': True,
                     'mode': 'generator'

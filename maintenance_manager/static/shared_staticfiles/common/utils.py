@@ -190,7 +190,8 @@ class GeneralUtility:
                 'name': info_to_generate_commands.get('name'),
                 'oldGpon': info_to_generate_commands.get('old_gpon'),
                 'oldHost': info_to_generate_commands.get('old_host'),
-                'rollback': info_to_generate_commands.get('rollback')
+                'rollback': info_to_generate_commands.get('rollback'),
+                'idsUsed': info_to_generate_commands.get('used_ids')
             })
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
@@ -210,7 +211,8 @@ class GeneralUtility:
 
             return {
                 'error': False,
-                'message': 'A requisição para o NMT ocorreu com sucesso'
+                'message': 'A requisição para o NMT ocorreu com sucesso',
+                'response': commands_response
             }
 
         except (requests.exceptions.RequestException, Exception) as err:
