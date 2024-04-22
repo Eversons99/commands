@@ -191,7 +191,7 @@ class GeneralUtility:
                 'oldGpon': info_to_generate_commands.get('old_gpon'),
                 'oldHost': info_to_generate_commands.get('old_host'),
                 'rollback': info_to_generate_commands.get('rollback'),
-                'idsUsed': info_to_generate_commands.get('used_ids')
+                'idsUsed': info_to_generate_commands.get('idsUsed')
             })
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)

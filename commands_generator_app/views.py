@@ -68,7 +68,7 @@ def get_commands(request):
         rollback_commands_info = info_to_generate_commands.get('rollback')
 
         commands = GeneralUtility.generate_commands(register_id, db_model, commands_info)
-        rollback_commands_info['used_ids'] = commands['response'].get('idsSelecteds')
+        rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
         GeneralUtility.generate_commands(register_id, db_model, rollback_commands_info)
 
         return HttpResponse(json.dumps(commands))
