@@ -165,14 +165,21 @@ class Olt:
         return { 'onts': onts, 'port_configuration': original_configuration} 
 
     async def apply_commands(self, websocket, maintenance_info):
+        rollback = maintenance_info.get('maintenanceInfo').get('rollback')
         file_name = maintenance_info.get('maintenanceInfo').get('file_name')
-        commands_urls =  maintenance_info.get('maintenanceInfo').get('commands_url')
-        formatted_commands = self.format_commands(commands_urls)
-        
+        commands_urls = maintenance_info.get('maintenanceInfo').get('commands_url')
         source_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
         destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
         destination_host = maintenance_info.get('maintenanceInfo').get('destination_gpon').get('host')
         
+        if rollback:
+            file_name = f'{file_name}-rollback'
+            commands_urls = maintenance_info.get('maintenanceInfo').get('rollback_commands_url')
+            source_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
+            destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
+            destination_host = maintenance_info.get('maintenanceInfo').get('source_gpon').get('host')
+
+        formatted_commands = self.format_commands(commands_urls)
         interface_commands = formatted_commands.get('interface_commands')
         global_commands = formatted_commands.get('global_commands')
         delete_commands = formatted_commands.get('delete_commands')

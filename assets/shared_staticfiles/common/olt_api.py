@@ -5,6 +5,7 @@ import requests
 import asyncio
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
+#from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
 load_dotenv('../commands.env')
 
 class Olt:
@@ -44,8 +45,8 @@ class Olt:
 
         if 'There is no ONT available' in all_onts or 'Failure: The ONT does not exist' in all_onts:
             error_message = {
-                'error': True,
-                'message': 'No ont were found'
+                "error": True,
+                "message": "No ont were found"
             }
             await websocket_connection.send(json.dumps(error_message))
             ssh_connection.disconnect()
@@ -64,7 +65,7 @@ class Olt:
                 ont_sn = ont.split()[1]
                 current_ont['id'] = ont_id
                 current_ont['sn'] = ont_sn
-                pon = gpon_info.get('pon').split('/')
+                pon = gpon_info.get("pon").split('/')
                 ont_info = ssh_connection.send_command_timing(f'display ont info {pon[0]} {pon[1]} {pon[2]} {ont_id}')
                 ont_info = ont_info.splitlines()
 
@@ -88,8 +89,8 @@ class Olt:
                 await asyncio.sleep(0.5)
                 await websocket_connection.send(json.dumps(current_ont))
 
-        headers = {'Content-Type': 'Application.json'}
-        body = json.dumps({'onts': collection_onts, 'tab_id': tab_id})
+        headers = {"Content-Type": 'Application.json'}
+        body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
         requests.post('http://10.0.30.157:8000/generator/update_onts_in_database', headers=headers, data=body)
 
         await websocket_connection.close()
@@ -98,7 +99,7 @@ class Olt:
     def get_amount_of_devices_by_pon(self, all_onts):
         olt_output = all_onts.splitlines()
         pattern_express = re.compile(r": [0-9]{1,3},")
-        amount_of_devices = {'total_number_onts': 0}
+        amount_of_devices = {"total_number_onts": 0}
 
         for record in olt_output:
             record_match = pattern_express.search(record)
@@ -115,8 +116,10 @@ class Olt:
         slot = maintenance_info.source_gpon.get('gpon').split('/')[1]
         port = maintenance_info.source_gpon.get('gpon').split('/')[2]
         source_host = maintenance_info.source_gpon.get('host')
-
+        
         ssh_connection = self.connect_olt(source_host)
+        
+        original_configuration = self.get_original_port_configuration(ssh_connection, maintenance_info)
 
         search_vlans = ssh_connection.send_command_timing(f'display service-port port 0/{slot}/{port}')
         output_olt = search_vlans.splitlines()
@@ -144,23 +147,56 @@ class Olt:
 
                         id = get_id[len(get_id) - 1]
 
-                        vlans_found.append({'id': id, 'vlan': vlan})
+                        vlans_found.append({ "id": id, "vlan": vlan})
 
                     else:
-                        vlans_not_found.append({'output': output, 'vlan': vlan})
+                        vlans_not_found.append({"uutput": output, "vlan": vlan})
 
         for ont in onts:
             for s_vlan in vlans_found:
-                if ont['id'] == s_vlan['id']:
-                    ont['vlan'] = s_vlan['vlan']
+                if ont["id"] == s_vlan["id"]:
+                    ont["vlan"] = s_vlan["vlan"]
 
             keys = ont.keys()
             if 'vlan' not in keys:
-                ont['vlan'] = ''
-            
-        ssh_connection.disconnect() # Finalizado a sessão
-        return onts 
+                ont["vlan"] = ""
+        
+        ssh_connection.disconnect()
+        return { 'onts': onts, 'port_configuration': original_configuration} 
 
+    async def apply_commands(self, websocket, maintenance_info):
+        rollback = maintenance_info.get('maintenanceInfo').get('rollback')
+
+        file_name = maintenance_info.get('maintenanceInfo').get('file_name')
+
+        commands_urls = maintenance_info.get('maintenanceInfo').get('commands_url')
+        source_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
+        destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
+        destination_host = maintenance_info.get('maintenanceInfo').get('destination_gpon').get('host')
+        
+        if rollback:
+            file_name = f'{file_name}-rollback'
+            commands_urls = maintenance_info.get('maintenanceInfo').get('rollback_commands_url')
+            source_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
+            destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
+            destination_host = maintenance_info.get('maintenanceInfo').get('source_gpon').get('host')
+
+        formatted_commands = self.format_commands(commands_urls)
+        interface_commands = formatted_commands.get('interface_commands')
+        global_commands = formatted_commands.get('global_commands')
+        delete_commands = formatted_commands.get('delete_commands')
+        log_file = open(f'C:/Users/Everson/Desktop/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
+        
+        ssh_connection = self.connect_olt(destination_host)
+        
+        await self.apply_delete_commands(source_info_maintenance, delete_commands, log_file, websocket)
+        await self.apply_interface_and_global_commands(destination_info_maintenance, ssh_connection, interface_commands, global_commands, log_file, websocket)
+
+        ssh_connection.disconnect()
+        log_file.close()
+        await websocket.close()
+
+    """
     async def apply_commands(self, websocket, maintenance_info):
         file_name = maintenance_info.get('maintenanceInfo').get('file_name')
         commands_urls =  maintenance_info.get('maintenanceInfo').get('commands_url')
@@ -183,6 +219,7 @@ class Olt:
         ssh_connection.disconnect()
         log_file.close()
         await websocket.close()
+    """
 
     def format_commands(self, commands_url):
         interface_commands = requests.get(commands_url.get('interfaceCommands')).text
@@ -201,9 +238,9 @@ class Olt:
                     commands.pop(index)
         
         return { 
-            'interface_commands': list_of_commands[0],
-            'global_commands': list_of_commands[1],
-            'delete_commands' : list_of_commands[2]
+            "interface_commands": list_of_commands[0],
+            "global_commands": list_of_commands[1],
+            "delete_commands" : list_of_commands[2]
         }    
 
     async def apply_delete_commands(self, source_info_maintenance, delete_commands, log_file, websocket):
@@ -281,21 +318,21 @@ class Olt:
 
                 if 'success: 1' in delete_ont:
                     return {
-                        'success': True,
-                        'message': 'SN was removed'
+                        "success": True,
+                        "message": 'SN was removed'
                     }
 
             return {
-                'success': False,
-                'message': 'Unable to get location and device id'
+                "success": False,
+                "message": 'Unable to get location and device id'
             }   
 
         return {
-            'success': False,
-            'message': 'The regex did not match'
+            "success": False,
+            "message": 'The regex did not match'
         }
         
-    def format_delete_commands(self, location, ont_id):        
+    def format_delete_commands(self, location, ont_id):
         location_splited = location.split('/')
         slot = location_splited[1]
         port = location_splited[2]
@@ -308,3 +345,10 @@ class Olt:
         ]
 
         return list_of_delete_commands
+
+    def get_original_port_configuration(self, ssh_connection, maintenance_info):
+        location_pon = maintenance_info.source_gpon.get('gpon')
+        configuration = ssh_connection.send_command_timing(f'display current-configuration port {location_pon}')
+        
+        return configuration
+        

@@ -282,6 +282,7 @@ class GeneralUtility:
         maintenance = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         maintenance_info = {
             'commands_url': maintenance.commands_url,
+            'rollback_commands_url': maintenance.rollback_commands_url,
             'source_gpon': maintenance.source_gpon,
             'destination_gpon': maintenance.destination_gpon,
             'file_name': maintenance.file_name
@@ -293,10 +294,15 @@ class GeneralUtility:
     def save_logs(request, db_model):
         try: 
             body_request = json.loads(request.body)
+            rollback = body_request.get('rollback')
             register_id = body_request.get('tabId')
             logs = body_request.get('logs')
             
             logs_to_save = {'logs': logs}
+
+            if rollback:
+                logs_to_save = {'rollback_logs': logs}
+
             GeneralUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
 
             return {'error': False}

@@ -146,11 +146,24 @@ def render_logs(request):
     Gets logs on database and render a templete with all logs
     """
     if request.method == 'GET':
-        register_id = request.GET.get('tab_id')
+        register_id = json.loads(request.GET.get('tab_id'))
+        rollback = json.loads(request.GET.get('rollback'))
         db_model = GeneratorDB
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name, 'operation_mode': 'generator'}
 
+        logs = {
+            'logs': maintenance_info.logs, 
+            'name': maintenance_info.file_name, 
+            'operation_mode': 'generator'}
+
+        if rollback:
+            logs = {
+                'logs': maintenance_info.rollback_logs, 
+                'name': f'{maintenance_info.file_name}-rollback', 
+                'operation_mode': 'generator',
+                'rollback': True
+            }
+            
         return render(request, 'commandsLogs.html', context=logs)
 
         

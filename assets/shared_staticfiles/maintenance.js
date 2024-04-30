@@ -210,7 +210,12 @@ function getIdDevicesSelected() {
     return idDevicesSelected
 }
 
-async function apllyCommands(operationMode) {
+/*
+async function apllyCommands(operationMode, rollback) {
+    const confirmApply = confirm('Confirme a aplicação dos comandos')
+
+    if (!confirmApply) return
+
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
     const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
@@ -250,6 +255,54 @@ async function apllyCommands(operationMode) {
         return alert(error)
     }
 }
+*/
+
+async function apllyCommands(operationMode, rollback) {
+
+    const confirmApply = confirm(rollback ? 'Confirm a aplicação dos comandos de rollack?' : 'Confirme a aplicação dos comandos')
+
+    if (!confirmApply) return
+
+    loadingAnimation(true)
+    const maintenanceInfo = await getMaintenanceInfo(operationMode)
+    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
+    const loadingText = document.getElementById('loader-message')
+    const commandsApplied = []
+    let operationStatus
+    let connectionWithErr
+    maintenanceInfo.rollback = rollback ? true : false
+
+    socket.onerror = (e) => {
+        loadingAnimation(false)
+        connectionWithErr = true
+        alert('Ocorreu um erro ao conectar ao servidor WebSocket.');
+    }
+
+    socket.onopen = () => {
+        socket.send(JSON.stringify({
+            maintenanceInfo
+        }))
+        console.log('Sessão com o servidor Websocket iniciada')
+    }
+
+    socket.onmessage = (event) => {
+        const currentMessage = JSON.parse(event.data)
+        if (currentMessage.command) {
+            let commandLog = currentMessage.command
+            loadingText.textContent = `Aplicando comando: ${commandLog}`
+            commandsApplied.push(currentMessage)
+        }
+    }
+
+    socket.onclose = async () => {
+        if (!connectionWithErr){
+            loadingAnimation(false)
+            await showLogs(commandsApplied, operationMode, rollback)
+            console.log('Sessão com o servidor Websocket finalizada')
+            return operationStatus
+        }
+    }
+}
 
 async function getMaintenanceInfo(operationMode) {
     const url = `http://10.0.30.157:8000/${operationMode}/get_maintenance_info`
@@ -270,9 +323,7 @@ async function getMaintenanceInfo(operationMode) {
     return maintenanceInfo
 }
 
-async function showLogs(logs, operationMode) {
-    // Fazer um post para o APP e salvar os logs no banco
-    // Fazer um get para o APP para renderizar os comandos aplicados
+async function showLogs(logs, operationMode, rollback) {
     const tabId = getIdentificator()
     const baseUrl = `http://10.0.30.157:8000/${operationMode}`
     const requestOptions = {
@@ -282,6 +333,7 @@ async function showLogs(logs, operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
+            'rollback': rollback,
             'tabId': tabId,
             'logs': logs
         })
@@ -292,5 +344,81 @@ async function showLogs(logs, operationMode) {
 
     if (saveCommands.error) return alert(saveCommands.message)
 
-    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
+    if (!rollback){
+        return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
+    }
+    
+    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}&rollback=${rollback}` 
+
+}
+
+async function downloadCommandsFile(operationMode) {
+    const tab_id = getIdentificator()
+    const url = `http://10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
+    const div = document.querySelector('.action-buttuns')
+    const link = document.createElement('a')
+
+    link.setAttribute('href', url)
+    link.setAttribute('id', 'link-download')
+    div.appendChild(link)
+
+    const elementLink = document.getElementById('link-download')
+    elementLink.click()
+}
+
+async function discardCommands(operationMode) {
+    const confirmDelete = confirm('Realmente deseja deletar os comandos ?')
+
+    if (!confirmDelete) return
+
+    const donwloadButton = document.getElementById('btn-save')
+    const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
+    const requestOptions = {
+        method: 'DELETE',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator()
+        })
+    }
+
+    let removeCommands = await fetch(url, requestOptions)
+    removeCommands = await removeCommands.json()
+    donwloadButton.disabled = true
+
+    if (!removeCommands.error) {
+        const removeButton = document.getElementById('btn-discard')
+        removeButton.disabled = true
+    }
+
+    return alert(removeCommands.message)
+}
+
+async function makeRollBack(operationMode) {
+    const confirmRoolback = confirm('Deseja realmente fazer o roolback ?')
+
+    if (!confirmRoolback) return
+ 
+    const url = `http://10.0.30.157:8000/${operationMode}/apply_rollback_commands`
+
+    // Salvei os comandos originais da porta durante a checagem de vlan, salvei no banco e adicionei no arquivo de comandos -- OK
+    // Gerar comandos de rollback -- OK
+    // Aplicar commandos
+    // Registrar logs
+    // Apresentar logs
+
+    // Onde, quando e como vou salvar os comandos de roolback ?
+        // 1° Quando eu for gerar os comandos no NMT vou gerar os commandos de roolback, basta chamar a função novamente passando as localizações
+        // 2° Quando eu eu for verificar a vlan eu dou o comando display current-configurations porque já vou estar com a sessão aberta na OLT, então eu salvo o output no banco apenas para se der qualquer merda  -- OK
+        // 3° Quando eu tiver gerando a plinha devo incluir os comandos de rollback, independente.
+
+    // Aplicar os comandos de roolback:
+        // 1° Me conecto ao websocket, busco as informações no banco e os comandos necessários
+        // 2° Aplico os comandos e renderizo
+
+    // Quando a pessoa clicar em aplicar comandos eu poderia, gerar os comandos de roolback atráves do websocket e apenas editar os arquivos existentes
+
+
 }

@@ -210,8 +210,8 @@ function getIdDevicesSelected() {
     return idDevicesSelected
 }
 
-async function apllyCommands(operationMode) {
-    const confirmApply = confirm('Confirme a aplicação dos comandos')
+async function apllyCommands(operationMode, rollback) {
+    const confirmApply = confirm(rollback ? 'Confirm a aplicação dos comandos de rollack?' : 'Confirme a aplicação dos comandos')
 
     if (!confirmApply) return
 
@@ -219,39 +219,41 @@ async function apllyCommands(operationMode) {
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
     const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
     const loadingText = document.getElementById('loader-message')
-    let operationStatus
     const commandsApplied = []
+    let operationStatus
+    let connectionWithErr
+    rollback = rollback ? true : false
+    maintenanceInfo.rollback = rollback ? true : false
 
-    try {
-        socket.onopen = () => {
-            socket.send(JSON.stringify({
-                maintenanceInfo
-            }))
-            console.log('Sessão com o servidor Websocket iniciada')
+    socket.onerror = () => {
+        loadingAnimation(false)
+        connectionWithErr = true
+        alert('Ocorreu um erro ao conectar ao servidor WebSocket.');
+    }
+
+    socket.onopen = () => {
+        socket.send(JSON.stringify({
+            maintenanceInfo
+        }))
+        console.log('Sessão com o servidor Websocket iniciada')
+    }
+
+    socket.onmessage = (event) => {
+        const currentMessage = JSON.parse(event.data)
+        if (currentMessage.command) {
+            let commandLog = currentMessage.command
+            loadingText.textContent = `Aplicando comando: ${commandLog}`
+            commandsApplied.push(currentMessage)
         }
+    }
 
-        socket.onmessage = (event) => {
-            const currentMessage = JSON.parse(event.data)
-
-            if (currentMessage.command) {
-                let commandLog = currentMessage.command
-                loadingText.textContent = `Aplicando comando: ${commandLog}`
-                commandsApplied.push(currentMessage)
-            }
-        }
-
-        socket.onclose = async () => {
+    socket.onclose = async () => {
+        if (!connectionWithErr){
             loadingAnimation(false)
-            await showLogs(commandsApplied, operationMode)
+            await showLogs(commandsApplied, operationMode, rollback)
             console.log('Sessão com o servidor Websocket finalizada')
             return operationStatus
         }
-
-        socket.onerror = (e) => {
-            alert(JSON.parse(e))
-        }
-    } catch (error) {
-        return alert(error)
     }
 }
 
@@ -274,9 +276,7 @@ async function getMaintenanceInfo(operationMode) {
     return maintenanceInfo
 }
 
-async function showLogs(logs, operationMode) {
-    // Fazer um post para o APP e salvar os logs no banco
-    // Fazer um get para o APP para renderizar os comandos aplicados
+async function showLogs(logs, operationMode, rollback) {
     const tabId = getIdentificator()
     const baseUrl = `http://10.0.30.157:8000/${operationMode}`
     const requestOptions = {
@@ -286,6 +286,7 @@ async function showLogs(logs, operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
+            'rollback': rollback,
             'tabId': tabId,
             'logs': logs
         })
@@ -296,7 +297,7 @@ async function showLogs(logs, operationMode) {
 
     if (saveCommands.error) return alert(saveCommands.message)
 
-    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
+    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}&rollback=${rollback}` 
 }
 
 async function downloadCommandsFile(operationMode) {
@@ -341,31 +342,4 @@ async function discardCommands(operationMode) {
     }
 
     return alert(removeCommands.message)
-}
-
-async function makeRollBack(operationMode) {
-    const confirmRoolback = confirm('Deseja realmente fazer o roolback ?')
-
-    if (!confirmRoolback) return
- 
-    const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
-
-    // Salvei os comandos originais da porta durante a checagem de vlan, salvei no banco e adicionei no arquivo de comandos -- OK
-    // Gerar comandos de rollback -- OK
-    // Aplicar commandos
-    // Registrar logs
-    // Apresentar logs
-
-    // Onde, quando e como vou salvar os comandos de roolback ?
-        // 1° Quando eu for gerar os comandos no NMT vou gerar os commandos de roolback, basta chamar a função novamente passando as localizações
-        // 2° Quando eu eu for verificar a vlan eu dou o comando display current-configurations porque já vou estar com a sessão aberta na OLT, então eu salvo o output no banco apenas para se der qualquer merda  -- OK
-        // 3° Quando eu tiver gerando a plinha devo incluir os comandos de rollback, independente.
-
-    // Aplicar os comandos de roolback:
-        // 1° Me conecto ao websocket, busco as informações no banco e os comandos necessários
-        // 2° Aplico os comandos e renderizo
-
-    // Quando a pessoa clicar em aplicar comandos eu poderia, gerar os comandos de roolback atráves do websocket e apenas editar os arquivos existentes
-
-
 }
