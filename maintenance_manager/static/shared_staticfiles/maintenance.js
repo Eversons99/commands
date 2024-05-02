@@ -250,6 +250,7 @@ async function apllyCommands(operationMode, rollback) {
     socket.onclose = async () => {
         if (!connectionWithErr){
             loadingAnimation(false)
+            await updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback)
             await showLogs(commandsApplied, operationMode, rollback)
             console.log('Sessão com o servidor Websocket finalizada')
             return operationStatus
@@ -342,4 +343,15 @@ async function discardCommands(operationMode) {
     }
 
     return alert(removeCommands.message)
+}
+
+async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
+    const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
+    const url = `http://10.0.30.157:8000/${operationMode}/update_status_applied_commands?${queryParams}`
+    let updateInfo = await fetch(url)
+    updateInfo = await updateInfo.json()
+
+    if (updateInfo.error) {
+        return alert(updateInfo.message)
+    }
 }

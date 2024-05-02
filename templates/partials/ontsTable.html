@@ -15,9 +15,9 @@
             <td>{{ device.sn }}</td>
             <td>{{ device.type }}</td>
             {% if device.status == 1 %}
-                <td>ONLINE</td>
+                <td class="ont-online">ONLINE</td>
             {% else %}
-                <td>OFFLINE</td>
+                <td class="ont-offline">OFFLINE</td>
             {% endif %}
         </tr>
     {% endfor %}

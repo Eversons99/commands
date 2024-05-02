@@ -193,3 +193,10 @@ def discard_commands(request):
         db_model = GeneratorDB
         commands_response = GeneralUtility.discard_commands_file(request, db_model)
         return commands_response
+
+def update_status_applied_commands(request):
+    if request.method == 'GET':
+        db_model = GeneratorDB
+        update_info = GeneralUtility.update_status_applied_commands(request, db_model)
+        
+        return HttpResponse(json.dumps(update_info))
