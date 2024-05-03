@@ -127,7 +127,7 @@ async function generateCommands() {
         return alert('Selecione ao menos um dispositivo')
     }
 
-    const maintenanceInfo = getMaintenanceInfoFromForm()
+    const maintenanceInfo = await getMaintenanceInfoFromForm()
 
     if (maintenanceInfo.error) {
         loadingAnimation(false)
@@ -157,6 +157,43 @@ async function generateCommands() {
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
     return window.location = `${baseUrl}/render_page_commands?tab_id=${maintenanceInfo.tabId}`
+}
+
+async function getMaintenanceInfoFromForm() {
+    const destinationHost = document.getElementById('select-olt').value
+    const destinationSlot = document.getElementById('select-slot').value
+    const destinationPort = document.getElementById('select-port').value
+    const fileName = document.getElementById('file-name').value
+    const tabId = getIdentificator()
+
+    if (!destinationHost || !destinationSlot || !destinationPort) {
+        return { error: true, message: 'Preecha o F/S/P para prosseguir'}
+    } else if (!fileName) {
+        return { error: true, message: 'Digite um nome para o seu arquivo para prosseguir'}
+    }
+    
+    const checkFileName = await checkFileNameExists(fileName)
+    if (checkFileName.used) {
+        return  { error: true, message: `O nome ${fileName} já está em uso, escolha outro` }
+    }
+
+    const gponInfo = {
+        destinationGpon: {
+            'host': destinationHost,
+            'gpon': `0/${destinationSlot}/${destinationPort}`
+        },
+        fileName,
+        tabId,
+        idDevicesSelected: getIdDevicesSelected()
+    }
+    return gponInfo
+}
+
+async function checkFileNameExists(fileName){
+    let allFileNames = await fetch(`http://10.0.30.157:8000/shared-core/check_file_names?fileName=${fileName}`)
+    allFileNames = await allFileNames.json()
+
+    return allFileNames
 }
 
 function resultsButton(e) {

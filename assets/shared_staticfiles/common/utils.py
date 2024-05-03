@@ -1,4 +1,5 @@
 import ast
+from datetime import datetime, timezone
 import json
 import requests
 import os
@@ -281,6 +282,7 @@ class GeneralUtility:
         register_id = body_request.get('tabId')
         maintenance = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         maintenance_info = {
+            'register_id': maintenance.register_id,
             'commands_url': maintenance.commands_url,
             'rollback_commands_url': maintenance.rollback_commands_url,
             'source_gpon': maintenance.source_gpon,
@@ -390,21 +392,59 @@ class GeneralUtility:
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        file_name = f'{maintenance_info.file_name}.xlsx'
-        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+        xlsx_file = f'{maintenance_info.file_name}.xlsx'
+        file_name = maintenance_info.file_name
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{xlsx_file}'
 
         try:
             os.unlink(file_path)
-        except FileNotFoundError:
+            rm_file_on_nmt = requests.get(f'https://nmt.nmultifibra.com.br/files/drop-commands-file?fileName={file_name}')
+            rm_file_on_nmt = rm_file_on_nmt.json()
+            
+            if rm_file_on_nmt.get('error'):
+                raise FileNotFoundError(rm_file_on_nmt.get('error'))    
+        except FileNotFoundError as err:
             error_response = {
                 'error': True,
-                'message': f'Erro ao deletar o arquivo {file_name}, arquivo não encontrado'
+                'message': f'Erro ao deletar o arquivo {file_name}. Err: {err}'
             }
             return HttpResponse(json.dumps(error_response))
+        
+        data_to_update = {'commands_removed': True}
+        GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model) 
 
-        success_respons = {
+        success_response = {
             'error': False,
             'message': f'Arquivo {file_name} removido com sucesso'
         }
-        return HttpResponse(json.dumps(success_respons))
+        return HttpResponse(json.dumps(success_response))
 
+    @staticmethod
+    def update_status_applied_commands(request, db_model):
+        try:
+            rollback = json.loads(request.GET.get('rollback'))
+            register_id = json.loads(request.GET.get('tabId'))
+            
+            status_to_update = {
+                'commands_applied': True, 
+                'date_commands_applied': datetime.now(tz=timezone.utc)
+            }
+            
+            if rollback:
+                status_to_update = {
+                    'rollback_commands_applied': True, 
+                    'date_rollback_commands_applied': datetime.now(tz=timezone.utc)
+                }
+                
+            GeneralUtility.update_maintenance_info_in_database(status_to_update, register_id, db_model)
+            
+            return {
+                'error': False,
+                'message': 'Status da aplicação dos comandos atualizado com sucesso'
+            }
+
+        except Exception as err:
+            return {
+                'error': True,
+                'message': f'Ocorreu um erro ao atualizar o status da aplicação dos comandos no banco. Err: {err}'
+            }

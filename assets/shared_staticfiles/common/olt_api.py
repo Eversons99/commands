@@ -166,9 +166,7 @@ class Olt:
 
     async def apply_commands(self, websocket, maintenance_info):
         rollback = maintenance_info.get('maintenanceInfo').get('rollback')
-
         file_name = maintenance_info.get('maintenanceInfo').get('file_name')
-
         commands_urls = maintenance_info.get('maintenanceInfo').get('commands_url')
         source_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
         destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
@@ -195,31 +193,6 @@ class Olt:
         ssh_connection.disconnect()
         log_file.close()
         await websocket.close()
-
-    """
-    async def apply_commands(self, websocket, maintenance_info):
-        file_name = maintenance_info.get('maintenanceInfo').get('file_name')
-        commands_urls =  maintenance_info.get('maintenanceInfo').get('commands_url')
-        formatted_commands = self.format_commands(commands_urls)
-        
-        source_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
-        destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
-        destination_host = maintenance_info.get('maintenanceInfo').get('destination_gpon').get('host')
-        
-        interface_commands = formatted_commands.get('interface_commands')
-        global_commands = formatted_commands.get('global_commands')
-        delete_commands = formatted_commands.get('delete_commands')
-        log_file = open(f'C:/Users/Everson/Desktop/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
-        
-        ssh_connection = self.connect_olt(destination_host)
-        
-        await self.apply_delete_commands(source_info_maintenance, delete_commands, log_file, websocket)
-        await self.apply_interface_and_global_commands(destination_info_maintenance, ssh_connection, interface_commands, global_commands, log_file, websocket)
-
-        ssh_connection.disconnect()
-        log_file.close()
-        await websocket.close()
-    """
 
     def format_commands(self, commands_url):
         interface_commands = requests.get(commands_url.get('interfaceCommands')).text

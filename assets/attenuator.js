@@ -8,7 +8,7 @@ async function saveInitialAttenuationState() {
         return alert('Você precisa selecionar todos os dispositivos')
     }
 
-    const maintenanceInfo = getMaintenanceInfoFromForm()
+    const maintenanceInfo = await getMaintenanceInfoFromForm()
 
     if (maintenanceInfo.error) {
         loadingAnimation(false)
@@ -37,31 +37,6 @@ async function saveInitialAttenuationState() {
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
     return window.location = `${baseUrl}/render_attenuations_page?tab_id=${maintenanceInfo.tabId}`
-}
-
-function getMaintenanceInfoFromForm() {
-    const destinationHost = document.getElementById('select-olt').value
-    const destinationSlot = document.getElementById('select-slot').value
-    const destinationPort = document.getElementById('select-port').value
-    const fileName = document.getElementById('file-name').value
-    const tabId = getIdentificator()
-
-    if (!destinationHost || !destinationSlot || !destinationPort) {
-        return { error: true, message: 'Preecha o F/S/P para prosseguir'}
-    } else if (!fileName) {
-        return { error: true, message: 'Digite um nome para o seu arquivo para prosseguir'}
-    }
-
-    const gponInfo = {
-        destinationGpon: {
-            'host': destinationHost,
-            'gpon': `0/${destinationSlot}/${destinationPort}`
-        },
-        fileName,
-        tabId,
-        idDevicesSelected: getIdDevicesSelected()
-    }
-    return gponInfo
 }
 
 function checkIfAllDevicesIsSelected()  {

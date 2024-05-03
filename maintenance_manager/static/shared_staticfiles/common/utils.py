@@ -4,6 +4,7 @@ import json
 import requests
 import os
 import pandas as pd
+from commands_generator_app.models import GeneratorDB
 from attenuations_manager_app.models import AttenuatorDB
 from django.http.response import HttpResponse, FileResponse
 from django.db.utils import IntegrityError
@@ -448,3 +449,18 @@ class GeneralUtility:
                 'error': True,
                 'message': f'Ocorreu um erro ao atualizar o status da aplicação dos comandos no banco. Err: {err}'
             }
+    
+    @staticmethod 
+    def check_file_names(request):
+        file_name = request.GET.get('fileName')
+        all_file_names = []
+
+        generator_names = GeneratorDB.objects.all().filter(file_name__isnull=False).values_list('file_name', flat=True)
+        attenuator_names = AttenuatorDB.objects.all().filter(file_name__isnull=False).values_list('file_name', flat=True)
+        all_file_names.extend(generator_names)
+        all_file_names.extend(attenuator_names)
+        
+        if file_name in all_file_names:
+            return {'used': True}
+
+        return {'used': False}

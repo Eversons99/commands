@@ -421,3 +421,11 @@ textarea {
 #link-download {
     display: none;
 }
+
+.ont-online {
+    color: rgba(147, 194, 77, 0.808);
+}
+
+.ont-offline {
+    color: red;
+}
