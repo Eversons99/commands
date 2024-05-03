@@ -150,8 +150,6 @@ def get_numbers_to_send_sms(request):
         serial_numbers_selecteds = body_request['serialNumbers']
         register_id =  body_request['tabId']
 
-        print(serial_numbers_selecteds)
-
         try:
             url = 'https://nmt.nmultifibra.com.br/rompimentos/parcial'
             headers_request = {"Content-Type": "application/json; charset=utf-8"}

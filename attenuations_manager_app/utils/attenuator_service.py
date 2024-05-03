@@ -171,22 +171,50 @@ class AttenuationUtility:
         try:
             olt_api = Olt()
             register_id = request.GET.get('tab_id')
-
+            onts_to_generate_commands = []
             maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-            onts = AttenuationUtility.get_onts_to_generate_commands(maintenance_info)
+            unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
+            onts_info = AttenuationUtility.get_onts_to_generate_commands(maintenance_info)
+            id_devices_selected = onts_info.get('id_devices_selected')
+            onts_checked = olt_api.check_vlan(unchanged_onts, maintenance_info)
+            port_config = {'source_port_config': onts_checked.get('port_configuration')}
+
+            GeneralUtility.update_maintenance_info_in_database(
+                data_to_update=port_config,
+                register_id=register_id,
+                db_model=db_model
+            )
+            
+            for ont in onts_checked.get('onts'):
+                if int(ont['id']) in id_devices_selected:
+                    onts_to_generate_commands.append(ont)
 
             info_to_generate_commands = {
-                'onts': olt_api.check_vlan(onts, maintenance_info),
-                'gpon': maintenance_info.destination_gpon.get('gpon'),
-                'host': maintenance_info.destination_gpon.get('host'),
-                'name': maintenance_info.file_name,
-                'old_gpon': maintenance_info.source_gpon.get('gpon'),
-                'old_host': maintenance_info.source_gpon.get('host'),
-                'destination_gpon': maintenance_info.destination_gpon,
                 'register_id': register_id,
-                'mode': 'attenuator'
+                'commands': {
+                    'onts': onts_to_generate_commands,
+                    'gpon': maintenance_info.destination_gpon.get('gpon'),
+                    'host': maintenance_info.destination_gpon.get('host'),
+                    'name': maintenance_info.file_name,
+                    'old_gpon': maintenance_info.source_gpon.get('gpon'),
+                    'old_host': maintenance_info.source_gpon.get('host'),
+                    'destination_gpon': maintenance_info.destination_gpon,
+                    'rollback': False,
+                    'mode': 'attenuator'
+                }, 
+                'rollback': {
+                    'onts': onts_to_generate_commands,
+                    'gpon': maintenance_info.source_gpon.get('gpon'),
+                    'host': maintenance_info.source_gpon.get('host'),
+                    'name': f'{maintenance_info.file_name}-rollback',
+                    'old_gpon': maintenance_info.destination_gpon.get('gpon'),
+                    'old_host': maintenance_info.destination_gpon.get('host'),
+                    'destination_gpon': maintenance_info.source_gpon,
+                    'rollback': True,
+                    'mode': 'attenuator'
+                }
             }
-
+            
             return info_to_generate_commands
 
         except ObjectDoesNotExist as err:
@@ -206,6 +234,8 @@ class AttenuationUtility:
         onts_info = ast.literal_eval(maintenance_info.unchanged_onts)
         all_onts_ids_in_attenuations = []
         onts_to_generate_commands = []
+        id_devices_selected = []
+        
 
         for index in range(1, len(all_attenuations)):
             ids_onts_in_attenuation = all_attenuations[index].get('onts')
@@ -217,6 +247,7 @@ class AttenuationUtility:
         for ont in onts_info:
             id_ont = ont.get('id')
             if id_ont in all_onts_ids_in_attenuations:
+                id_devices_selected.append(int(id_ont))
                 onts_to_generate_commands.append(ont)
 
-        return onts_to_generate_commands
+        return {'onts': onts_to_generate_commands, 'id_devices_selected': id_devices_selected} 

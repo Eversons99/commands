@@ -17,5 +17,7 @@ urlpatterns = [
     path('save_logs', views.save_logs, name='save_logs'),
     path('render_logs', views.render_logs, name='render_logs'),
     path('download_command_file', views.download_command_file, name='download_command_file'),
-    path('discard_commands', views.discard_commands, name='discard_commands')
+    path('discard_commands', views.discard_commands, name='discard_commands'),
+    path('update_status_applied_commands', views.update_status_applied_commands, name='update_status_applied_commands')
+
 ]

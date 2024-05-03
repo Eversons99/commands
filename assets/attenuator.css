@@ -26,13 +26,14 @@
     width: 85%;
     text-align: center;
     display: flex;
-    margin: 4em auto;
+    margin: 2em auto;
     align-items: center;
     justify-content: space-between;
     background-color: #fff3cd;
     color: #856404;
     border: 1px solid #ffeeba;
     border-radius: 0.25rem;
+    font-size: 12px;
 }
 
 #alert-img, #error-img {

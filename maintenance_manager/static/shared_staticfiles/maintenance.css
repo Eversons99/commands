@@ -156,6 +156,14 @@ table th:first-child {
     background: #08d;
 }
 
+#btn-rollback {
+    background: rgb(240, 28, 28);
+}
+
+#btn-rollback:hover {
+    background: rgb(196, 107, 107);
+}
+
 #btn-discard:hover{
     background: rgb(227, 107, 107);
 }
@@ -338,13 +346,13 @@ textarea {
 
 }
 
-#error-title-h2, #bnt-error, #error-message {
+#error-title-h2, #bnt-error, #error-message-pg {
     margin: 0 0 1em 0;
 }
 
 #logs-container {
     background: black;
-    width: 90%;
+    width: 85%;
     font-size: 16px;
     color: white;
     padding: 1.5em;
@@ -412,4 +420,12 @@ textarea {
 
 #link-download {
     display: none;
+}
+
+.ont-online {
+    color: rgba(147, 194, 77, 0.808);
+}
+
+.ont-offline {
+    color: red;
 }

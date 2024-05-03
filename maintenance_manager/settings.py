@@ -27,8 +27,7 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.157', '10.0.30.157', '10.0.30.157', '168.0.96.11']
-
+ALLOWED_HOSTS = ['10.0.30.157', '168.0.96.11']
 
 # Application definition
 
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -80,9 +80,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "maintenance_manager.wsgi.application"
-
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -114,7 +111,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -130,16 +126,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATICFILES_DIRS = [
-    f'{ABSOLUTE_PATH}/attenuations_manager_app/static',
-    f'{ABSOLUTE_PATH}/commands_generator_app/static',
-    f'{ABSOLUTE_PATH}/send_sms_app/static',
-    f'{ABSOLUTE_PATH}/gpon_health_app/static',
     f'{ABSOLUTE_PATH}/maintenance_manager/static'
 ]
 
-STATIC_URL = "static/"
+STATIC_URL = "assets/"
 STATIC_ROOT = f'{ABSOLUTE_PATH}/assets'
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

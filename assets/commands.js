@@ -40,37 +40,46 @@ async function searchOntsViaSsh(operationMode) {
     let total_number_onts = 0
     let controllerPercentage = 0
 
-    socket.onopen = () => {
-        socket.send(JSON.stringify({
-            pon, 
-            host, 
-            tab_id: tabId
-        }))
-        console.log('Sessão com o servidor Websocket iniciada')
-    }
-
-    socket.onmessage = (event) => {
-        const currentMessage = JSON.parse(event.data)
-
-        if (currentMessage.total_number_onts){
-            total_number_onts = currentMessage.total_number_onts
-            loadingText.textContent = `Carregando dados dos dispositivos - 0%`
-
-        } else if (currentMessage.id) {
-            controllerPercentage+=1
-            let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
-            loadingText.textContent = `Carregando dados dos dispositivos  - ${percentage}%`
-            onts.push(currentMessage)
-
-        } else if (currentMessage.message == "No ont were found") {
-            socket.close()
-            alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
-            return window.location =  `${baseUrl}/home`
+    try {
+        socket.onopen = () => {
+            socket.send(JSON.stringify({
+                pon, 
+                host, 
+                tab_id: tabId
+            }))
+            console.log('Sessão com o servidor Websocket iniciada')
         }
+    
+        socket.onmessage = (event) => {
+            const currentMessage = JSON.parse(event.data)
+    
+            if (currentMessage.total_number_onts){
+                total_number_onts = currentMessage.total_number_onts
+                loadingText.textContent = `Carregando dados dos dispositivos - 0%`
+    
+            } else if (currentMessage.id) {
+                controllerPercentage+=1
+                let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
+                loadingText.textContent = `Carregando dados dos dispositivos  - ${percentage}%`
+                onts.push(currentMessage)
+    
+            } else if (currentMessage.message == "No ont were found") {
+                socket.close()
+                alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
+                return window.location = `${baseUrl}/home`
+            }
+        }
+    
+        socket.onclose = () => {
+            console.log('Sessão com o servidor Websocket finalizada')
+            if (!total_number_onts) {
+                alert('Nenhuma ONT na porta informada')
+                return window.location = `${baseUrl}/home`
+            }
+            return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
+        } 
+    } catch (error) {
+        return alert(error)
     }
 
-    socket.onclose = () => {
-        console.log('Sessão com o servidor Websocket finalizada')
-        return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
-    }
 }
