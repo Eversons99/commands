@@ -195,6 +195,7 @@ td {
 
 .gray-row td, .gray-color {
     background: rgb(211, 206, 206);
+    color: black;
 }
 
 /*Multiple locaitons page*/

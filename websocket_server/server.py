@@ -2,8 +2,7 @@ import asyncio
 import json
 import sys
 import websockets
-# sys.path.append('/home/nmultifibra/commands/maintenance_manager/static/shared_staticfiles/common/')
-sys.path.append('C:/Users/Everson/Desktop/commands/maintenance_manager/static/shared_staticfiles/common/')
+sys.path.append('/home/nmultifibra/commands/maintenance_manager/static/shared_staticfiles/common/')
 from olt_api import Olt
 from dotenv import load_dotenv
 load_dotenv()
@@ -23,7 +22,7 @@ async def olt(websocket, path):
             
 
 async def server():
-    async with websockets.serve(olt, '10.0.30.157', 5678):
+    async with websockets.serve(olt, '10.0.30.252', 5678):
         await asyncio.Future()  # run forever
 
 

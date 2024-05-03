@@ -66,7 +66,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.252:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -119,7 +119,7 @@ function getIdentificator() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000/generator"
+    const baseUrl = "http://10.0.30.252:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {
@@ -213,7 +213,7 @@ function getIdDevicesSelected() {
 async function apllyCommands(operationMode) {
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
-    const socket = new WebSocket('ws://10.0.30.157:5678/apply-commands')
+    const socket = new WebSocket('ws://10.0.30.252:5678/apply-commands')
     const loadingText = document.getElementById('loader-message')
     let operationStatus
     const commandsApplied = []
@@ -252,7 +252,7 @@ async function apllyCommands(operationMode) {
 }
 
 async function getMaintenanceInfo(operationMode) {
-    const url = `http://10.0.30.157:8000/${operationMode}/get_maintenance_info`
+    const url = `http://10.0.30.252:8000/${operationMode}/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -274,7 +274,7 @@ async function showLogs(logs, operationMode) {
     // Fazer um post para o APP e salvar os logs no banco
     // Fazer um get para o APP para renderizar os comandos aplicados
     const tabId = getIdentificator()
-    const baseUrl = `http://10.0.30.157:8000/${operationMode}`
+    const baseUrl = `http://10.0.30.252:8000/${operationMode}`
     const requestOptions = {
         method: 'POST',
         headers: {

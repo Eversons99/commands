@@ -30,11 +30,11 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://10.0.30.252:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
-    const socket = new WebSocket('ws://10.0.30.157:5678/get-onts')
+    const socket = new WebSocket('ws://10.0.30.252:5678/get-onts')
     const tabId = getIdentificator()
     const onts = []
     let total_number_onts = 0
@@ -62,7 +62,7 @@ async function searchOntsViaSsh(operationMode) {
                 let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
                 loadingText.textContent = `Carregando dados dos dispositivos  - ${percentage}%`
                 onts.push(currentMessage)
-    
+
             } else if (currentMessage.message == "No ont were found") {
                 socket.close()
                 alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
