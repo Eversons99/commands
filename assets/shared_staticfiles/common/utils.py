@@ -331,7 +331,7 @@ class GeneralUtility:
         global_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('globalCommands')).text
         delete_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('deleteCommands')).text
 
-        file = pd.ExcelWriter(f'C:/Users/Everson/Desktop/commands/public/files/{file_name}.xlsx')
+        file = pd.ExcelWriter(f'/home/nmultifibra/commands/public/files/{file_name}.xlsx')
 
         df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))     
         df_unchanged_onts['status'] = df_unchanged_onts['status'].apply(lambda x: 'online' if x == 1 else 'offline')
@@ -382,7 +382,7 @@ class GeneralUtility:
         register_id = request.GET.get('tab_id')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = f'{maintenance_info.file_name}.xlsx'
-        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+        file_path = f'/home/nmultifibra/commands/public/files/{file_name}'
 
         file = open(file_path, 'rb')
         response = FileResponse(file)
@@ -397,7 +397,7 @@ class GeneralUtility:
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         xlsx_file = f'{maintenance_info.file_name}.xlsx'
         file_name = maintenance_info.file_name
-        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{xlsx_file}'
+        file_path = f'/home/nmultifibra/commands/public/files/{xlsx_file}'
 
         try:
             os.unlink(file_path)

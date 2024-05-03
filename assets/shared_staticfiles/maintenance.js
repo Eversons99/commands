@@ -189,7 +189,7 @@ async function getMaintenanceInfoFromForm() {
 }
 
 async function checkFileNameExists(fileName){
-    const url = `http://10.0.30.157:8000/get_used_file_names`
+    const url = `http://10.0.30.252:8000/get_used_file_names`
     let allFileNames = await fetch(url)
     allFileNames = await allFileNames.json()
     
@@ -342,7 +342,7 @@ async function showLogs(logs, operationMode, rollback) {
 
 async function downloadCommandsFile(operationMode) {
     const tab_id = getIdentificator()
-    const url = `http://10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
+    const url = `http://10.0.30.252:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
     const div = document.querySelector('.action-buttuns')
     const link = document.createElement('a')
 
@@ -360,7 +360,7 @@ async function discardCommands(operationMode) {
     if (!confirmDelete) return
 
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
+    const url = `http://10.0.30.252:8000/${operationMode}/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -381,12 +381,12 @@ async function discardCommands(operationMode) {
         removeButton.disabled = true
     }
     alert(removeCommands.message)
-    return window.location = 'http://10.0.30.157:8000/'
+    return window.location = 'http://10.0.30.252:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
     const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
-    const url = `http://10.0.30.157:8000/${operationMode}/update_status_applied_commands?${queryParams}`
+    const url = `http://10.0.30.252:8000/${operationMode}/update_status_applied_commands?${queryParams}`
     let updateInfo = await fetch(url)
     updateInfo = await updateInfo.json()
 

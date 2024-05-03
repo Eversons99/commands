@@ -190,7 +190,7 @@ async function getMaintenanceInfoFromForm() {
 }
 
 async function checkFileNameExists(fileName){
-    let allFileNames = await fetch(`http://10.0.30.157:8000/shared-core/check_file_names?fileName=${fileName}`)
+    let allFileNames = await fetch(`http://10.0.30.252:8000/shared-core/check_file_names?fileName=${fileName}`)
     allFileNames = await allFileNames.json()
 
     return allFileNames
@@ -379,12 +379,12 @@ async function discardCommands(operationMode) {
         removeButton.disabled = true
     }
     alert(removeCommands.message)
-    return window.location = 'http://10.0.30.157:8000/'
+    return window.location = 'http://10.0.30.252:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
     const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
-    const url = `http://10.0.30.157:8000/${operationMode}/update_status_applied_commands?${queryParams}`
+    const url = `http://10.0.30.252:8000/${operationMode}/update_status_applied_commands?${queryParams}`
     let updateInfo = await fetch(url)
     updateInfo = await updateInfo.json()
 
