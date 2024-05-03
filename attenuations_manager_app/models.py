@@ -20,5 +20,6 @@ class AttenuatorDB(models.Model):
     rollback_commands_applied = models.BooleanField(default=False)
     date_commands_applied = models.DateTimeField(null=True)
     date_rollback_commands_applied = models.DateTimeField(null=True)
+    commands_removed = models.BooleanField(default=False)
     source_port_config = models.TextField(null=True)
     created_date = models.DateTimeField(default=timezone.now, null=True)

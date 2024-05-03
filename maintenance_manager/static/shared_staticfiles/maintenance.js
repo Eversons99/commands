@@ -316,7 +316,7 @@ async function downloadCommandsFile(operationMode) {
 }
 
 async function discardCommands(operationMode) {
-    const confirmDelete = confirm('Realmente deseja deletar os comandos ?')
+    const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidas?')
 
     if (!confirmDelete) return
 
@@ -341,8 +341,8 @@ async function discardCommands(operationMode) {
         const removeButton = document.getElementById('btn-discard')
         removeButton.disabled = true
     }
-
-    return alert(removeCommands.message)
+    alert(removeCommands.message)
+    return window.location = 'http://10.0.30.157:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){

@@ -392,23 +392,32 @@ class GeneralUtility:
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        file_name = f'{maintenance_info.file_name}.xlsx'
-        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
+        xlsx_file = f'{maintenance_info.file_name}.xlsx'
+        file_name = maintenance_info.file_name
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{xlsx_file}'
 
         try:
             os.unlink(file_path)
-        except FileNotFoundError:
+            rm_file_on_nmt = requests.get(f'https://nmt.nmultifibra.com.br/files/drop-commands-file?fileName={file_name}')
+            rm_file_on_nmt = rm_file_on_nmt.json()
+            
+            if rm_file_on_nmt.get('error'):
+                raise FileNotFoundError(rm_file_on_nmt.get('error'))    
+        except FileNotFoundError as err:
             error_response = {
                 'error': True,
-                'message': f'Erro ao deletar o arquivo {file_name}, arquivo não encontrado'
+                'message': f'Erro ao deletar o arquivo {file_name}. Err: {err}'
             }
             return HttpResponse(json.dumps(error_response))
+        
+        data_to_update = {'commands_removed': True}
+        GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model) 
 
-        success_respons = {
+        success_response = {
             'error': False,
             'message': f'Arquivo {file_name} removido com sucesso'
         }
-        return HttpResponse(json.dumps(success_respons))
+        return HttpResponse(json.dumps(success_response))
 
     @staticmethod
     def update_status_applied_commands(request, db_model):

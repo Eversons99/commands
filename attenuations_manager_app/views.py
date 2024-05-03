@@ -251,8 +251,8 @@ def discard_commands(request):
     """
     if request.method == 'DELETE':
         db_model = AttenuatorDB
-        commands_response = GeneralUtility.discard_commands_file(request, db_model)
-        return commands_response
+        rm_commands_response = GeneralUtility.discard_commands_file(request, db_model)
+        return rm_commands_response
     
 def update_status_applied_commands(request):
     if request.method == 'GET':
