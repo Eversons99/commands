@@ -5,6 +5,7 @@ import requests
 import asyncio
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
+#from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
 load_dotenv('../commands.env')
 
 class Olt:
@@ -115,8 +116,10 @@ class Olt:
         slot = maintenance_info.source_gpon.get('gpon').split('/')[1]
         port = maintenance_info.source_gpon.get('gpon').split('/')[2]
         source_host = maintenance_info.source_gpon.get('host')
-
+        
         ssh_connection = self.connect_olt(source_host)
+        
+        original_configuration = self.get_original_port_configuration(ssh_connection, maintenance_info)
 
         search_vlans = ssh_connection.send_command_timing(f'display service-port port 0/{slot}/{port}')
         output_olt = search_vlans.splitlines()
@@ -157,19 +160,26 @@ class Olt:
             keys = ont.keys()
             if 'vlan' not in keys:
                 ont["vlan"] = ""
-            
-        ssh_connection.disconnect() # Finalizado a sessão
-        return onts 
+        
+        ssh_connection.disconnect()
+        return { 'onts': onts, 'port_configuration': original_configuration} 
 
     async def apply_commands(self, websocket, maintenance_info):
+        rollback = maintenance_info.get('maintenanceInfo').get('rollback')
         file_name = maintenance_info.get('maintenanceInfo').get('file_name')
-        commands_urls =  maintenance_info.get('maintenanceInfo').get('commands_url')
-        formatted_commands = self.format_commands(commands_urls)
-        
+        commands_urls = maintenance_info.get('maintenanceInfo').get('commands_url')
         source_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
         destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
         destination_host = maintenance_info.get('maintenanceInfo').get('destination_gpon').get('host')
         
+        if rollback:
+            file_name = f'{file_name}-rollback'
+            commands_urls = maintenance_info.get('maintenanceInfo').get('rollback_commands_url')
+            source_info_maintenance = maintenance_info.get('maintenanceInfo').get('destination_gpon')
+            destination_info_maintenance = maintenance_info.get('maintenanceInfo').get('source_gpon')
+            destination_host = maintenance_info.get('maintenanceInfo').get('source_gpon').get('host')
+
+        formatted_commands = self.format_commands(commands_urls)
         interface_commands = formatted_commands.get('interface_commands')
         global_commands = formatted_commands.get('global_commands')
         delete_commands = formatted_commands.get('delete_commands')
@@ -295,7 +305,7 @@ class Olt:
             "message": 'The regex did not match'
         }
         
-    def format_delete_commands(self, location, ont_id):        
+    def format_delete_commands(self, location, ont_id):
         location_splited = location.split('/')
         slot = location_splited[1]
         port = location_splited[2]
@@ -308,3 +318,10 @@ class Olt:
         ]
 
         return list_of_delete_commands
+
+    def get_original_port_configuration(self, ssh_connection, maintenance_info):
+        location_pon = maintenance_info.source_gpon.get('gpon')
+        configuration = ssh_connection.send_command_timing(f'display current-configuration port {location_pon}')
+        
+        return configuration
+        

@@ -1,10 +1,14 @@
 import ast
+from datetime import datetime, timezone
 import json
 import requests
 import os
 import pandas as pd
 from attenuations_manager_app.models import AttenuatorDB
-from django.http.response import HttpResponse, FileResponse
+import os
+import pandas as pd
+from attenuations_manager_app.models import AttenuatorDB
+from django.http.response import HttpResponse, FileResponse, FileResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -174,7 +178,7 @@ class GeneralUtility:
 
         except ObjectDoesNotExist as err:
             raise err
-
+        
     @staticmethod
     def generate_commands(register_id, db_model, info_to_generate_commands):
         """
@@ -189,24 +193,30 @@ class GeneralUtility:
                 'host': info_to_generate_commands.get('host'),
                 'name': info_to_generate_commands.get('name'),
                 'oldGpon': info_to_generate_commands.get('old_gpon'),
-                'oldHost': info_to_generate_commands.get('old_host')
+                'oldHost': info_to_generate_commands.get('old_host'),
+                'rollback': info_to_generate_commands.get('rollback'),
+                'idsUsed': info_to_generate_commands.get('idsUsed')
             })
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             commands_response = commands.json()
 
-            data_to_update = {
-                'file_name': info_to_generate_commands.get('name'),
-                'destination_gpon': info_to_generate_commands.get('destination_gpon'),
-                'selected_devices': info_to_generate_commands.get('onts'),
-                'commands_url': commands_response
-            }
+            data_to_update = {}
+            
+            if info_to_generate_commands.get('rollback'):
+                data_to_update['rollback_commands_url'] = commands_response
+            else:
+                data_to_update['file_name'] = info_to_generate_commands.get('name')
+                data_to_update['commands_url'] = commands_response
+                data_to_update['destination_gpon'] = info_to_generate_commands.get('destination_gpon')
+                data_to_update['selected_devices'] = info_to_generate_commands.get('onts')
 
             GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
             return {
-                "error": False,
-                'message': 'A requisição para o NMT ocorreu com sucesso'
+                'error': False,
+                'message': 'A requisição para o NMT ocorreu com sucesso',
+                'response': commands_response
             }
 
         except (requests.exceptions.RequestException, Exception) as err:
@@ -275,7 +285,9 @@ class GeneralUtility:
         register_id = body_request.get('tabId')
         maintenance = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         maintenance_info = {
+            'register_id': maintenance.register_id,
             'commands_url': maintenance.commands_url,
+            'rollback_commands_url': maintenance.rollback_commands_url,
             'source_gpon': maintenance.source_gpon,
             'destination_gpon': maintenance.destination_gpon,
             'file_name': maintenance.file_name
@@ -287,10 +299,15 @@ class GeneralUtility:
     def save_logs(request, db_model):
         try: 
             body_request = json.loads(request.body)
+            rollback = body_request.get('rollback')
             register_id = body_request.get('tabId')
             logs = body_request.get('logs')
             
             logs_to_save = {'logs': logs}
+
+            if rollback:
+                logs_to_save = {'rollback_logs': logs}
+
             GeneralUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
 
             return {'error': False}
@@ -303,15 +320,18 @@ class GeneralUtility:
         Generates a xlsx file with ready commands and attenuation if there's
         """
         register_id = request.GET.get('tab_id')
-   
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = maintenance_info.file_name
 
+        source_port_config = maintenance_info.source_port_config
         interface_commands = requests.get(maintenance_info.commands_url.get('interfaceCommands')).text
         global_commands = requests.get(maintenance_info.commands_url.get('globalCommands')).text
         delete_commands = requests.get(maintenance_info.commands_url.get('deleteCommands')).text
+        interface_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('interfaceCommands')).text
+        global_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('globalCommands')).text
+        delete_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('deleteCommands')).text
 
-        file = pd.ExcelWriter(f'/home/nmultifibra/commands/public/files/{file_name}.xlsx')
+        file = pd.ExcelWriter(f'C:/Users/Everson/Desktop/commands/public/files/{file_name}.xlsx')
 
         df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))     
         df_unchanged_onts['status'] = df_unchanged_onts['status'].apply(lambda x: 'online' if x == 1 else 'offline')
@@ -319,9 +339,13 @@ class GeneralUtility:
         df_unchanged_onts = df_unchanged_onts.drop(['type','description'], axis=1)
         df_unchanged_onts.to_excel(file, index=False, sheet_name="Main")
 
+        df_source_port_config = pd.DataFrame(source_port_config.splitlines())
         df_interface_commands = pd.DataFrame(interface_commands.split('\n'))
         df_global_commands = pd.DataFrame(global_commands.split('\n'))
         df_delete_commands = pd.DataFrame(delete_commands.split('\n'))
+        df_interface_commands_rollback = pd.DataFrame(interface_commands_rollback.split('\n'))
+        df_global_commands_rollback = pd.DataFrame(global_commands_rollback.split('\n'))
+        df_delete_commands_rollback = pd.DataFrame(delete_commands_rollback.split('\n'))
         
         if db_model == AttenuatorDB:
             attenuations = maintenance_info.attenuations
@@ -339,10 +363,14 @@ class GeneralUtility:
                 attenuation_id = attenuation.get('attenuation_id')
                 df_attenuations = df_attenuations.drop(['type', 'status', 'description'], axis=1)
                 df_attenuations.to_excel(file, index=False, header=False, sheet_name=f'Atenuação {attenuation_id}')
-
-        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Comandos da interface')
-        df_global_commands.to_excel(file, index=False, header=False, sheet_name='Comandos globais')
-        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Comandos de deletar')
+        
+        df_source_port_config.to_excel(file, index=False, header=False, sheet_name='Configs originais da porta')
+        df_interface_commands.to_excel(file, index=False, header=False, sheet_name='Interface')
+        df_global_commands.to_excel(file, index=False, header=False, sheet_name='Global')
+        df_delete_commands.to_excel(file, index=False, header=False, sheet_name='Deletar')
+        df_interface_commands_rollback.to_excel(file, index=False, header=False, sheet_name='Interface - Rollback')
+        df_global_commands_rollback.to_excel(file, index=False, header=False, sheet_name='Global - Rollback')
+        df_delete_commands_rollback.to_excel(file, index=False, header=False, sheet_name='Deletar - Rollback')
 
         file.close()
 
@@ -354,7 +382,7 @@ class GeneralUtility:
         register_id = request.GET.get('tab_id')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = f'{maintenance_info.file_name}.xlsx'
-        file_path = f'/home/nmultifibra/commands/public/files/{file_name}'
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{file_name}'
 
         file = open(file_path, 'rb')
         response = FileResponse(file)
@@ -367,21 +395,59 @@ class GeneralUtility:
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        file_name = f'{maintenance_info.file_name}.xlsx'
-        file_path = f'/home/nmultifibra/commands/public/files/{file_name}'
+        xlsx_file = f'{maintenance_info.file_name}.xlsx'
+        file_name = maintenance_info.file_name
+        file_path = f'C:/Users/Everson/Desktop/commands/public/files/{xlsx_file}'
 
         try:
             os.unlink(file_path)
-        except FileNotFoundError:
+            rm_file_on_nmt = requests.get(f'https://nmt.nmultifibra.com.br/files/drop-commands-file?fileName={file_name}')
+            rm_file_on_nmt = rm_file_on_nmt.json()
+            
+            if rm_file_on_nmt.get('error'):
+                raise FileNotFoundError(rm_file_on_nmt.get('error'))    
+        except FileNotFoundError as err:
             error_response = {
                 'error': True,
-                'message': f'Erro ao deletar o arquivo {file_name}, arquivo não encontrado'
+                'message': f'Erro ao deletar o arquivo {file_name}. Err: {err}'
             }
             return HttpResponse(json.dumps(error_response))
+        
+        data_to_update = {'commands_removed': True}
+        GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model) 
 
-        success_respons = {
+        success_response = {
             'error': False,
             'message': f'Arquivo {file_name} removido com sucesso'
         }
-        return HttpResponse(json.dumps(success_respons))
+        return HttpResponse(json.dumps(success_response))
 
+    @staticmethod
+    def update_status_applied_commands(request, db_model):
+        try:
+            rollback = json.loads(request.GET.get('rollback'))
+            register_id = json.loads(request.GET.get('tabId'))
+            
+            status_to_update = {
+                'commands_applied': True, 
+                'date_commands_applied': datetime.now(tz=timezone.utc)
+            }
+            
+            if rollback:
+                status_to_update = {
+                    'rollback_commands_applied': True, 
+                    'date_rollback_commands_applied': datetime.now(tz=timezone.utc)
+                }
+                
+            GeneralUtility.update_maintenance_info_in_database(status_to_update, register_id, db_model)
+            
+            return {
+                'error': False,
+                'message': 'Status da aplicação dos comandos atualizado com sucesso'
+            }
+
+        except Exception as err:
+            return {
+                'error': True,
+                'message': f'Ocorreu um erro ao atualizar o status da aplicação dos comandos no banco. Err: {err}'
+            }

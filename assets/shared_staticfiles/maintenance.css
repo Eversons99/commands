@@ -152,6 +152,18 @@ table th:first-child {
     color: black;
 }
 
+#btn-home {
+    background: #08d;
+}
+
+#btn-rollback {
+    background: rgb(240, 28, 28);
+}
+
+#btn-rollback:hover {
+    background: rgb(196, 107, 107);
+}
+
 #btn-discard:hover{
     background: rgb(227, 107, 107);
 }
@@ -162,7 +174,23 @@ table th:first-child {
 }
 
 #btn-save:hover {
-    background: rgb(132, 231, 153);
+    background: rgb(163, 247, 181);
+}
+
+#btn-home:hover {
+    background: rgb(21, 149, 228);
+}
+
+#btn-save:disabled {
+    background-color: rgb(214, 248, 221);
+    color: rgb(133, 133, 133);
+    cursor: default;
+}
+
+#btn-discard:disabled {
+    background-color: rgb(223, 156, 156);
+    color: rgb(133, 133, 133);
+    cursor: default;
 }
 
 textarea {
@@ -318,13 +346,13 @@ textarea {
 
 }
 
-#error-title-h2, #bnt-error, #error-message {
+#error-title-h2, #bnt-error, #error-message-pg {
     margin: 0 0 1em 0;
 }
 
 #logs-container {
     background: black;
-    width: 90%;
+    width: 85%;
     font-size: 16px;
     color: white;
     padding: 1.5em;
@@ -343,4 +371,61 @@ textarea {
 
 #log {
     color: rgb(205, 226, 108);
+}
+
+#apps {
+    display: flex;
+    width: 90%;
+}
+
+.app-title {
+    padding: 0.5em;
+    text-align: center;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border: solid 2px #f0eded;
+    margin: 3em;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: space-between;
+    
+}
+
+.app a {
+    text-decoration: none;
+    color: black;
+}
+
+.app-explanation {
+    padding: 0.5em;
+    text-align: justify;
+}
+
+#title-homepage {
+    margin: 0.1em auto;
+    text-align: center;
+}
+.btn-app {
+    background-color: #08d;
+}
+
+.btn-app:hover {
+    background-color: rgb(63, 171, 238);
+    cursor: pointer;
+}
+
+#link-download {
+    display: none;
+}
+
+.ont-online {
+    color: rgba(147, 194, 77, 0.808);
+}
+
+.ont-offline {
+    color: red;
 }

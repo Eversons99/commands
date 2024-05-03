@@ -150,7 +150,13 @@ def end_attenuations(request):
             return info_to_generate_commands
 
         register_id = info_to_generate_commands.get('register_id')
-        commands = GeneralUtility.generate_commands(register_id, db_model, info_to_generate_commands)
+        
+        commands_info = info_to_generate_commands.get('commands')
+        rollback_commands_info = info_to_generate_commands.get('rollback')
+        
+        commands = GeneralUtility.generate_commands(register_id, db_model, commands_info)
+        rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
+        GeneralUtility.generate_commands(register_id, db_model, rollback_commands_info)
 
         return HttpResponse(json.dumps(commands))
 
@@ -187,7 +193,6 @@ def save_logs(request):
     """
     Save logs on database
     """
-    
     if request.method == 'POST':
         db_model = AttenuatorDB
         save_logs_on_db = GeneralUtility.save_logs(request, db_model)
@@ -200,10 +205,24 @@ def render_logs(request):
     Gets logs on database and render a templete with all logs
     """
     if request.method == 'GET':
-        register_id = request.GET.get('tab_id')
+        register_id = json.loads(request.GET.get('tab_id'))
+        rollback = json.loads(request.GET.get('rollback'))
         db_model = AttenuatorDB
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-        logs = {'logs': maintenance_info.logs, 'name': maintenance_info.file_name}
+        
+        logs = {
+            'logs': maintenance_info.logs, 
+            'name': maintenance_info.file_name, 
+            'operation_mode': 'attenuator',
+        }
+
+        if rollback:
+            logs = {
+                'logs': maintenance_info.rollback_logs, 
+                'name': f'{maintenance_info.file_name}-rollback', 
+                'operation_mode': 'attenuator',
+                'rollback': True
+            }
 
         return render(request, 'attenuatorLogs.html', context=logs)
 
@@ -232,5 +251,12 @@ def discard_commands(request):
     """
     if request.method == 'DELETE':
         db_model = AttenuatorDB
-        commands_response = GeneralUtility.discard_commands_file(request, db_model)
-        return commands_response
+        rm_commands_response = GeneralUtility.discard_commands_file(request, db_model)
+        return rm_commands_response
+    
+def update_status_applied_commands(request):
+    if request.method == 'GET':
+        db_model = AttenuatorDB
+        update_info = GeneralUtility.update_status_applied_commands(request, db_model)
+        
+        return HttpResponse(json.dumps(update_info))

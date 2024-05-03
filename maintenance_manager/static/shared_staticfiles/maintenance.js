@@ -127,7 +127,7 @@ async function generateCommands() {
         return alert('Selecione ao menos um dispositivo')
     }
 
-    const maintenanceInfo = getMaintenanceInfoFromForm()
+    const maintenanceInfo = await getMaintenanceInfoFromForm()
 
     if (maintenanceInfo.error) {
         loadingAnimation(false)
@@ -157,6 +157,43 @@ async function generateCommands() {
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
     return window.location = `${baseUrl}/render_page_commands?tab_id=${maintenanceInfo.tabId}`
+}
+
+async function getMaintenanceInfoFromForm() {
+    const destinationHost = document.getElementById('select-olt').value
+    const destinationSlot = document.getElementById('select-slot').value
+    const destinationPort = document.getElementById('select-port').value
+    const fileName = document.getElementById('file-name').value
+    const tabId = getIdentificator()
+
+    if (!destinationHost || !destinationSlot || !destinationPort) {
+        return { error: true, message: 'Preecha o F/S/P para prosseguir'}
+    } else if (!fileName) {
+        return { error: true, message: 'Digite um nome para o seu arquivo para prosseguir'}
+    }
+    
+    const checkFileName = await checkFileNameExists(fileName)
+    if (checkFileName.used) {
+        return  { error: true, message: `O nome ${fileName} já está em uso, escolha outro` }
+    }
+
+    const gponInfo = {
+        destinationGpon: {
+            'host': destinationHost,
+            'gpon': `0/${destinationSlot}/${destinationPort}`
+        },
+        fileName,
+        tabId,
+        idDevicesSelected: getIdDevicesSelected()
+    }
+    return gponInfo
+}
+
+async function checkFileNameExists(fileName){
+    let allFileNames = await fetch(`http://10.0.30.157:8000/shared-core/check_file_names?fileName=${fileName}`)
+    allFileNames = await allFileNames.json()
+
+    return allFileNames
 }
 
 function resultsButton(e) {
@@ -210,44 +247,51 @@ function getIdDevicesSelected() {
     return idDevicesSelected
 }
 
-async function apllyCommands(operationMode) {
+async function apllyCommands(operationMode, rollback) {
+    const confirmApply = confirm(rollback ? 'Confirm a aplicação dos comandos de rollack?' : 'Confirme a aplicação dos comandos')
+
+    if (!confirmApply) return
+
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
     const socket = new WebSocket('ws://10.0.30.252:5678/apply-commands')
     const loadingText = document.getElementById('loader-message')
-    let operationStatus
     const commandsApplied = []
+    let operationStatus
+    let connectionWithErr
+    rollback = rollback ? true : false
+    maintenanceInfo.rollback = rollback ? true : false
 
-    try {
-        socket.onopen = () => {
-            socket.send(JSON.stringify({
-                maintenanceInfo
-            }))
-            console.log('Sessão com o servidor Websocket iniciada')
+    socket.onerror = () => {
+        loadingAnimation(false)
+        connectionWithErr = true
+        alert('Ocorreu um erro ao conectar ao servidor WebSocket.');
+    }
+
+    socket.onopen = () => {
+        socket.send(JSON.stringify({
+            maintenanceInfo
+        }))
+        console.log('Sessão com o servidor Websocket iniciada')
+    }
+
+    socket.onmessage = (event) => {
+        const currentMessage = JSON.parse(event.data)
+        if (currentMessage.command) {
+            let commandLog = currentMessage.command
+            loadingText.textContent = `Aplicando comando: ${commandLog}`
+            commandsApplied.push(currentMessage)
         }
+    }
 
-        socket.onmessage = (event) => {
-            const currentMessage = JSON.parse(event.data)
-
-            if (currentMessage.command) {
-                let commandLog = currentMessage.command
-                loadingText.textContent = `Aplicando comando: ${commandLog}`
-                commandsApplied.push(currentMessage)
-            }
-        }
-
-        socket.onclose = async () => {
+    socket.onclose = async () => {
+        if (!connectionWithErr){
             loadingAnimation(false)
-            await showLogs(commandsApplied, operationMode)
+            await updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback)
+            await showLogs(commandsApplied, operationMode, rollback)
             console.log('Sessão com o servidor Websocket finalizada')
             return operationStatus
         }
-
-        socket.onerror = (e) => {
-            alert(JSON.parse(e))
-        }
-    } catch (error) {
-        return alert(error)
     }
 }
 
@@ -270,9 +314,7 @@ async function getMaintenanceInfo(operationMode) {
     return maintenanceInfo
 }
 
-async function showLogs(logs, operationMode) {
-    // Fazer um post para o APP e salvar os logs no banco
-    // Fazer um get para o APP para renderizar os comandos aplicados
+async function showLogs(logs, operationMode, rollback) {
     const tabId = getIdentificator()
     const baseUrl = `http://10.0.30.252:8000/${operationMode}`
     const requestOptions = {
@@ -282,6 +324,7 @@ async function showLogs(logs, operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
+            'rollback': rollback,
             'tabId': tabId,
             'logs': logs
         })
@@ -292,7 +335,7 @@ async function showLogs(logs, operationMode) {
 
     if (saveCommands.error) return alert(saveCommands.message)
 
-    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}` 
+    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}&rollback=${rollback}` 
 }
 
 async function downloadCommandsFile(operationMode) {
@@ -310,6 +353,10 @@ async function downloadCommandsFile(operationMode) {
 }
 
 async function discardCommands(operationMode) {
+    const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidas?')
+
+    if (!confirmDelete) return
+
     const donwloadButton = document.getElementById('btn-save')
     const url = `http://10.0.30.252:8000/${operationMode}/discard_commands`
     const requestOptions = {
@@ -331,6 +378,17 @@ async function discardCommands(operationMode) {
         const removeButton = document.getElementById('btn-discard')
         removeButton.disabled = true
     }
+    alert(removeCommands.message)
+    return window.location = 'http://10.0.30.157:8000/'
+}
 
-    return alert(removeCommands.message)
+async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
+    const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
+    const url = `http://10.0.30.157:8000/${operationMode}/update_status_applied_commands?${queryParams}`
+    let updateInfo = await fetch(url)
+    updateInfo = await updateInfo.json()
+
+    if (updateInfo.error) {
+        return alert(updateInfo.message)
+    }
 }
