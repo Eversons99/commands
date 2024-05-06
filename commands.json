@@ -3,7 +3,7 @@
         {
             "name": "commands",
             "script": "manage.py",
-            "args": "runserver 10.0.30.252:8000",
+            "args": "runserver commands.nmultifibra.com.br",
             "interpreter": "python3.11",
             "watch": true
         }
