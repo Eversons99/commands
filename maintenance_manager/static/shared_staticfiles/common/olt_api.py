@@ -183,7 +183,7 @@ class Olt:
         interface_commands = formatted_commands.get('interface_commands')
         global_commands = formatted_commands.get('global_commands')
         delete_commands = formatted_commands.get('delete_commands')
-        log_file = open(f'C:/Users/Everson/Desktop/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
+        log_file = open(f'/home/nmultifibra/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
         
         ssh_connection = self.connect_olt(destination_host)
         
