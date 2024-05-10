@@ -455,8 +455,8 @@ class GeneralUtility:
         file_name = request.GET.get('fileName')
         all_file_names = []
 
-        generator_names = GeneratorDB.objects.all().filter(file_name__isnull=False).values_list('file_name', flat=True)
-        attenuator_names = AttenuatorDB.objects.all().filter(file_name__isnull=False).values_list('file_name', flat=True)
+        generator_names = GeneratorDB.objects.all().filter(file_name__isnull=False, commands_removed=False).values_list('file_name', flat=True)
+        attenuator_names = AttenuatorDB.objects.all().filter(file_name__isnull=False, commands_removed=False).values_list('file_name', flat=True)
         all_file_names.extend(generator_names)
         all_file_names.extend(attenuator_names)
         
