@@ -1,6 +1,6 @@
 async function saveInitialAttenuationState() {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000/attenuator"
+    const baseUrl = "http://commands.nmultifibra.com.br/attenuator"
     allDevicesSelected = checkIfAllDevicesIsSelected()
 
     if (!allDevicesSelected) {
@@ -64,7 +64,7 @@ async function showAttenuation(attenuationId) {
         })
     }
 
-    let allAttenuations = await fetch('http://10.0.30.157:8000/attenuator/get_onts_to_render', requestOptions)
+    let allAttenuations = await fetch('http://commands.nmultifibra.com.br/attenuator/get_onts_to_render', requestOptions)
     allAttenuations = await allAttenuations.json()
     let ontsInAttenuation = getOntsInAttenuation(attenuationId, allAttenuations)
 
@@ -146,7 +146,7 @@ async function discardAttenuation(attenuationId) {
         })
     }
 
-    let discardSingleAttenuation = await fetch('http://10.0.30.157:8000/attenuator/discard_attenuation', requestOptions)
+    let discardSingleAttenuation = await fetch('http://commands.nmultifibra.com.br/attenuator/discard_attenuation', requestOptions)
     discardSingleAttenuation = await discardSingleAttenuation.json()
 
     if (discardSingleAttenuation.error) {
@@ -155,19 +155,19 @@ async function discardAttenuation(attenuationId) {
 
     alert(`Atenuação ${attenuationId} removida com sucesso`)
     //return window.location.reload()
-    return window.location = `http://10.0.30.157:8000/attenuator/render_attenuations_page?tab_id=${getIdentificator()}`
+    return window.location = `http://commands.nmultifibra.com.br/attenuator/render_attenuations_page?tab_id=${getIdentificator()}`
 }
 
 function maintainAttenuation() {
     loadingAnimation(true)
     const tabId = getIdentificator()
-    return window.location = `http://10.0.30.157:8000/attenuator/render_attenuations_page?tab_id=${tabId}`
+    return window.location = `http://commands.nmultifibra.com.br/attenuator/render_attenuations_page?tab_id=${tabId}`
 }
 
 function nextAttenuation() {
     loadingAnimation(true)
     const tabId = getIdentificator()
-    return window.location = `http://10.0.30.157:8000/attenuator/next_attenuation?tab_id=${tabId}`
+    return window.location = `http://commands.nmultifibra.com.br/attenuator/next_attenuation?tab_id=${tabId}`
 }
 
 async function endAttenuation() {
@@ -182,12 +182,12 @@ async function endAttenuation() {
     }
 
     const tabId = getIdentificator()
-    let endAttenuations = await fetch(`http://10.0.30.157:8000/attenuator/end_attenuations?tab_id=${tabId}`)
+    let endAttenuations = await fetch(`http://commands.nmultifibra.com.br/attenuator/end_attenuations?tab_id=${tabId}`)
     endAttenuations = await endAttenuations.json()
 
     if (endAttenuations.error) {
         const messageError = endAttenuations.message
-        return window.location = `http://10.0.30.157:8000/attenuator/render_error_page?message=${messageError}`
+        return window.location = `http://commands.nmultifibra.com.br/attenuator/render_error_page?message=${messageError}`
     }
-    return window.location = `http://10.0.30.157:8000/attenuator/render_page_commands?tab_id=${tabId}`
+    return window.location = `http://commands.nmultifibra.com.br/attenuator/render_page_commands?tab_id=${tabId}`
 }

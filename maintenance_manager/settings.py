@@ -27,7 +27,9 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.0.30.157', '168.0.96.11']
+ALLOWED_HOSTS = ['127.0.0.1', '168.0.96.11', '10.0.30.157', '10.0.30.252']
+
+CSRF_TRUSTED_ORIGINS = ['http://commands.nmultifibra.com.br', 'https://commands.nmultifibra.com.br',]
 
 # Application definition
 
