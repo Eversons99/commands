@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-load_dotenv('./commands.env')
+load_dotenv('./.env')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', '168.0.96.11', '10.0.30.157', '10.0.30.252']
 
-CSRF_TRUSTED_ORIGINS = ['http://commands.nmultifibra.com.br', 'https://commands.nmultifibra.com.br',]
+CSRF_TRUSTED_ORIGINS = ['http://10.0.30.157:8000', 'https://commands.nmultifibra.com.br', 'http://commands.nmultifibra.com.br']
 
 # Application definition
 

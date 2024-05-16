@@ -66,7 +66,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://commands.nmultifibra.com.br" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -119,7 +119,7 @@ function getIdentificator() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://commands.nmultifibra.com.br/generator"
+    const baseUrl = "10.0.30.157:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {
@@ -189,7 +189,7 @@ async function getMaintenanceInfoFromForm() {
 }
 
 async function checkFileNameExists(fileName){
-    const url = `http://commands.nmultifibra.com.br/get_used_file_names`
+    const url = `10.0.30.157:8000/get_used_file_names`
     let allFileNames = await fetch(url)
     allFileNames = await allFileNames.json()
     
@@ -298,7 +298,7 @@ async function apllyCommands(operationMode, rollback) {
 }
 
 async function getMaintenanceInfo(operationMode) {
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/get_maintenance_info`
+    const url = `10.0.30.157:8000/${operationMode}/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -318,7 +318,7 @@ async function getMaintenanceInfo(operationMode) {
 
 async function showLogs(logs, operationMode, rollback) {
     const tabId = getIdentificator()
-    const baseUrl = `http://commands.nmultifibra.com.br/${operationMode}`
+    const baseUrl = `10.0.30.157:8000/${operationMode}`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -342,7 +342,7 @@ async function showLogs(logs, operationMode, rollback) {
 
 async function downloadCommandsFile(operationMode) {
     const tab_id = getIdentificator()
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/download_command_file?tab_id=${tab_id}`
+    const url = `10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
     const div = document.querySelector('.action-buttuns')
     const link = document.createElement('a')
 
@@ -360,7 +360,7 @@ async function discardCommands(operationMode) {
     if (!confirmDelete) return
 
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/discard_commands`
+    const url = `10.0.30.157:8000/${operationMode}/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -381,12 +381,12 @@ async function discardCommands(operationMode) {
         removeButton.disabled = true
     }
     alert(removeCommands.message)
-    return window.location = 'http://commands.nmultifibra.com.br/'
+    return window.location = '10.0.30.157:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
     const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/update_status_applied_commands?${queryParams}`
+    const url = `10.0.30.157:8000/${operationMode}/update_status_applied_commands?${queryParams}`
     let updateInfo = await fetch(url)
     updateInfo = await updateInfo.json()
 

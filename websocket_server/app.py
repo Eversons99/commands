@@ -1,14 +1,14 @@
 import asyncio
+import dotenv
 import json
 import signal
 import sys
 import os
 import websockets
 from datetime import datetime
-sys.path.append('/home/nmultifibra/commands/maintenance_manager/static/shared_staticfiles/common/')
+dotenv.load_dotenv('../.env')
+sys.path.append(f'{os.getenv("PROJECT_DIR")}/maintenance_manager/static/shared_staticfiles/common/')
 from olt_api import Olt
-from dotenv import load_dotenv
-load_dotenv()
 
 
 async def olt(websocket, path):
@@ -29,22 +29,28 @@ async def olt(websocket, path):
             
 
 async def server():
-    # Set the stop condition when receiving SIGTERM. SIGTERM is foward when the connetsion is closed
-    loop = asyncio.get_running_loop()
-    stop = loop.create_future()
-    loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+    try:
+        # Set the stop condition when receiving SIGTERM. SIGTERM is foward when the connetion is closed
+        loop = asyncio.get_running_loop()
+        stop = loop.create_future()
+        loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
 
-    async with websockets.serve(olt, '127.0.0.1', 8001):
-        await asyncio.Future()
-        await stop
+        async with websockets.serve(olt, '127.0.0.1', 8001):
+            await asyncio.Future()
+            await stop
+
+    except Exception as err:
+        print(err)
+        with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
+            log_file.write(f'{err}\n')
+
 
 try:
     asyncio.run(server())
-    with open('/var/log/cmd_websocket/stdout.log', 'a', encoding='UTF-8') as log_file:
+    with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:
         log_file.write(f'Servidor Websocket foi inicializado com sucesso - {datetime.now()}\n')
-    
-    
+
 except Exception as err:
-    with open('/var/log/cmd_websocket/stderr.log', 'a', encoding='UTF-8') as log_file:
+    with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
         log_file.write(f'{err}\n')
 

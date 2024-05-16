@@ -5,8 +5,7 @@ import requests
 import asyncio
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
-#from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
-load_dotenv('../commands.env')
+load_dotenv(f'{os.getenv("PROJECT_DIR")}/.env')
 
 class Olt:
     def connect_olt(self, olt_name):
@@ -183,7 +182,7 @@ class Olt:
         interface_commands = formatted_commands.get('interface_commands')
         global_commands = formatted_commands.get('global_commands')
         delete_commands = formatted_commands.get('delete_commands')
-        log_file = open(f'/home/nmultifibra/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
+        log_file = open(f'{os.getenv("PROJECT_DIR")}/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
         
         ssh_connection = self.connect_olt(destination_host)
         

@@ -6,7 +6,7 @@ import asyncio
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
 #from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
-load_dotenv('../commands.env')
+load_dotenv('../.env')
 
 class Olt:
     def connect_olt(self, olt_name):
@@ -91,7 +91,7 @@ class Olt:
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        requests.post('http://commands.nmultifibra.com.br/generator/update_onts_in_database', headers=headers, data=body)
+        requests.post('10.0.30.157:8000/generator/update_onts_in_database', headers=headers, data=body)
 
         await websocket_connection.close()
         ssh_connection.disconnect()
@@ -183,7 +183,7 @@ class Olt:
         interface_commands = formatted_commands.get('interface_commands')
         global_commands = formatted_commands.get('global_commands')
         delete_commands = formatted_commands.get('delete_commands')
-        log_file = open(f'/home/nmultifibra/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
+        log_file = open(f'{os.getenv("PROJECT_DIR")}/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
         
         ssh_connection = self.connect_olt(destination_host)
         
