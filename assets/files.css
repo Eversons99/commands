@@ -1,0 +1,12 @@
+#files-mng-container {
+    display: flex;
+    width: 85%;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+#filter-container {
+    display: flex;
+    width: 100%;
+
+}

@@ -83,15 +83,15 @@ async function searchOntsSms() {
         })
     }
     
-    const ontsRequest = await fetch('10.0.30.157:8000/sms/search_onts', requestOptions)
+    const ontsRequest = await fetch('http://127.0.0.1:8000/sms/search_onts', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
     console.log(responsOfontsRequest)
     if (responsOfontsRequest.error == true) {
         const messageError = responsOfontsRequest.message
-        return window.location = `10.0.30.157:8000/sms/render_error_page?message=${messageError}`
+        return window.location = `http://127.0.0.1:8000/sms/render_error_page?message=${messageError}`
     }
 
-    return window.location = `10.0.30.157:8000/sms/render_onts_table?tab_id=${tabId}` 
+    return window.location = `http://127.0.0.1:8000/sms/render_onts_table?tab_id=${tabId}` 
 }
 
 async function getNumbersToSendSms() {
@@ -121,14 +121,14 @@ async function getNumbersToSendSms() {
         })
     }
 
-    let getContacts = await fetch('10.0.30.157:8000/sms/get_contacts', requestOptions)
+    let getContacts = await fetch('http://127.0.0.1:8000/sms/get_contacts', requestOptions)
     getContacts = await getContacts.json()
     
     if (getContacts.error) {
         messageError =  getContacts.message
-        return window.location = `10.0.30.157:8000/sms/render_error_page?message=${messageError}`
+        return window.location = `http://127.0.0.1:8000/sms/render_error_page?message=${messageError}`
     }
-    return window.location = `10.0.30.157:8000/sms/render_contacts_page?tab_id=${tabId}` 
+    return window.location = `http://127.0.0.1:8000/sms/render_contacts_page?tab_id=${tabId}` 
 }
 
 async function createRupture() {
@@ -152,14 +152,14 @@ async function createRupture() {
         })
     }
 
-    const createRuptureRequest = await fetch('10.0.30.157:8000/sms/create_rupture', requestOptions)
+    const createRuptureRequest = await fetch('http://127.0.0.1:8000/sms/create_rupture', requestOptions)
     const ruptureResponse = await createRuptureRequest.json()
 
     if (ruptureResponse.error) {
         messageError =  ruptureResponse.message
-        return window.location = `10.0.30.157:8000/sms/render_error_page?message=${messageError}`
+        return window.location = `http://127.0.0.1:8000/sms/render_error_page?message=${messageError}`
     }
-    return window.location = `10.0.30.157:8000/sms/render_rupture_page?tab_id=${tabId}` 
+    return window.location = `http://127.0.0.1:8000/sms/render_rupture_page?tab_id=${tabId}` 
 }
 
 async function sendSms() {
@@ -177,14 +177,14 @@ async function sendSms() {
         })
     }
 
-    const sendSmsRequest = await fetch('10.0.30.157:8000/sms/send_sms', requestOptions)
+    const sendSmsRequest = await fetch('http://127.0.0.1:8000/sms/send_sms', requestOptions)
     const smsResponse = await sendSmsRequest.json()
 
     if (smsResponse.error) {
         messageError =  smsResponse.message
-        return window.location = `10.0.30.157:8000/sms/render_error_page?message=${messageError}`
+        return window.location = `http://127.0.0.1:8000/sms/render_error_page?message=${messageError}`
     }
-    return window.location = `10.0.30.157:8000/sms/render_sms_result_page?tab_id=${tabId}` 
+    return window.location = `http://127.0.0.1:8000/sms/render_sms_result_page?tab_id=${tabId}` 
 }
 
 async function getBoardsHost() {

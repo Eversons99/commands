@@ -10,8 +10,9 @@
         <title>Gerenciador de Atenuações</title>
     {% endif %}
     
-    <link rel="stylesheet" type="text/css" href="{% static 'attenuator.css' %}"> 
-    <link rel="stylesheet" type="text/css" href="{% static 'shared_staticfiles/maintenance.css' %}">
+    <link rel='stylesheet' type='text/css' href="{% static 'attenuator.css' %}">
+    <link rel='stylesheet' type='text/css' href="{% static 'files.css' %}">
+    <link rel='stylesheet' type='text/css' href="{% static 'shared_staticfiles/maintenance.css' %}">
 </head>
 <body>
     {% csrf_token %}
@@ -27,6 +28,7 @@
     {% block content %} {% endblock %} 
 
     <script type='text/javascript' src="{% static 'attenuator.js' %}"></script>
+    <script type='text/javascript' src="{% static 'files.js' %}"></script>
     <script type='text/javascript' src="{% static 'commands.js' %}"></script>
     <script type='text/javascript' src="{% static 'shared_staticfiles/maintenance.js' %}"></script>
 </body>

@@ -27,15 +27,16 @@ SECRET_KEY = "django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '168.0.96.11', '10.0.30.157', '10.0.30.252']
+ALLOWED_HOSTS = ['127.0.0.1', '168.0.96.11', '127.0.0.1', '10.0.30.252', 'localhost']
 
-CSRF_TRUSTED_ORIGINS = ['http://10.0.30.157:8000', 'https://commands.nmultifibra.com.br', 'http://commands.nmultifibra.com.br']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'https://commands.nmultifibra.com.br', 'http://commands.nmultifibra.com.br']
 
 # Application definition
 
 INSTALLED_APPS = [
     "attenuations_manager_app",
     "commands_generator_app",
+    "files_manager_app",
     "gpon_health_app",
     "send_sms_app",
     "core_app",
@@ -66,9 +67,10 @@ TEMPLATES = [
         "DIRS": [
             f'{ABSOLUTE_PATH}/attenuations_manager_app/templates',
             f'{ABSOLUTE_PATH}/commands_generator_app/templates/',
+            f'{ABSOLUTE_PATH}/files_manager_app/templates/',
             f'{ABSOLUTE_PATH}/gpon_health_app/templates/',
             f'{ABSOLUTE_PATH}/send_sms_app/templates/',
-            f'{ABSOLUTE_PATH}/templates/'
+            f'{ABSOLUTE_PATH}/core_app/templates/'
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -127,9 +129,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATICFILES_DIRS = [
-    f'{ABSOLUTE_PATH}/maintenance_manager/static'
-]
+# STATICFILES_DIRS = [
+#     f'{ABSOLUTE_PATH}/core_app/static'
+# ]
 
 STATIC_URL = "assets/"
 STATIC_ROOT = f'{ABSOLUTE_PATH}/assets'

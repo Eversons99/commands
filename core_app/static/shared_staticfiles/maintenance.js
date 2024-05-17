@@ -66,7 +66,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://127.0.0.1:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -119,7 +119,7 @@ function getIdentificator() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://10.0.30.157:8000/generator"
+    const baseUrl = "http://127.0.0.1:8000/generator"
     const idDevicesSelected = getIdDevicesSelected()
 
     if (idDevicesSelected.length == 0) {
@@ -190,7 +190,7 @@ async function getMaintenanceInfoFromForm() {
 }
 
 async function checkFileNameExists(fileName){
-    let allFileNames = await fetch(`http://10.0.30.157:8000/shared-core/check_file_names?fileName=${fileName}`)
+    let allFileNames = await fetch(`http://127.0.0.1:8000/shared-core/check_file_names?fileName=${fileName}`)
     allFileNames = await allFileNames.json()
 
     return allFileNames
@@ -254,24 +254,19 @@ async function apllyCommands(operationMode, rollback) {
 
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode)
-    const socket = new WebSocket('ws://10.0.30.157:8001/apply-commands')
+    const socket = new WebSocket('ws://127.0.0.1:5678/apply-commands')
     const loadingText = document.getElementById('loader-message')
     const commandsApplied = []
-    let operationStatus
-    let connectionWithErr
+    let sessionStarted
     rollback = rollback ? true : false
     maintenanceInfo.rollback = rollback ? true : false
-
-    socket.onerror = () => {
-        loadingAnimation(false)
-        connectionWithErr = true
-        alert('Ocorreu um erro ao conectar ao servidor WebSocket.');
-    }
 
     socket.onopen = () => {
         socket.send(JSON.stringify({
             maintenanceInfo
         }))
+        sessionStarted = true
+        loadingText.textContent = 'Iniciando sessão com o servidor websocket...'
         console.log('Sessão com o servidor Websocket iniciada')
     }
 
@@ -285,18 +280,24 @@ async function apllyCommands(operationMode, rollback) {
     }
 
     socket.onclose = async () => {
-        if (!connectionWithErr){
+        if (sessionStarted){
             loadingAnimation(false)
             await updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback)
             await showLogs(commandsApplied, operationMode, rollback)
             console.log('Sessão com o servidor Websocket finalizada')
-            return operationStatus
+            return
         }
+        alert('Ocorreu um erro ao se conectar ao servidor websocket')
+    }
+
+    socket.onerror = (event) => {
+        loadingAnimation(false)
+        alert(`Ocorreu um erro durante a conexão websocket. Err: ${event}`);
     }
 }
 
 async function getMaintenanceInfo(operationMode) {
-    const url = `http://10.0.30.157:8000/${operationMode}/get_maintenance_info`
+    const url = `http://127.0.0.1:8000/${operationMode}/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -316,7 +317,7 @@ async function getMaintenanceInfo(operationMode) {
 
 async function showLogs(logs, operationMode, rollback) {
     const tabId = getIdentificator()
-    const baseUrl = `http://10.0.30.157:8000/${operationMode}`
+    const baseUrl = `http://127.0.0.1:8000/${operationMode}`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -340,7 +341,7 @@ async function showLogs(logs, operationMode, rollback) {
 
 async function downloadCommandsFile(operationMode) {
     const tab_id = getIdentificator()
-    const url = `http://10.0.30.157:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
+    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
     const div = document.querySelector('.action-buttuns')
     const link = document.createElement('a')
 
@@ -358,7 +359,7 @@ async function discardCommands(operationMode) {
     if (!confirmDelete) return
 
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://10.0.30.157:8000/${operationMode}/discard_commands`
+    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -379,12 +380,12 @@ async function discardCommands(operationMode) {
         removeButton.disabled = true
     }
     alert(removeCommands.message)
-    return window.location = 'http://10.0.30.157:8000/'
+    return window.location = 'http://127.0.0.1:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
     const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
-    const url = `http://10.0.30.157:8000/${operationMode}/update_status_applied_commands?${queryParams}`
+    const url = `http://127.0.0.1:8000/${operationMode}/update_status_applied_commands?${queryParams}`
     let updateInfo = await fetch(url)
     updateInfo = await updateInfo.json()
 

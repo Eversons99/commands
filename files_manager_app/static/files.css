@@ -1,0 +1,16 @@
+#files-mng-container {
+    display: flex;
+    width: 85%;
+    align-items: center;
+    box-sizing: border-box;
+    flex-direction: column;
+}
+
+#filter-container {
+    display: flex;
+    width: 100%;
+}
+
+#list-button {
+    margin: 0;
+}

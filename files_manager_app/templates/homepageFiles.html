@@ -1,0 +1,40 @@
+{% extends 'partials/base.html'%}
+{% load static%}
+{% block content %}
+
+<header>
+    <h1 id='title'>GA - Gerenciador dos Arquivos</h1>
+</header>
+
+<section id='files-mng-container'>
+    <h2>Selecione um filtro</h2>
+
+    <div id='filter-container'>    
+        <select>
+            <option></option>
+            <option>Todos os comandos</option>
+            <option>Comandos aplicados</option>
+            <option>Comandos não aplicados</option>
+
+        </select>
+        <button id='list-button'>Listar</button>
+    </div>
+
+    <div>
+        <table>
+            {%for file in files%}
+                <tr>
+                    <td>{{file.name}}</td>
+                    <td>{{file.created_date}}</td>
+                    <td>Action here</td>
+                </tr>
+            {%endfor%}
+        </table>
+    </div>
+</section>
+
+
+
+
+
+{% endblock %}
