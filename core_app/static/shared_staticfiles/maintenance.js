@@ -353,13 +353,14 @@ async function downloadCommandsFile(operationMode) {
     elementLink.click()
 }
 
-async function discardCommands(operationMode) {
+async function discardCommands(operationMode, registerId) {
     const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidas?')
+    const tabId = registerId ? registerId : getIdentificator();
 
     if (!confirmDelete) return
 
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`
+    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`.toLowerCase()
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -367,20 +368,26 @@ async function discardCommands(operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': getIdentificator()
+            'tabId': tabId
         })
     }
 
     let removeCommands = await fetch(url, requestOptions)
     removeCommands = await removeCommands.json()
-    donwloadButton.disabled = true
-
-    if (!removeCommands.error) {
-        const removeButton = document.getElementById('btn-discard')
-        removeButton.disabled = true
+    
+    if (!registerId){
+        donwloadButton.disabled = true
+        
+        if (!removeCommands.error) {
+            const removeButton = document.getElementById('btn-discard')
+            removeButton.disabled = true
+        }
+        alert(removeCommands.message)
+        return window.location = 'http://127.0.0.1:8000/'
+    } else {
+        alert(removeCommands.message)
+        window.location = window.location.href;
     }
-    alert(removeCommands.message)
-    return window.location = 'http://127.0.0.1:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
