@@ -29,18 +29,20 @@
 }
 
 #files-actions {
-    display: flex; 
+    display: flex;
+    margin: 0;
+
 }
 
 /* Tooltip container */
 .icon-actions {
+    display: flex;
     position: relative;
-    display: inline-block;
-    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
-  }
+    /*display: inline-block; */
+}
   
   /* Tooltip text */
-  .icon-actions .auxiliary-text {
+.icon-actions .auxiliary-text {
     visibility: hidden;
     width: 120px;
     background-color: #555;
@@ -59,10 +61,10 @@
     /* Fade in tooltip */
     opacity: 0;
     transition: opacity 0.3s;
-  }
+}
   
   /* Tooltip arrow */
-  .icon-actions .auxiliary-text::after {
+.icon-actions .auxiliary-text::after {
     content: "";
     position: absolute;
     top: 100%;
@@ -71,10 +73,20 @@
     border-width: 5px;
     border-style: solid;
     border-color: #555 transparent transparent transparent;
-  }
+}
   
   /* Show the tooltip text when you mouse over the tooltip container */
-  .icon-actions:hover .auxiliary-text {
+.icon-actions:hover .auxiliary-text {
     visibility: visible;
     opacity: 1;
-  }
+}
+
+
+.single-file:hover {
+    background: #ebe5e5;
+}
+
+svg {
+    margin: 0;
+    
+}

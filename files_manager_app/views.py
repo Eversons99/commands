@@ -18,11 +18,11 @@ def get_files(request):
         
         query = map_query.get(selected_filter)
         if query is None:
-            records_commands = GeneratorDB.objects.filter(commands_url__isnull=False)
-            records_attenuator = AttenuatorDB.objects.filter(commands_url__isnull=False)
+            records_commands = GeneratorDB.objects.filter(commands_url__isnull=False, commands_removed=False)
+            records_attenuator = AttenuatorDB.objects.filter(commands_url__isnull=False, commands_removed=False)
         else:
-            records_commands = GeneratorDB.objects.filter(commands_applied=query, commands_url__isnull=False)
-            records_attenuator = AttenuatorDB.objects.filter(commands_applied=query, commands_url__isnull=False)
+            records_commands = GeneratorDB.objects.filter(commands_applied=query, commands_url__isnull=False, commands_removed=False)
+            records_attenuator = AttenuatorDB.objects.filter(commands_applied=query, commands_url__isnull=False, commands_removed=False)
         
         all_records = [
             {'record': record, 'module_name': 'Generator'} for record in records_commands
@@ -34,7 +34,7 @@ def get_files(request):
             'files': all_records,
             'filtered': True,
             'selected_filter': selected_filter,
-            'len_files': len(all_records)
+            'warn_message': 'A pesquisa não retornou nenhum arquivo' if len(all_records) == 0 else ''    
         }
    
         return render(request, 'homepageFiles.html', context)

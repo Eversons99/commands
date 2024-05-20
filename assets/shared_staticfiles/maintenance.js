@@ -247,13 +247,18 @@ function getIdDevicesSelected() {
     return idDevicesSelected
 }
 
-async function apllyCommands(operationMode, rollback) {
-    const confirmApply = confirm(rollback ? 'Confirm a aplicação dos comandos de rollack?' : 'Confirme a aplicação dos comandos')
+async function apllyCommands(operationMode, rollback, registerId) {
+
+    
+    const confirmApply = confirm(
+        rollback ? 'Realmente deseja aplicar os comandos de rollack?' : 'Realmente deseja aplicar os comandos?'
+    )
+    return
 
     if (!confirmApply) return
 
     loadingAnimation(true)
-    const maintenanceInfo = await getMaintenanceInfo(operationMode)
+    const maintenanceInfo = await getMaintenanceInfo(operationMode, registerId)
     const socket = new WebSocket('ws://127.0.0.1:5678/apply-commands')
     const loadingText = document.getElementById('loader-message')
     const commandsApplied = []
@@ -296,8 +301,9 @@ async function apllyCommands(operationMode, rollback) {
     }
 }
 
-async function getMaintenanceInfo(operationMode) {
-    const url = `http://127.0.0.1:8000/${operationMode}/get_maintenance_info`
+async function getMaintenanceInfo(operationMode, registerId) {
+    const tabId = registerId ? registerId : getIdentificator();
+    const url = `http://127.0.0.1:8000/${operationMode}/get_maintenance_info`.toLowerCase()
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -305,7 +311,7 @@ async function getMaintenanceInfo(operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': getIdentificator()
+            'tabId': tabId
         })
     }
      
@@ -339,11 +345,17 @@ async function showLogs(logs, operationMode, rollback) {
     return window.location = `${baseUrl}/render_logs?tab_id=${tabId}&rollback=${rollback}` 
 }
 
-async function downloadCommandsFile(operationMode) {
-    const tab_id = getIdentificator()
-    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
-    const div = document.querySelector('.action-buttuns')
+async function downloadCommandsFile(operationMode, registerId) {
+    const tab_id = registerId ? registerId : getIdentificator();
+    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${tab_id}`.toLowerCase()
     const link = document.createElement('a')
+    let div
+
+    if(!registerId){
+        div = document.querySelector('.action-buttuns')
+    }else{
+        div = document.querySelector('#files-actions')
+    }
 
     link.setAttribute('href', url)
     link.setAttribute('id', 'link-download')
@@ -353,13 +365,14 @@ async function downloadCommandsFile(operationMode) {
     elementLink.click()
 }
 
-async function discardCommands(operationMode) {
-    const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidas?')
+async function discardCommands(operationMode, registerId) {
+    const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidos?')
+    const tabId = registerId ? registerId : getIdentificator();
 
     if (!confirmDelete) return
 
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`
+    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`.toLowerCase()
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -367,20 +380,26 @@ async function discardCommands(operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': getIdentificator()
+            'tabId': tabId
         })
     }
 
     let removeCommands = await fetch(url, requestOptions)
     removeCommands = await removeCommands.json()
-    donwloadButton.disabled = true
-
-    if (!removeCommands.error) {
-        const removeButton = document.getElementById('btn-discard')
-        removeButton.disabled = true
+    
+    if (!registerId){
+        donwloadButton.disabled = true
+        
+        if (!removeCommands.error) {
+            const removeButton = document.getElementById('btn-discard')
+            removeButton.disabled = true
+        }
+        alert(removeCommands.message)
+        return window.location = 'http://127.0.0.1:8000/'
+    } else {
+        alert(removeCommands.message)
+        window.location = window.location.href;
     }
-    alert(removeCommands.message)
-    return window.location = 'http://127.0.0.1:8000/'
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){

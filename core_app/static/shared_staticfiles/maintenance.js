@@ -247,13 +247,15 @@ function getIdDevicesSelected() {
     return idDevicesSelected
 }
 
-async function apllyCommands(operationMode, rollback) {
-    const confirmApply = confirm(rollback ? 'Confirm a aplicação dos comandos de rollack?' : 'Confirme a aplicação dos comandos')
+async function apllyCommands(operationMode, rollback, registerId) {
+    const confirmApply = confirm(
+        rollback ? 'Realmente deseja aplicar os comandos de rollack?' : 'Realmente deseja aplicar os comandos?'
+    )
 
     if (!confirmApply) return
 
     loadingAnimation(true)
-    const maintenanceInfo = await getMaintenanceInfo(operationMode)
+    const maintenanceInfo = await getMaintenanceInfo(operationMode, registerId)
     const socket = new WebSocket('ws://127.0.0.1:5678/apply-commands')
     const loadingText = document.getElementById('loader-message')
     const commandsApplied = []
@@ -296,7 +298,8 @@ async function apllyCommands(operationMode, rollback) {
     }
 }
 
-async function getMaintenanceInfo(operationMode) {
+async function getMaintenanceInfo(operationMode, registerId) {
+    const tabId = registerId ? registerId : getIdentificator();
     const url = `http://127.0.0.1:8000/${operationMode}/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
@@ -305,7 +308,7 @@ async function getMaintenanceInfo(operationMode) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': getIdentificator()
+            'tabId': tabId
         })
     }
      
@@ -339,11 +342,17 @@ async function showLogs(logs, operationMode, rollback) {
     return window.location = `${baseUrl}/render_logs?tab_id=${tabId}&rollback=${rollback}` 
 }
 
-async function downloadCommandsFile(operationMode) {
-    const tab_id = getIdentificator()
-    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${tab_id}`
-    const div = document.querySelector('.action-buttuns')
+async function downloadCommandsFile(operationMode, registerId) {
+    const tabId = registerId ? registerId : getIdentificator();
+    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${tabId}`
     const link = document.createElement('a')
+    let div
+
+    if(!registerId){
+        div = document.querySelector('.action-buttuns')
+    }else{
+        div = document.querySelector('#files-actions')
+    }
 
     link.setAttribute('href', url)
     link.setAttribute('id', 'link-download')
@@ -354,13 +363,13 @@ async function downloadCommandsFile(operationMode) {
 }
 
 async function discardCommands(operationMode, registerId) {
-    const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidas?')
+    const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidos?')
     const tabId = registerId ? registerId : getIdentificator();
 
     if (!confirmDelete) return
 
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`.toLowerCase()
+    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {

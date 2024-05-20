@@ -4,10 +4,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    {% if "/generator/" in request.path %}
+    {% if '/generator/' in request.path %}
         <title>Gerador de Comandos</title>
-    {% else  %}
+    {% elif '/attenuator/' in request.path %}
         <title>Gerenciador de Atenuações</title>
+    {% elif '/files/' in request.path %}
+        <title>Gerenciador de arquivos</title>
     {% endif %}
     
     <link rel='stylesheet' type='text/css' href="{% static 'attenuator.css' %}">
@@ -22,7 +24,9 @@
     </div>
 
     <nav class="logo">
-        <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+        <a href='http://127.0.0.1:8000/'>
+            <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+        </a>
     </nav>
 
     {% block content %} {% endblock %} 

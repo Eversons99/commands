@@ -429,3 +429,6 @@ textarea {
 .ont-offline {
     color: red;
 }
+.device-row:hover {
+    background: #ebe5e5;
+}

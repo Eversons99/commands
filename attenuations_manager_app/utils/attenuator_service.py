@@ -81,7 +81,7 @@ class AttenuationUtility:
         if onts_in_current_attenuation.get('error'):
             next_attenuation_info = {
                 'error': True,
-                'message': onts_in_current_attenuation.get('message'),
+                'error_message': onts_in_current_attenuation.get('message'),
                 'onts': [],
                 'name': maintenance_info.file_name,
                 'total_offline_onts': 0,
@@ -96,7 +96,8 @@ class AttenuationUtility:
             'name': maintenance_info.file_name,
             'total_offline_onts': len(onts_in_current_attenuation.get('onts')),
             'attenuation_id': id_current_attenuation,
-            'attenuations': all_attenuations
+            'attenuations': all_attenuations,
+            'warn_message': 'Nenhuma ont caiu nesta atenuação' if len(onts_in_current_attenuation.get('onts')) == 0  else ''
         }
 
         return next_attenuation_info
