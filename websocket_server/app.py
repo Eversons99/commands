@@ -7,10 +7,10 @@ import os
 import websockets
 from datetime import datetime
 dotenv.load_dotenv('../.env')
-sys.path.append(f'{os.getenv("PROJECT_DIR")}/maintenance_manager/static/shared_staticfiles/common/')
+sys.path.append(f'{os.getenv("PROJECT_DIR")}/core_app/static/shared_staticfiles/common/')
 from olt_api import Olt
 
-
+print()
 async def olt(websocket, path):
     async for data in websocket:
         if path == '/get-onts':

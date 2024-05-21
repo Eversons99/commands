@@ -10,8 +10,3 @@ async function getReadyCommandFiles(){
     loadingAnimation(false)
     window.location = `http://127.0.0.1:8000/files/get_files?filter=${selectedFilter}`
 }
-
-async function displayLogs(){
-
-}
-

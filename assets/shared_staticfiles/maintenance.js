@@ -248,12 +248,9 @@ function getIdDevicesSelected() {
 }
 
 async function apllyCommands(operationMode, rollback, registerId) {
-
-    
     const confirmApply = confirm(
         rollback ? 'Realmente deseja aplicar os comandos de rollack?' : 'Realmente deseja aplicar os comandos?'
     )
-    return
 
     if (!confirmApply) return
 
@@ -288,7 +285,7 @@ async function apllyCommands(operationMode, rollback, registerId) {
         if (sessionStarted){
             loadingAnimation(false)
             await updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback)
-            await showLogs(commandsApplied, operationMode, rollback)
+            await showLogs(commandsApplied, operationMode, rollback, registerId)
             console.log('Sessão com o servidor Websocket finalizada')
             return
         }
@@ -302,8 +299,7 @@ async function apllyCommands(operationMode, rollback, registerId) {
 }
 
 async function getMaintenanceInfo(operationMode, registerId) {
-    const tabId = registerId ? registerId : getIdentificator();
-    const url = `http://127.0.0.1:8000/${operationMode}/get_maintenance_info`.toLowerCase()
+    const url = `http://127.0.0.1:8000/${operationMode}/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -311,7 +307,7 @@ async function getMaintenanceInfo(operationMode, registerId) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': tabId
+            'tabId': registerId
         })
     }
      
@@ -321,8 +317,7 @@ async function getMaintenanceInfo(operationMode, registerId) {
     return maintenanceInfo
 }
 
-async function showLogs(logs, operationMode, rollback) {
-    const tabId = getIdentificator()
+async function showLogs(logs, operationMode, rollback, registerId) {
     const baseUrl = `http://127.0.0.1:8000/${operationMode}`
     const requestOptions = {
         method: 'POST',
@@ -332,26 +327,25 @@ async function showLogs(logs, operationMode, rollback) {
         },
         body: JSON.stringify({
             'rollback': rollback,
-            'tabId': tabId,
+            'tabId': registerId,
             'logs': logs
         })
     }
     
     let saveCommands = await fetch(`${baseUrl}/save_logs`, requestOptions)
     saveCommands = await saveCommands.json()
-
+    console.log()
     if (saveCommands.error) return alert(saveCommands.message)
 
-    return window.location = `${baseUrl}/render_logs?tab_id=${tabId}&rollback=${rollback}` 
+    return window.location = `${baseUrl}/render_logs?tab_id=${registerId}&rollback=${rollback}` 
 }
 
 async function downloadCommandsFile(operationMode, registerId) {
-    const tab_id = registerId ? registerId : getIdentificator();
-    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${tab_id}`.toLowerCase()
+    const url = `http://127.0.0.1:8000/${operationMode}/download_command_file?tab_id=${registerId}`
     const link = document.createElement('a')
-    let div
+    const currentUrl = window.location.href
 
-    if(!registerId){
+    if(currentUrl.includes('/render_page_commands')){
         div = document.querySelector('.action-buttuns')
     }else{
         div = document.querySelector('#files-actions')
@@ -367,12 +361,12 @@ async function downloadCommandsFile(operationMode, registerId) {
 
 async function discardCommands(operationMode, registerId) {
     const confirmDelete = confirm('Realmente deseja deletar os comandos? TODOS os dados serão perdidos?')
-    const tabId = registerId ? registerId : getIdentificator();
 
     if (!confirmDelete) return
 
+    const currentUrl =  window.location.href
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`.toLowerCase()
+    const url = `http://127.0.0.1:8000/${operationMode}/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -380,14 +374,14 @@ async function discardCommands(operationMode, registerId) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': tabId
+            'tabId': registerId
         })
     }
 
     let removeCommands = await fetch(url, requestOptions)
     removeCommands = await removeCommands.json()
-    
-    if (!registerId){
+
+    if(currentUrl.includes('/render_page_commands')){
         donwloadButton.disabled = true
         
         if (!removeCommands.error) {

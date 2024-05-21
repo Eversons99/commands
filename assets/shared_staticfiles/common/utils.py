@@ -249,7 +249,8 @@ class GeneralUtility:
                 "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
                 "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
                 "maintenance_name": commands.file_name,
-                "operation_mode": operation_mode
+                "operation_mode": operation_mode,
+                "register_id": register_id
             }
 
             return all_commands

@@ -171,7 +171,11 @@ function nextAttenuation() {
 }
 
 async function endAttenuation() {
-    loadingAnimation(true)
+    const confirmEndAttenuation = confirm('Realmente deseja finalizar as atenuações?')
+    
+    if(!confirmEndAttenuation) return loadingAnimation(false)
+
+    
 
     const attenuationsTable = document.getElementById('attenuations-table')
     const attenuations = attenuationsTable.childNodes[1].childNodes
