@@ -1,0 +1,42 @@
+{% extends 'partials/base.html'%}
+{% load static %}
+
+{% block content %}
+    <header>
+        <h1> {{ model_title }}</h1>
+    </header>
+    
+    <div id="maintenance-title">
+        <h3>Manutenção: {{ name }}</h3>
+    </div>
+
+    <section id="navigation-bar">
+        <button id="logs-btn" class="active-btn" onclick="resultsTabsButton(event)">Logs</button>
+        {% if rollback_logs %}
+            <button id="rollback-logs-btn" onclick="resultsTabsButton(event)">Rollback Logs</button>
+        {% endif %}
+    </section>
+
+    <section id="all-logs-container">
+        <div class="active-result" id="logs" >
+            {% for log in logs %}
+                <p><b id="applied">COMANDO APLICADO: </b>{{log.command}}</p>
+                <p><b id="log">OUTPUT: </b>{{log.log}}</p>
+            {% endfor %}
+        </div>
+
+        {% if rollback_logs %}
+            <div class="inactive-result" id="rollback-logs">
+                {% for log in rollback_logs %}
+                    <p><b id="applied">COMANDO APLICADO: </b>{{log.command}}</p>
+                    <p><b id="log">OUTPUT: </b>{{log.log}}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+    
+    <div class="action-buttuns">
+        <button id="btn-home" onclick="location.href='{{ last_filter_url }}'">Voltar</button>
+    </div>
+    
+{% endblock %}

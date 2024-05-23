@@ -34,14 +34,11 @@
 
 }
 
-/* Tooltip container */
 .icon-actions {
     display: flex;
     position: relative;
-    /*display: inline-block; */
 }
-  
-  /* Tooltip text */
+
 .icon-actions .auxiliary-text {
     visibility: hidden;
     width: 120px;
@@ -50,20 +47,15 @@
     text-align: center;
     padding: 5px 0;
     border-radius: 6px;
-  
-    /* Position the tooltip text */
     position: absolute;
     z-index: 1;
     bottom: 125%;
     left: 50%;
     margin-left: -60px;
-  
-    /* Fade in tooltip */
     opacity: 0;
     transition: opacity 0.3s;
 }
-  
-  /* Tooltip arrow */
+
 .icon-actions .auxiliary-text::after {
     content: "";
     position: absolute;
@@ -74,19 +66,53 @@
     border-style: solid;
     border-color: #555 transparent transparent transparent;
 }
-  
-  /* Show the tooltip text when you mouse over the tooltip container */
+
 .icon-actions:hover .auxiliary-text {
     visibility: visible;
     opacity: 1;
 }
-
 
 .single-file:hover {
     background: #ebe5e5;
 }
 
 svg {
+    margin: 0;   
+}
+
+#navigation-bar {
+    display: flex;
+    width: 85%;
+    background-color: #8b8b8b;
+    margin: 0 auto;
+    padding: 0;
+}
+
+#navigation-bar button {
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 0px 15px 0 0;
+    color: #ffffff;
     margin: 0;
+}
+
+#all-logs-container {
+    display: flex;
+    width: 85%
     
+}
+
+#logs, #rollback-logs {
+    background: black;
+    width: 100%;
+    font-size: 16px;
+    color: white;
+    padding: 1.5em;
+    height: 30em;
+    overflow-y: scroll;
+    border-radius: 0 0 10px 10px;
+}
+
+#logs p, #rollback-logs p {
+    padding: 0.2em;
 }
