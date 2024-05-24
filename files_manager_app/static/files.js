@@ -40,3 +40,11 @@ function resultsTabsButton(e) {
         logsButton.setAttribute('class', 'inactive-btn')
     }
 }
+
+function showOperationList(){
+    const operationList = document.querySelector('.operation-list')
+    
+    if (!operationList.style.display) {
+        operationList.style.display = 'flex'
+    }
+}

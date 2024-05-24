@@ -17,7 +17,6 @@ def get_files(request):
         }
 
         query = map_query.get(selected_filter)
-
         if query is None:
             records_commands = GeneratorDB.objects.filter(commands_url__isnull=False, commands_removed=False)
             records_attenuator = AttenuatorDB.objects.filter(commands_url__isnull=False, commands_removed=False)
@@ -25,17 +24,14 @@ def get_files(request):
             records_commands = GeneratorDB.objects.filter(commands_applied=query, commands_url__isnull=False, commands_removed=False)
             records_attenuator = AttenuatorDB.objects.filter(commands_applied=query, commands_url__isnull=False, commands_removed=False)
 
-        all_records = [
-            {'record': record, 'module_name': 'Generator'} for record in records_commands
-        ] + [
-            {'record': record, 'module_name': 'Attenuator'} for record in records_attenuator
-        ]
-
+        len_all_records = len(records_commands) + len(records_attenuator)
+        files_formatted = format_files_to_render(records_commands, records_attenuator)
+        print(files_formatted)
         context = {
-            'files': all_records,
+            'files': files_formatted,
             'filtered': True,
             'selected_filter': selected_filter,
-            'warn_message': 'A pesquisa não retornou nenhum arquivo' if len(all_records) == 0 else ''    
+            'warn_message': 'A pesquisa não retornou nenhum arquivo' if len_all_records == 0 else ''    
         }
 
         return render(request, 'homepageFiles.html', context)
@@ -66,3 +62,30 @@ def show_logs(request):
 
         return render(request, 'fileLogs.html', context)
         
+
+def format_files_to_render(records_commands, records_attenuator):
+    all_db_records = [records_commands, records_attenuator]
+    files = []
+
+    for single_record in all_db_records:
+
+        for record in single_record:
+            record_info = {
+                'record': record,
+                'module_name': 'Generator'
+            }
+
+            if record.commands_applied:
+                record_info['apply_command_class'] = 'inactive-operation'
+                record_info['show_logs_class'] = 'active-operation'
+            else:
+                record_info['apply_command_class'] = 'active-operation'
+                record_info['show_logs_class'] = 'inactive-operation'
+                
+            files.append(record_info)
+   
+    return files
+
+
+def teste(request):
+    return render(request, 'teste.html')

@@ -39,7 +39,7 @@
     position: relative;
 }
 
-.icon-actions .auxiliary-text {
+/* .icon-actions .auxiliary-text {
     visibility: hidden;
     width: 120px;
     background-color: #555;
@@ -70,7 +70,7 @@
 .icon-actions:hover .auxiliary-text {
     visibility: visible;
     opacity: 1;
-}
+} */
 
 .single-file:hover {
     background: #ebe5e5;
@@ -111,8 +111,62 @@ svg {
     height: 30em;
     overflow-y: scroll;
     border-radius: 0 0 10px 10px;
+
 }
 
 #logs p, #rollback-logs p {
     padding: 0.2em;
+}
+
+.inactive-operation {
+    color: #8b8b8b;
+    background-color: rgb(218, 218, 218);
+    pointer-events: none;
+}
+.inactive-operation a {
+    color: #8b8b8b;
+}
+
+#nav-actions {
+    display: flex;
+    border: 1px solid black;
+    border-radius: 10%;
+    width: max-content;
+    text-align: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+#nav-actions ul {
+    width: 100%;
+    list-style: none;
+    text-align: center;
+    text-decoration: none;
+    margin: 0;
+}
+
+#nav-actions li {
+    border-bottom: 1px solid;
+    padding: 0.5em 0.5em;
+    font-weight: bold;
+    margin: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+#nav-actions li:last-child {
+    border-bottom: 0;
+}
+
+#nav-actions li:hover {
+    background: #afaeae;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+#nav-actions {
+    display: none;
 }

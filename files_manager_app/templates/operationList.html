@@ -1,0 +1,10 @@
+{% load static %}
+<nav id="nav-actions" class="operation-list">
+    <ul>
+        <li class='icon-actions {{file.apply_command_class}}' onclick='apllyCommands("{{file.module_name|lower}}", false, "{{file.record.register_id}}")'>Aplicar comandos</li>
+        <li class='icon-actions' onclick='discardCommands("{{file.module_name|lower}}", "{{file.record.register_id}}")'>Deletar registro</li>
+        <li class='icon-actions' onclick='downloadCommandsFile("{{file.module_name|lower}}", "{{file.record.register_id}}")'>Fazer download</li>
+        <li class='icon-actions {{file.show_logs_class}}' onclick='displayAllLogs("{{file.module_name|lower}}", "{{file.record.register_id}}")'>Exibir logs</li>
+    </ul>
+</nav>
+
