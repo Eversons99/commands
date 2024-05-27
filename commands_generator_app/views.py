@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB
 from django.http.response import HttpResponse
-from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
+from core_app.static.shared_staticfiles.common.utils import GeneralUtility
 from commands_generator_app.utils.generator_service import CommandsUtility
 
 
@@ -152,14 +152,17 @@ def render_logs(request):
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
 
         logs = {
-            'logs': maintenance_info.logs, 
-            'name': maintenance_info.file_name, 
-            'operation_mode': 'generator'}
+            'logs': maintenance_info.logs,
+            'name': maintenance_info.file_name,
+            'register_id': maintenance_info.register_id,
+            'operation_mode': 'generator'
+        }
 
         if rollback:
             logs = {
-                'logs': maintenance_info.rollback_logs, 
-                'name': f'{maintenance_info.file_name}-rollback', 
+                'logs': maintenance_info.rollback_logs,
+                'name': f'{maintenance_info.file_name}-rollback',
+                'register_id': maintenance_info.register_id,
                 'operation_mode': 'generator',
                 'rollback': True
             }

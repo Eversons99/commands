@@ -5,8 +5,7 @@ import requests
 import asyncio
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
-#from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
-load_dotenv('../commands.env')
+load_dotenv(f'{os.getenv("PROJECT_DIR")}/.env')
 
 class Olt:
     def connect_olt(self, olt_name):
@@ -53,7 +52,7 @@ class Olt:
             await websocket_connection.close()
 
         total_number_onts = self.get_amount_of_devices_by_pon(all_onts)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
         await websocket_connection.send(json.dumps(total_number_onts))
 
         all_onts = all_onts.splitlines()
@@ -86,12 +85,12 @@ class Olt:
                             current_ont['status'] = 2
 
                 collection_onts.append(current_ont)
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(0.1)
                 await websocket_connection.send(json.dumps(current_ont))
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        requests.post('http://commands.nmultifibra.com.br/generator/update_onts_in_database', headers=headers, data=body)
+        requests.post('http://127.0.0.1:8000/generator/update_onts_in_database', headers=headers, data=body)
 
         await websocket_connection.close()
         ssh_connection.disconnect()
@@ -183,7 +182,7 @@ class Olt:
         interface_commands = formatted_commands.get('interface_commands')
         global_commands = formatted_commands.get('global_commands')
         delete_commands = formatted_commands.get('delete_commands')
-        log_file = open(f'/home/nmultifibra/commands/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
+        log_file = open(f'{os.getenv("PROJECT_DIR")}/logs/apply_commands/{file_name}_logs.txt', 'a', encoding='utf-8')
         
         ssh_connection = self.connect_olt(destination_host)
         
@@ -225,7 +224,7 @@ class Olt:
             log_file.write(f'APPLIED: {command} \n\n')  
             send_command_rm = ssh_connection.send_command_timing(command)
             log_file.write(f'LOG: {send_command_rm} \n\n')
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
             await websocket.send(json.dumps({'command': f'{command}', 'log': send_command_rm}))
 
         ssh_connection.disconnect()
@@ -254,7 +253,7 @@ class Olt:
                     log_file.write('INFO: O SN duplicado foi deletado e o comando foi aplicado novamente')
 
             log_file.write(f'LOG: {send_command_int} \n\n')
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
             await websocket.send(json.dumps({'command': f'{command}', 'log': send_command_int}))
         
         log_file.write('<---------------------------- PROVISIONAMENTO - GLOBAL ------------------------------>\n')
@@ -264,7 +263,7 @@ class Olt:
             log_file.write(f'APPLIED: {command} \n\n')
             send_command_gbl = ssh_connection.send_command_timing(command)
             log_file.write(f'LOG: {send_command_gbl} \n\n')
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
             await websocket.send(json.dumps({'command': f'{command}', 'log': send_command_gbl}))
 
     def delete_sn_duplicate(self, command, ssh_connection):
