@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
-from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
+from core_app.static.shared_staticfiles.common.utils import GeneralUtility
 from attenuations_manager_app.utils.attenuator_service import AttenuationUtility
 from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
@@ -211,15 +211,17 @@ def render_logs(request):
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         
         logs = {
-            'logs': maintenance_info.logs, 
-            'name': maintenance_info.file_name, 
+            'logs': maintenance_info.logs,
+            'name': maintenance_info.file_name,
+            'register_id': maintenance_info.register_id,
             'operation_mode': 'attenuator',
         }
 
         if rollback:
             logs = {
-                'logs': maintenance_info.rollback_logs, 
-                'name': f'{maintenance_info.file_name}-rollback', 
+                'logs': maintenance_info.rollback_logs,
+                'name': f'{maintenance_info.file_name}-rollback',
+                'register_id': maintenance_info.register_id,
                 'operation_mode': 'attenuator',
                 'rollback': True
             }

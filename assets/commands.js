@@ -30,13 +30,14 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://commands.nmultifibra.com.br" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://127.0.0.1:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
     const socket = new WebSocket('ws://127.0.0.1:5678/get-onts')
     const tabId = getIdentificator()
     const onts = []
+    let sessionStarted = false
     let total_number_onts = 0
     let controllerPercentage = 0
 
@@ -47,6 +48,8 @@ async function searchOntsViaSsh(operationMode) {
                 host, 
                 tab_id: tabId
             }))
+            sessionStarted = true
+            loadingText.textContent = 'Iniciando sessão com o servidor websocket...'
             console.log('Sessão com o servidor Websocket iniciada')
         }
     
@@ -62,7 +65,7 @@ async function searchOntsViaSsh(operationMode) {
                 let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
                 loadingText.textContent = `Carregando dados dos dispositivos  - ${percentage}%`
                 onts.push(currentMessage)
-    
+
             } else if (currentMessage.message == "No ont were found") {
                 socket.close()
                 alert('Não existem dispositivos na localização informada! Vamos te redirecionar para a homepage.')
@@ -72,14 +75,18 @@ async function searchOntsViaSsh(operationMode) {
     
         socket.onclose = () => {
             console.log('Sessão com o servidor Websocket finalizada')
-            if (!total_number_onts) {
-                alert('Nenhuma ONT na porta informada')
+            if (!total_number_onts && !sessionStarted) {
+                alert('Ocorreu um erro ao se conectar ao servidor websocket')
                 return window.location = `${baseUrl}/home`
             }
             return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
-        } 
+        }
+
+        socket.onerror = (event) => {
+            loadingAnimation(false)
+            alert(`Ocorreu um erro durante a conexão websocket. Err: ${event}`);
+        }
     } catch (error) {
         return alert(error)
     }
-
 }

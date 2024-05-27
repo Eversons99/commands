@@ -1,9 +1,9 @@
 import ast
 import json
-from maintenance_manager.static.shared_staticfiles.common.olt_api import Olt
+from core_app.static.shared_staticfiles.common.olt_api import Olt
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from maintenance_manager.static.shared_staticfiles.common.utils import GeneralUtility
+from core_app.static.shared_staticfiles.common.utils import GeneralUtility
 
 
 class CommandsUtility:

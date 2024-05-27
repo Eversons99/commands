@@ -1,14 +1,12 @@
 import ast
-from datetime import datetime, timezone
 import json
+import os
+import pandas as pd
 import requests
-import os
-import pandas as pd
+from datetime import datetime, timezone
+from commands_generator_app.models import GeneratorDB
 from attenuations_manager_app.models import AttenuatorDB
-import os
-import pandas as pd
-from attenuations_manager_app.models import AttenuatorDB
-from django.http.response import HttpResponse, FileResponse, FileResponse
+from django.http.response import HttpResponse, FileResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -251,7 +249,8 @@ class GeneralUtility:
                 "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
                 "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
                 "maintenance_name": commands.file_name,
-                "operation_mode": operation_mode
+                "operation_mode": operation_mode,
+                "register_id": register_id
             }
 
             return all_commands
@@ -273,7 +272,7 @@ class GeneralUtility:
         request_body = json.loads(request.body)
         register_id = request_body.get("tab_id")
         onts = request_body.get("onts")
-
+        print(onts)
         data_to_update = {"unchanged_onts": onts}
         GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
@@ -331,7 +330,7 @@ class GeneralUtility:
         global_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('globalCommands')).text
         delete_commands_rollback = requests.get(maintenance_info.rollback_commands_url.get('deleteCommands')).text
 
-        file = pd.ExcelWriter(f'/home/nmultifibra/commands/public/files/{file_name}.xlsx')
+        file = pd.ExcelWriter(f'{os.getenv("PROJECT_DIR")}/public/files/{file_name}.xlsx')
 
         df_unchanged_onts = pd.DataFrame(ast.literal_eval((maintenance_info.unchanged_onts)))     
         df_unchanged_onts['status'] = df_unchanged_onts['status'].apply(lambda x: 'online' if x == 1 else 'offline')
@@ -382,7 +381,7 @@ class GeneralUtility:
         register_id = request.GET.get('tab_id')
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = f'{maintenance_info.file_name}.xlsx'
-        file_path = f'/home/nmultifibra/commands/public/files/{file_name}'
+        file_path = f'{os.getenv("PROJECT_DIR")}/public/files/{file_name}'
 
         file = open(file_path, 'rb')
         response = FileResponse(file)
@@ -397,7 +396,7 @@ class GeneralUtility:
         maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
         xlsx_file = f'{maintenance_info.file_name}.xlsx'
         file_name = maintenance_info.file_name
-        file_path = f'/home/nmultifibra/commands/public/files/{xlsx_file}'
+        file_path = f'{os.getenv("PROJECT_DIR")}/public/files/{xlsx_file}'
 
         try:
             os.unlink(file_path)
@@ -451,3 +450,18 @@ class GeneralUtility:
                 'error': True,
                 'message': f'Ocorreu um erro ao atualizar o status da aplicação dos comandos no banco. Err: {err}'
             }
+    
+    @staticmethod 
+    def check_file_names(request):
+        file_name = request.GET.get('fileName')
+        all_file_names = []
+
+        generator_names = GeneratorDB.objects.all().filter(file_name__isnull=False, commands_removed=False).values_list('file_name', flat=True)
+        attenuator_names = AttenuatorDB.objects.all().filter(file_name__isnull=False, commands_removed=False).values_list('file_name', flat=True)
+        all_file_names.extend(generator_names)
+        all_file_names.extend(attenuator_names)
+        
+        if file_name in all_file_names:
+            return {'used': True}
+
+        return {'used': False}

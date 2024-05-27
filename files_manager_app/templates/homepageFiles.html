@@ -1,0 +1,58 @@
+{% extends 'partials/base.html'%}
+{% load static%}
+{% block content %}
+
+<header>
+    <h1 id='title'>GA - Gerenciador dos Arquivos</h1>
+</header>
+
+<section id='files-mng-container'>
+    <h2>Selecione um filtro</h2>
+
+    <div id='filter-container'>    
+        <select id="filter-selected">
+            <option>{{selected_filter}}</option>
+            <option>Todos os comandos</option>
+            <option>Comandos aplicados</option>
+            <option>Comandos pendentes</option>
+        </select>
+        <button id='list-button' onclick="getReadyCommandFiles()">Listar</button>
+    </div>
+
+    <div id='files-containter'>
+        {% if filtered == True and files|length == 0 %}
+            {% include 'partials/warnMessage.html' %}
+        {% elif not files and not filtered and not selected_filter %}
+        {% else %}
+            <table id="files-table">
+                <tr id="table-head">
+                    <th class='t-head'>ID</th>
+                    <th class='t-head'>Nome do Arquivo</th>
+                    <th class='t-head'>Data de criação</th>
+                    <th class='t-head'>Modo de operação</th>
+                    <th class='t-head'>Actions</th>
+                </tr>
+
+                {% for file in files %}
+                    <tr class="single-file">
+                        <td>{{file.record.register_id}}</td>
+                        <td>{{file.record.file_name}}</td>
+                        <td>{{file.record.created_date|date:"d-m-Y"}}</td>
+                        <td>{{file.module_name}}</td>
+                        <td id='files-actions'>
+                            <select id="select-file-actions" onchange="handleActionChange(this)">
+                                <option>...</option>
+                                <option value="apply" class="icon-actions {{file.apply_command_class}}" {{file.disabled_apply}}>Aplicar comandos</option>
+                                <option value="discard" class="icon-actions" {{file.disabled}}>Deletar registro</option>
+                                <option value="download" class="icon-actions" {{file.disabled}}>Fazer download</option>
+                                <option value="logs" class="icon-actions {{file.show_logs_class}}" {{file.disabled_logs}}>Exibir logs</option>
+                            </select>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
