@@ -91,7 +91,7 @@ class Olt:
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        requests.post('http://10.0.30.157:8000/generator/update_onts_in_database', headers=headers, data=body)
+        requests.post('http://commands.nmultifibra.com.br/generator/update_onts_in_database', headers=headers, data=body)
 
         await websocket_connection.close()
         ssh_connection.disconnect()
