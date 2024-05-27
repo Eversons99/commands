@@ -1,4 +1,4 @@
-/* #files-mng-container {
+#files-mng-container {
     display: flex;
     width: 85%;
     align-items: center;
@@ -31,49 +31,6 @@
 #files-actions {
     display: flex;
     margin: 0;
-
-}
-
-.icon-actions {
-    display: flex;
-    position: relative;
-}
-
-.icon-actions .auxiliary-text {
-    visibility: hidden;
-    width: 120px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.icon-actions .auxiliary-text::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #555 transparent transparent transparent;
-}
-
-.icon-actions:hover .auxiliary-text {
-    visibility: visible;
-    opacity: 1;
-}
-
-.single-file:hover {
-    background: #ebe5e5;
 }
 
 svg {
@@ -99,7 +56,6 @@ svg {
 #all-logs-container {
     display: flex;
     width: 85%
-    
 }
 
 #logs, #rollback-logs {
@@ -115,4 +71,87 @@ svg {
 
 #logs p, #rollback-logs p {
     padding: 0.2em;
-} */
+}
+
+.inactive-operation {
+    color: #8b8b8b;
+    background-color: rgb(218, 218, 218);
+    pointer-events: none;
+}
+
+.inactive-operation a {
+    color: #8b8b8b;
+}
+
+#nav-actions {
+    display: flex;
+    border: 1px solid black;
+    border-radius: 10%;
+    width: max-content;
+    text-align: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+#nav-actions ul {
+    width: 100%;
+    list-style: none;
+    text-align: center;
+    text-decoration: none;
+    margin: 0;
+}
+
+#nav-actions li {
+    border-bottom: 1px solid;
+    padding: 0.5em 0.5em;
+    font-weight: bold;
+    margin: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+#nav-actions li:last-child {
+    border-bottom: 0;
+}
+
+
+#nav-actions li:hover {
+    background: #afaeae;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+#nav-actions {
+    display: none;
+}
+
+#actions-file {
+    position: relative;
+}
+
+#nav-actions {
+    position: absolute;
+}
+
+#select-file-actions {
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: none;
+    background-color: white;
+}
+
+.single-file:hover {
+    background: #ebe5e5;
+}
+
+.single-file:hover #select-file-actions {
+    background-color: #ebe5e5;
+}
+
+.single-file select:focus {
+    outline: none;
+}

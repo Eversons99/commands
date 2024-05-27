@@ -26,7 +26,7 @@ def get_files(request):
 
         len_all_records = len(records_commands) + len(records_attenuator)
         files_formatted = format_files_to_render(records_commands, records_attenuator)
-        print(files_formatted)
+
         context = {
             'files': files_formatted,
             'filtered': True,
@@ -78,9 +78,11 @@ def format_files_to_render(records_commands, records_attenuator):
             if record.commands_applied:
                 record_info['apply_command_class'] = 'inactive-operation'
                 record_info['show_logs_class'] = 'active-operation'
+                record_info['disabled_apply'] = 'disabled'
             else:
                 record_info['apply_command_class'] = 'active-operation'
                 record_info['show_logs_class'] = 'inactive-operation'
+                record_info['disabled_logs'] = 'disabled'
                 
             files.append(record_info)
    

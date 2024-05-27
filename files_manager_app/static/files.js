@@ -44,7 +44,33 @@ function resultsTabsButton(e) {
 function showOperationList(){
     const operationList = document.querySelector('.operation-list')
     
-    if (!operationList.style.display) {
-        operationList.style.display = 'flex'
+    if (!operationList.style.display || operationList.style.display == 'none') {
+        operationList.style.display = 'block'
+    } else {
+        operationList.style.display = 'none'
     }
+}
+
+function handleActionChange(selectElement) {
+    let selectedValue = selectElement.value;
+    let moduleName = selectElement.parentNode.parentNode.childNodes[7].textContent.toLowerCase()
+    let registerId = selectElement.parentNode.parentNode.childNodes[1].textContent.toLowerCase()
+    
+    switch (selectedValue) {
+        case "apply":
+            apllyCommands(moduleName, false, registerId);
+            break;
+        case "discard":
+            discardCommands(moduleName, registerId);
+            break;
+        case "download":
+            downloadCommandsFile(moduleName, registerId);
+            break;
+        case "logs":
+            displayAllLogs(moduleName, registerId);
+            break;
+        default:
+            break;
+    }
+    selectElement.value = "...";
 }

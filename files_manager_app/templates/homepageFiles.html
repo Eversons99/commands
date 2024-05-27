@@ -6,7 +6,7 @@
     <h1 id='title'>GA - Gerenciador dos Arquivos</h1>
 </header>
 
-<section id='files-mng-container', onload>
+<section id='files-mng-container'>
     <h2>Selecione um filtro</h2>
 
     <div id='filter-container'>    
@@ -26,6 +26,7 @@
         {% else %}
             <table id="files-table">
                 <tr id="table-head">
+                    <th class='t-head'>ID</th>
                     <th class='t-head'>Nome do Arquivo</th>
                     <th class='t-head'>Data de criação</th>
                     <th class='t-head'>Modo de operação</th>
@@ -34,12 +35,18 @@
 
                 {% for file in files %}
                     <tr class="single-file">
+                        <td>{{file.record.register_id}}</td>
                         <td>{{file.record.file_name}}</td>
                         <td>{{file.record.created_date|date:"d-m-Y"}}</td>
                         <td>{{file.module_name}}</td>
                         <td id='files-actions'>
-                            <b onclick="showOperationList()">...</b>
-                            {% include 'operationList.html'%}
+                            <select id="select-file-actions" onchange="handleActionChange(this)">
+                                <option>...</option>
+                                <option value="apply" class="icon-actions {{file.apply_command_class}}" {{file.disabled_apply}}>Aplicar comandos</option>
+                                <option value="discard" class="icon-actions" {{file.disabled}}>Deletar registro</option>
+                                <option value="download" class="icon-actions" {{file.disabled}}>Fazer download</option>
+                                <option value="logs" class="icon-actions {{file.show_logs_class}}" {{file.disabled_logs}}>Exibir logs</option>
+                            </select>
                         </td>
                     </tr>
                 {% endfor %}

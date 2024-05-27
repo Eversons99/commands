@@ -347,8 +347,8 @@ async function downloadCommandsFile(operationMode, registerId) {
 
     if(currentUrl.includes('/render_page_commands')){
         div = document.querySelector('.action-buttuns')
-    }else{
-        div = document.querySelector('#files-actions')
+    } else {
+        div = document.querySelector('#files-mng-container')
     }
 
     link.setAttribute('href', url)
