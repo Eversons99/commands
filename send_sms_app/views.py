@@ -222,6 +222,7 @@ def create_rupture(request):
             'OLT_TRMS_01': [],
             'OLT_TRMS_02': [],
             'OLT_CCDA_01': [],
+            'OLT_CCDA_02': [],
             'OLT_VGPA_01': [],
             'OLT_GRVN_01': []
         }

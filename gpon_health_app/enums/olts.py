@@ -5,6 +5,7 @@ class KnownOlts(Enum):
     Enum que "mapeia" o id_transmissor do IXC com o nome de uma OLT
     """
     OLT_CCDA_01 = '16'
+    OLT_CCDA_02 = '20'
     OLT_COTIA_01 = '1'
     OLT_COTIA_02 = '4'
     OLT_COTIA_03 = '7'

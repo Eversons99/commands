@@ -36,7 +36,7 @@ def get_files(request):
 
         return render(request, 'homepageFiles.html', context)
 
-    return redirect('http://127.0.0.1:8000/files/home')
+    return redirect('http://commands.nmultifibra.com.br/files/home')
 
 def show_logs(request):
     if request.method == 'GET':
@@ -67,12 +67,13 @@ def format_files_to_render(records_commands, records_attenuator):
     all_db_records = [records_commands, records_attenuator]
     files = []
 
-    for single_record in all_db_records:
+    for index, single_record in enumerate(all_db_records):
 
-        for record in single_record:
+        for record  in single_record:
+            module_name =  'Generator' if index == 0 else 'Attenuator'
             record_info = {
                 'record': record,
-                'module_name': 'Generator'
+                'module_name': module_name
             }
 
             if record.commands_applied:

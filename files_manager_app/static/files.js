@@ -8,12 +8,12 @@ async function getReadyCommandFiles(){
     }
 
     loadingAnimation(false)
-    window.location = `http://127.0.0.1:8000/files/get_files?filter=${selectedFilter}`
+    window.location = `http://commands.nmultifibra.com.br/files/get_files?filter=${selectedFilter}`
 }
 
 async function displayAllLogs(operationMode, registerId){
     const lastFilter = window.location.href
-    const url = `http://127.0.0.1:8000/files/show_logs?tabId=${registerId}&operationMode=${operationMode}&lastFilter=${lastFilter}`
+    const url = `http://commands.nmultifibra.com.br/files/show_logs?tabId=${registerId}&operationMode=${operationMode}&lastFilter=${lastFilter}`
     return window.location = url
 }
 

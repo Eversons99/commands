@@ -30,7 +30,7 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh(operationMode) {
     loadingAnimation(true)
-    const baseUrl = "http://127.0.0.1:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = "http://commands.nmultifibra.com.br" + (operationMode == 'generator' ? '/generator' : '/attenuator')
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
