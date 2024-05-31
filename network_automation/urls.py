@@ -1,4 +1,4 @@
-"""maintenance_manager URL Configuration
+"""network_automation URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('', include('core_app.urls')),
+    path('maintenance/', include('maintenance_core_app.urls')),
+    path('gpon/', include('gpon_health_app.urls')),
     path('admin/', admin.site.urls),
 ]

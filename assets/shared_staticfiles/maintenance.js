@@ -66,21 +66,22 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = "http://127.0.0.1:8000" + (operationMode == 'generator' ? '/generator' : '/attenuator')
+    const baseUrl = 'http://localhost:8000/maintenance/shared_core'
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
     const tabId = getIdentificator()
-    const sourceGpon = {
-        'host':  sourceHost,
-        'gpon': `0/${sourceSlot}/${sourcePort}`
-    }
-    
+
     if (!sourceHost || !sourceSlot || !sourcePort) {
         loadingAnimation(false)
         return alert("ATENÇÃO: Preencha o F/S/P!")
     } 
 
+    const sourceGpon = {
+        'host':  sourceHost,
+        'gpon': `0/${sourceSlot}/${sourcePort}`
+    }
+    
     const requestOptions = {
         method: 'POST',
         headers: { 
@@ -89,15 +90,16 @@ async function searchOnts(operationMode) {
         },
         body: JSON.stringify({
             tabId,
-            sourceGpon
+            sourceGpon,
+            mode: operationMode
         })
     }
 
     const ontsRequest = await fetch(`${baseUrl}/search_onts_via_snmp`, requestOptions)
-    const responseRequest = await ontsRequest.json()
+    const responseofOntsRequest = await ontsRequest.json()
     
-    if (operationMode == 'attenuator' && responseRequest.error == true) {
-        let messageError = responseRequest.message
+    if (operationMode == 'attenuator' && responseofOntsRequest.error == true) {
+        let messageError = responseofOntsRequest.message
 
         if (messageError == 'No onts were found') {
             messageError = 'Nenhuma ONU na porta informada'
@@ -105,58 +107,15 @@ async function searchOnts(operationMode) {
 
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
-    else if (responseRequest.error == true) {
-        return window.location = `${baseUrl}/search_onts_via_ssh?tab_id=${tabId}`
+    else if (responseofOntsRequest.error == true) {
+        return window.location = `http://localhost:8000/maintenance/generator/search_onts_via_ssh?tab_id=${tabId}`
     }
-
-    return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}`
+    return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}&mode=${operationMode}`
 }
 
 function getIdentificator() {
     const identificatorTab = window.sessionStorage.getItem('tabId')
     return identificatorTab
-}
-
-async function generateCommands() {
-    loadingAnimation(true)
-    const baseUrl = "http://commands.nmultifibra.com.br/generator"
-    const idDevicesSelected = getIdDevicesSelected()
-
-    if (idDevicesSelected.length == 0) {
-        loadingAnimation(false)
-        return alert('Selecione ao menos um dispositivo')
-    }
-
-    const maintenanceInfo = await getMaintenanceInfoFromForm()
-
-    if (maintenanceInfo.error) {
-        loadingAnimation(false)
-        return alert(maintenanceInfo.message)
-    }
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({
-            'tabId': maintenanceInfo.tabId,
-            'destinationGpon': maintenanceInfo.destinationGpon,
-            'fileName': maintenanceInfo.fileName,
-            'idDevicesSelected': maintenanceInfo.idDevicesSelected,
-            'mode': 'generator'
-        })
-    }
-
-    let getCommands = await fetch(`${baseUrl}/get_commands`, requestOptions)
-    getCommands = await getCommands.json()
-    
-    if (getCommands.error) {
-        messageError =  getCommands.message
-        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
-    }
-    return window.location = `${baseUrl}/render_page_commands?tab_id=${maintenanceInfo.tabId}`
 }
 
 async function getMaintenanceInfoFromForm() {
@@ -190,7 +149,7 @@ async function getMaintenanceInfoFromForm() {
 }
 
 async function checkFileNameExists(fileName){
-    let allFileNames = await fetch(`http://commands.nmultifibra.com.br/shared-core/check_file_names?fileName=${fileName}`)
+    let allFileNames = await fetch(`http://localhost:8000/maintenance/shared-core/check_file_names?fileName=${fileName}`)
     allFileNames = await allFileNames.json()
 
     return allFileNames
@@ -299,7 +258,7 @@ async function apllyCommands(operationMode, rollback, registerId) {
 }
 
 async function getMaintenanceInfo(operationMode, registerId) {
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/get_maintenance_info`
+    const url = `http://localhost:8000/maintenance/shared_core/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -307,7 +266,8 @@ async function getMaintenanceInfo(operationMode, registerId) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': registerId
+            'tabId': registerId,
+            'mode': operationMode
         })
     }
      
@@ -318,7 +278,7 @@ async function getMaintenanceInfo(operationMode, registerId) {
 }
 
 async function showLogs(logs, operationMode, rollback, registerId) {
-    const baseUrl = `http://commands.nmultifibra.com.br/${operationMode}`
+    const baseUrl = 'http://localhost:8000/maintenance/shared_core'
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -328,20 +288,21 @@ async function showLogs(logs, operationMode, rollback, registerId) {
         body: JSON.stringify({
             'rollback': rollback,
             'tabId': registerId,
-            'logs': logs
+            'logs': logs,
+            'mode': operationMode
         })
     }
     
     let saveCommands = await fetch(`${baseUrl}/save_logs`, requestOptions)
     saveCommands = await saveCommands.json()
-    console.log()
+
     if (saveCommands.error) return alert(saveCommands.message)
 
-    return window.location = `${baseUrl}/render_logs?tab_id=${registerId}&rollback=${rollback}` 
+    return window.location = `${baseUrl}/render_logs?tab_id=${registerId}&rollback=${rollback}&mode=${operationMode}` 
 }
 
 async function downloadCommandsFile(operationMode, registerId) {
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/download_command_file?tab_id=${registerId}`
+    const url = `http://localhost:8000/maintenance/shared_core/download_command_file?tab_id=${registerId}&mode=${operationMode}`
     const link = document.createElement('a')
     const currentUrl = window.location.href
 
@@ -366,7 +327,7 @@ async function discardCommands(operationMode, registerId) {
 
     const currentUrl =  window.location.href
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/discard_commands`
+    const url = `http://localhost:8000/maintenance/shared_core/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -374,7 +335,8 @@ async function discardCommands(operationMode, registerId) {
             'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
-            'tabId': registerId
+            'tabId': registerId,
+            'mode': operationMode
         })
     }
 
@@ -389,7 +351,7 @@ async function discardCommands(operationMode, registerId) {
             removeButton.disabled = true
         }
         alert(removeCommands.message)
-        return window.location = 'http://commands.nmultifibra.com.br/'
+        return window.location = 'http://localhost:8000/maintenance/'
     } else {
         alert(removeCommands.message)
         window.location = window.location.href;
@@ -397,8 +359,8 @@ async function discardCommands(operationMode, registerId) {
 }
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
-    const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}`
-    const url = `http://commands.nmultifibra.com.br/${operationMode}/update_status_applied_commands?${queryParams}`
+    const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}&mode=${operationMode}`
+    const url = `http://localhost:8000/maintenance/shared_core/update_status_applied_commands?${queryParams}`
     let updateInfo = await fetch(url)
     updateInfo = await updateInfo.json()
 

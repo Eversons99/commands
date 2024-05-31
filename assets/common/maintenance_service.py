@@ -11,7 +11,7 @@ from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
 
-class GeneralUtility:
+class MaintenanceUtility:
     @staticmethod
     def get_onts_via_snmp(request, db_model):
         """
@@ -27,24 +27,24 @@ class GeneralUtility:
         if not register_id or not source_gpon:
             response_message = json.dumps({
                 'error': True,
-                'message': 'O host ou a localização pon não foram informados no corpo da requisição'
+                'message': 'Register id ou informaçõe gpon não foram informados no corpo da requisição'
             })
             return HttpResponse(response_message, status=400)
 
         initial_maintenance_info = {
-            "register_id": register_id,
-            "source_gpon": source_gpon
+            'register_id': register_id,
+            'source_gpon': source_gpon
         }
 
-        ont_devices = GeneralUtility.get_onts_info_on_nmt(source_host, source_pon)
+        ont_devices = MaintenanceUtility.get_onts_info_on_nmt(source_host, source_pon)
 
         if ont_devices['error']:
-            GeneralUtility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
+            MaintenanceUtility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
             response_error = json.dumps(ont_devices)
             return HttpResponse(response_error)
 
-        initial_maintenance_info["unchanged_onts"] = ont_devices["onts"]
-        save_maintenance_info = GeneralUtility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
+        initial_maintenance_info['unchanged_onts'] = ont_devices['onts']
+        save_maintenance_info = MaintenanceUtility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
         return HttpResponse(json.dumps(save_maintenance_info))
 
     @staticmethod
@@ -73,27 +73,27 @@ class GeneralUtility:
 
             if not isinstance(onts, list) and onts.get('error'):
                 return {
-                    "error": True,
-                    "onts": 0,
-                    "message": onts.get('error')
+                    'error': True,
+                    'onts': 0,
+                    'message': onts.get('error')
                 }
             
             elif len(onts) == 0 or isinstance(onts, dict):
                 return {
-                    "error": True,
-                    "onts": 0,
-                    "message": 'A busca via SNMP não retornou nenhuma informação'
+                    'error': True,
+                    'onts': 0,
+                    'message': 'A busca via SNMP não retornou nenhuma informação'
                 }
-                
 
             return {
-                "error": False,
-                "onts": onts
+                'error': False,
+                'onts': onts
             }
+
         except requests.exceptions.RequestException as err:
             return {
-                "error": True,
-                "message": f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
+                'error': True,
+                'message': f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
             }
 
     @staticmethod
@@ -120,19 +120,19 @@ class GeneralUtility:
         """
         register_id = request.GET.get('tab_id')
         if register_id:
-            maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+            maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
             gpon_info = maintenance_info.source_gpon
             query_info = {
-                "register_id": register_id,
-                "pon": gpon_info.get("gpon"),
-                "host": gpon_info.get("host"),
-                "error": False
+                'register_id': register_id,
+                'pon': gpon_info.get("gpon"),
+                'host': gpon_info.get("host"),
+                'error': False
             }
             return query_info
 
         query_info = {
-            "error": True,
-            "message": 'Ocorreu um erro ao obter o ID da página'
+            'error': True,
+            'message': 'Ocorreu um erro ao obter o ID da página'
         }
         return query_info
 
@@ -155,7 +155,7 @@ class GeneralUtility:
         attributes of the record are placed in a dict, this dict is returned
         """
         register_id = request.GET.get('tab_id')
-        
+
         if not register_id:
             error_message = {
                 'error': True,
@@ -165,13 +165,13 @@ class GeneralUtility:
             return error_message
 
         try:
-            maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
-            onts = ast.literal_eval(maintenance_info.unchanged_onts)
+            maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
 
             onts_info = {
                 'error': False,
-                'all_devices': onts
+                'all_devices':  ast.literal_eval(maintenance_info.unchanged_onts)
             }
+            print(onts_info)
             return onts_info
 
         except ObjectDoesNotExist as err:
@@ -209,7 +209,7 @@ class GeneralUtility:
                 data_to_update['destination_gpon'] = info_to_generate_commands.get('destination_gpon')
                 data_to_update['selected_devices'] = info_to_generate_commands.get('onts')
 
-            GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+            MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
             return {
                 'error': False,
@@ -241,25 +241,24 @@ class GeneralUtility:
         register_id = request.GET.get('tab_id')
 
         try:
-            commands = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+            commands = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
 
-            all_commands = {
-                "error": False,
-                "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
-                "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
-                "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
-                "maintenance_name": commands.file_name,
-                "operation_mode": operation_mode,
-                "register_id": register_id
+            commands_info = {
+                'error': False,
+                'delete_commands': requests.get(commands.commands_url.get('deleteCommands')).text,
+                'interface_commands': requests.get(commands.commands_url.get('interfaceCommands')).text,
+                'global_commands': requests.get(commands.commands_url.get('globalCommands')).text,
+                'maintenance_name': commands.file_name,
+                'operation_mode': operation_mode,
+                'register_id': register_id
             }
 
-            return all_commands
+            return commands_info
 
         except (requests.exceptions.RequestException, Exception) as err:
-
             error = {
-                "error": True,
-                "message": f'Ocorreu um erro ao renderizar a página de comandos. Error: {err}'
+                'error': True,
+                'message': f'Ocorreu um erro ao renderizar a página de comandos. Error: {err}'
             }
 
             return error
@@ -274,7 +273,7 @@ class GeneralUtility:
         onts = request_body.get("onts")
         print(onts)
         data_to_update = {"unchanged_onts": onts}
-        GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+        MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
         return HttpResponse(status=200)
 
@@ -282,7 +281,7 @@ class GeneralUtility:
     def get_maintenance_info_to_apply_commands(request, db_model):
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
-        maintenance = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         maintenance_info = {
             'register_id': maintenance.register_id,
             'commands_url': maintenance.commands_url,
@@ -307,9 +306,9 @@ class GeneralUtility:
             if rollback:
                 logs_to_save = {'rollback_logs': logs}
 
-            GeneralUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
-
+            MaintenanceUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
             return {'error': False}
+
         except Exception as err:
             return {'error': True, 'message': f'Ocorreu um erro ao salvar os logs. Err: {err}'}
 
@@ -319,7 +318,7 @@ class GeneralUtility:
         Generates a xlsx file with ready commands and attenuation if there's
         """
         register_id = request.GET.get('tab_id')
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = maintenance_info.file_name
 
         source_port_config = maintenance_info.source_port_config
@@ -379,7 +378,7 @@ class GeneralUtility:
         Reads a commands file and return your content to download
         """
         register_id = request.GET.get('tab_id')
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         file_name = f'{maintenance_info.file_name}.xlsx'
         file_path = f'{os.getenv("PROJECT_DIR")}/public/files/{file_name}'
 
@@ -393,7 +392,9 @@ class GeneralUtility:
     def discard_commands_file(request, db_model):
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        print('--------------------------')
+        print(db_model)
+        maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         xlsx_file = f'{maintenance_info.file_name}.xlsx'
         file_name = maintenance_info.file_name
         file_path = f'{os.getenv("PROJECT_DIR")}/public/files/{xlsx_file}'
@@ -413,7 +414,7 @@ class GeneralUtility:
             return HttpResponse(json.dumps(error_response))
         
         data_to_update = {'commands_removed': True}
-        GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model) 
+        MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model) 
 
         success_response = {
             'error': False,
@@ -438,7 +439,7 @@ class GeneralUtility:
                     'date_rollback_commands_applied': datetime.now(tz=timezone.utc)
                 }
                 
-            GeneralUtility.update_maintenance_info_in_database(status_to_update, register_id, db_model)
+            MaintenanceUtility.update_maintenance_info_in_database(status_to_update, register_id, db_model)
             
             return {
                 'error': False,

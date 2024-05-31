@@ -1,6 +1,6 @@
 from commands_generator_app.models import GeneratorDB
 from attenuations_manager_app.models import AttenuatorDB
-from core_app.static.shared_staticfiles.common.utils import GeneralUtility
+from maintenance_core_app.static.common.maintenance_service import MaintenanceUtility
 from django.shortcuts import render, redirect
 
 def home(request):
@@ -36,7 +36,7 @@ def get_files(request):
 
         return render(request, 'homepageFiles.html', context)
 
-    return redirect('http://commands.nmultifibra.com.br/files/home')
+    return redirect('http://localhost:8000/files/home')
 
 def show_logs(request):
     if request.method == 'GET':
@@ -50,7 +50,7 @@ def show_logs(request):
         else:
             db_model = AttenuatorDB
             
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         
         context = {
             'model_title': 'GC - Gerador de Comandos' if isinstance(db_model, GeneratorDB) else  'GA - Gerenciador de Atenuações',
@@ -88,7 +88,3 @@ def format_files_to_render(records_commands, records_attenuator):
             files.append(record_info)
    
     return files
-
-
-def teste(request):
-    return render(request, 'teste.html')

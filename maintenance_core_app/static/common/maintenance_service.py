@@ -27,13 +27,13 @@ class MaintenanceUtility:
         if not register_id or not source_gpon:
             response_message = json.dumps({
                 'error': True,
-                'message': 'O host ou a localização pon não foram informados no corpo da requisição'
+                'message': 'Register id ou informaçõe gpon não foram informados no corpo da requisição'
             })
             return HttpResponse(response_message, status=400)
 
         initial_maintenance_info = {
-            "register_id": register_id,
-            "source_gpon": source_gpon
+            'register_id': register_id,
+            'source_gpon': source_gpon
         }
 
         ont_devices = MaintenanceUtility.get_onts_info_on_nmt(source_host, source_pon)
@@ -43,7 +43,7 @@ class MaintenanceUtility:
             response_error = json.dumps(ont_devices)
             return HttpResponse(response_error)
 
-        initial_maintenance_info["unchanged_onts"] = ont_devices["onts"]
+        initial_maintenance_info['unchanged_onts'] = ont_devices['onts']
         save_maintenance_info = MaintenanceUtility.save_initial_maintenance_info_in_database(initial_maintenance_info, db_model)
         return HttpResponse(json.dumps(save_maintenance_info))
 
@@ -73,27 +73,27 @@ class MaintenanceUtility:
 
             if not isinstance(onts, list) and onts.get('error'):
                 return {
-                    "error": True,
-                    "onts": 0,
-                    "message": onts.get('error')
+                    'error': True,
+                    'onts': 0,
+                    'message': onts.get('error')
                 }
             
             elif len(onts) == 0 or isinstance(onts, dict):
                 return {
-                    "error": True,
-                    "onts": 0,
-                    "message": 'A busca via SNMP não retornou nenhuma informação'
+                    'error': True,
+                    'onts': 0,
+                    'message': 'A busca via SNMP não retornou nenhuma informação'
                 }
-                
 
             return {
-                "error": False,
-                "onts": onts
+                'error': False,
+                'onts': onts
             }
+
         except requests.exceptions.RequestException as err:
             return {
-                "error": True,
-                "message": f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
+                'error': True,
+                'message': f'Ocorreu um erro ao buscar as ONTs no NMT. Error: {err}'
             }
 
     @staticmethod
@@ -123,16 +123,16 @@ class MaintenanceUtility:
             maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
             gpon_info = maintenance_info.source_gpon
             query_info = {
-                "register_id": register_id,
-                "pon": gpon_info.get("gpon"),
-                "host": gpon_info.get("host"),
-                "error": False
+                'register_id': register_id,
+                'pon': gpon_info.get("gpon"),
+                'host': gpon_info.get("host"),
+                'error': False
             }
             return query_info
 
         query_info = {
-            "error": True,
-            "message": 'Ocorreu um erro ao obter o ID da página'
+            'error': True,
+            'message': 'Ocorreu um erro ao obter o ID da página'
         }
         return query_info
 
@@ -155,7 +155,7 @@ class MaintenanceUtility:
         attributes of the record are placed in a dict, this dict is returned
         """
         register_id = request.GET.get('tab_id')
-        
+
         if not register_id:
             error_message = {
                 'error': True,
@@ -166,12 +166,11 @@ class MaintenanceUtility:
 
         try:
             maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
-            onts = ast.literal_eval(maintenance_info.unchanged_onts)
-
             onts_info = {
                 'error': False,
-                'all_devices': onts
+                'all_devices':  ast.literal_eval(maintenance_info.unchanged_onts)
             }
+
             return onts_info
 
         except ObjectDoesNotExist as err:
@@ -243,23 +242,22 @@ class MaintenanceUtility:
         try:
             commands = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
 
-            all_commands = {
-                "error": False,
-                "delete_commands": requests.get(commands.commands_url.get("deleteCommands")).text,
-                "interface_commands": requests.get(commands.commands_url.get("interfaceCommands")).text,
-                "global_commands": requests.get(commands.commands_url.get("globalCommands")).text,
-                "maintenance_name": commands.file_name,
-                "operation_mode": operation_mode,
-                "register_id": register_id
+            commands_info = {
+                'error': False,
+                'delete_commands': requests.get(commands.commands_url.get('deleteCommands')).text,
+                'interface_commands': requests.get(commands.commands_url.get('interfaceCommands')).text,
+                'global_commands': requests.get(commands.commands_url.get('globalCommands')).text,
+                'maintenance_name': commands.file_name,
+                'operation_mode': operation_mode,
+                'register_id': register_id
             }
 
-            return all_commands
+            return commands_info
 
         except (requests.exceptions.RequestException, Exception) as err:
-
             error = {
-                "error": True,
-                "message": f'Ocorreu um erro ao renderizar a página de comandos. Error: {err}'
+                'error': True,
+                'message': f'Ocorreu um erro ao renderizar a página de comandos. Error: {err}'
             }
 
             return error
@@ -272,7 +270,6 @@ class MaintenanceUtility:
         request_body = json.loads(request.body)
         register_id = request_body.get("tab_id")
         onts = request_body.get("onts")
-        print(onts)
         data_to_update = {"unchanged_onts": onts}
         MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
@@ -308,8 +305,8 @@ class MaintenanceUtility:
                 logs_to_save = {'rollback_logs': logs}
 
             MaintenanceUtility.update_maintenance_info_in_database(logs_to_save, register_id, db_model)
-
             return {'error': False}
+
         except Exception as err:
             return {'error': True, 'message': f'Ocorreu um erro ao salvar os logs. Err: {err}'}
 

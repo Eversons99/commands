@@ -1,0 +1,35 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+
+{% block content %}
+
+    {% if operation_mode == 'generator' %}
+        {% include 'generatorCommandsTitle.html' %}
+    {% else %}
+        {% include 'attenuationsManagerTitle.html' %}
+    {% endif %}
+
+    <div id="maintenance-title">
+        <h3>Manutenção: {{ maintenance_name }}</h3>
+    </div>
+
+    <div class="ready-commands results">
+        <div class="result-buttuns">
+            <button class="active-btn" id="interface-button" onclick="resultsButton(event)">Comandos Interface</button>
+            <button id="global-button" onclick="resultsButton(event)">Comandos Globais</button>
+            <button id="delete-button" onclick="resultsButton(event)">Comandos Delete</button>
+        </div>
+        <div class="commands">
+            <textarea class="active-result" id="interface-results" disabled>{{ interface_commands }}</textarea>
+            <textarea class="inactive-result" id="global-results" disabled>{{ global_commands }}</textarea>
+            <textarea class="inactive-result" id="delete-results" disabled>{{ delete_commands }}</textarea>
+        </div>
+    </div>
+
+    <div class="action-buttuns">
+        <button id="btn-home" onclick="location.href='http://localhost:8000/maintenance'">Ir para Homepage</button>
+        <button id="btn-warn" onclick="apllyCommands('{{operation_mode}}', false, '{{register_id}}')">Aplicar Comandos</button>
+        <button id="btn-save" onclick="downloadCommandsFile('{{operation_mode}}', '{{register_id}}')">Baixar Comandos</button>
+        <button id="btn-discard" onclick="discardCommands('{{operation_mode}}', '{{register_id}}')">Descartar Comandos</button>
+    </div>
+{% endblock %}

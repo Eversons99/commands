@@ -1,12 +1,17 @@
-{% extends 'partials/base.html' %}
+{% extends 'shared_templates/base.html' %}
 {% load static %}
 
 {% block content %}
-    {% include 'generator_commands_title.html' %}
+    {% include 'generatorCommandsTitle.html' %}
+
     <section id="source-container">
-        {% include 'partials/gponForm.html' %}
+        {% include 'shared_templates/gponForm.html' %}
         <div class="search-btn">
             <button onclick="searchOnts('generator')">Buscar</button>
         </div>
     </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'generator.js' %}"></script>
 {% endblock %}

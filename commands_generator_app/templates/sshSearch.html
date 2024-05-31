@@ -1,4 +1,6 @@
+{% extends 'shared_templates/base.html' %}
 {% load static %}
+{% block content %}
 
 <section id="new-search-ssh" class="new-search-ssh">
     <p>
@@ -21,5 +23,11 @@
             <td id="host">{{ host }}</td>
         </tr>
     </table>
-    <button id="new-search-onts-btn" onclick="searchOntsViaSsh('{{ operation_mode }}')">Nova busca via SSH</button>
+    <button id="new-search-onts-btn" onclick="searchOntsViaSsh()">Nova busca via SSH</button>
 </section>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'generator.js' %}"></script>
+{% endblock %}

@@ -1,9 +1,9 @@
 import ast
 import json
-from core_app.static.shared_staticfiles.common.olt_api import Olt
+from maintenance_core_app.static.common.olt_api import Olt
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from core_app.static.shared_staticfiles.common.utils import GeneralUtility
+from maintenance_core_app.static.common.maintenance_service import MaintenanceUtility
 
 
 class CommandsUtility:
@@ -18,13 +18,13 @@ class CommandsUtility:
         olt_api = Olt()
 
         try:
-            maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+            maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
             unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
 
             onts_checked = olt_api.check_vlan(unchanged_onts, maintenance_info)
             port_config = { 'source_port_config': onts_checked.get('port_configuration')}
 
-            GeneralUtility.update_maintenance_info_in_database(
+            MaintenanceUtility.update_maintenance_info_in_database(
                 data_to_update=port_config,
                 register_id=register_id,
                 db_model=db_model
