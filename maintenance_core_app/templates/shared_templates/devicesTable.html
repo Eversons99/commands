@@ -17,12 +17,20 @@
 
 {% include 'shared_templates/gponForm.html' %}
 
-<div class="generate-btn">
-    <button onclick="generateCommands()">Gerar comandos</button>
-</div>
+{% if operation_mode == 'generator' %}
+    <div class="generate-btn">
+        <button onclick="generateCommands()">Gerar comandos</button>
+    </div>
+{% else %}
+    <div class="generate-btn">
+        <button onclick="saveInitialAttenuationState()">Continuar</button>
+    </div>
+{% endif %}
+
 
 {% block scripts %}
     <script src="{% static 'generator.js' %}"></script>
+    <script src="{% static 'attenuator.js' %}"></script>
 {% endblock %}
 
 {% endblock %}

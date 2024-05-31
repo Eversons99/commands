@@ -90,7 +90,7 @@ class Olt:
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        requests.post('http://localhost:8000/generator/update_onts_in_database', headers=headers, data=body)
+        requests.post('http://localhost:8000/maintenance/generator/update_onts_in_database', headers=headers, data=body)
 
         await websocket_connection.close()
         ssh_connection.disconnect()

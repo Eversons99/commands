@@ -1,16 +1,21 @@
-{% extends 'partials/base.html' %}
+{% extends 'shared_templates/base.html' %}
 {% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'attenuator.css' %}">
+{% endblock %}
+
 {% block content %}
-{% include 'attenuations_manager_title.html' %}
+{% include 'attenuationsManagerTitle.html' %}
 
     <div id="maintenance-name"><h3>Manutenção: {{ name }}</h3></div>
 
     {% if error %}
-        {% include 'partials/errorMessage.html'%}
+        {% include 'shared_templates/errorMessage.html'%}
         {% include 'attenuationsPagePartial.html' %}
 
     {% elif total_offline_onts == 0 and not error %}
-        {% include 'partials/warnMessage.html' %}
+        {% include 'shared_templates/warnMessage.html' %}
         {% include 'attenuationsPagePartial.html' %}
 
     {% else %}
@@ -38,4 +43,10 @@
         </div>
 
     {% endif %}
+    
+    {% block scripts %}
+        <script type='text/javascript' src="{% static 'attenuator.js' %}"></script>
+    {% endblock %}
 {% endblock %}
+
+

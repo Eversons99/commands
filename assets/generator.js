@@ -38,7 +38,7 @@ async function searchOntsViaSsh() {
     const tabId = getIdentificator()
     const onts = []
     let sessionStarted = false
-    let total_number_onts = 0
+    let totalNumberOnts = 0
     let controllerPercentage = 0
 
     try {
@@ -55,13 +55,11 @@ async function searchOntsViaSsh() {
     
         socket.onmessage = (event) => {
             const currentMessage = JSON.parse(event.data)
+
             if (currentMessage.total_number_onts) {
-                if (currentMessage.total_number_onts == 0 || currentMessage.total_number_onts == '0') {
-                    return alert('afjoisdgfisdghosdihjgs')
-                } 
-                total_number_onts = currentMessage.total_number_onts
+                totalNumberOnts = currentMessage.total_number_onts
                 loadingText.textContent = `Carregando dados dos dispositivos - 0%`
-    
+
             } else if (currentMessage.id) {
                 controllerPercentage+=1
                 let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
@@ -76,9 +74,14 @@ async function searchOntsViaSsh() {
         }
     
         socket.onclose = () => {
-            console.log('Sessão com o servidor Websocket finalizada inesperadamente')
-            if (!total_number_onts && !sessionStarted) {
+            console.log('Sessão com o servidor Websocket finalizada')
+
+            if (!sessionStarted) {
                 alert('Ocorreu um erro ao se conectar ao servidor websocket')
+                return window.location = `${baseUrl}/generator/home`
+
+            } else if (!totalNumberOnts) {
+                alert('Nenhum dispositivo foi encontrado na localização informada!')
                 return window.location = `${baseUrl}/generator/home`
             }
             return window.location = `${baseUrl}/shared_core/render_onts_table?tab_id=${tabId}&mode=generator`

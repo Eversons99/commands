@@ -166,12 +166,11 @@ class MaintenanceUtility:
 
         try:
             maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
-
             onts_info = {
                 'error': False,
                 'all_devices':  ast.literal_eval(maintenance_info.unchanged_onts)
             }
-            print(onts_info)
+
             return onts_info
 
         except ObjectDoesNotExist as err:
@@ -271,7 +270,6 @@ class MaintenanceUtility:
         request_body = json.loads(request.body)
         register_id = request_body.get("tab_id")
         onts = request_body.get("onts")
-        print(onts)
         data_to_update = {"unchanged_onts": onts}
         MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
@@ -392,8 +390,6 @@ class MaintenanceUtility:
     def discard_commands_file(request, db_model):
         body_request = json.loads(request.body)
         register_id = body_request.get('tabId')
-        print('--------------------------')
-        print(db_model)
         maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         xlsx_file = f'{maintenance_info.file_name}.xlsx'
         file_name = maintenance_info.file_name

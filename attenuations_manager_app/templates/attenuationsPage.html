@@ -1,11 +1,15 @@
-{% extends 'partials/base.html' %}
+{% extends 'shared_templates/base.html' %}
 {% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'attenuator.css' %}">
+{% endblock %}
 
 {% block content %}
 
-{% include 'attenuations_manager_title.html' %}
+{% include 'attenuationsManagerTitle.html' %}
 <div id="maintenance-name"><h3>Manutenção: {{ name }}</h3></div>
 {% include 'attenuationsPagePartial.html'%}
 
-<script type='text/javascript' src="{% static 'attenuations_manager/staticattenuator.js' %}"></script>
+<script type='text/javascript' src="{% static 'attenuator.js' %}"></script>
 {% endblock %}

@@ -1,6 +1,6 @@
 async function saveInitialAttenuationState() {
     loadingAnimation(true)
-    const baseUrl = "http://localhost:8000/attenuator"
+    const baseUrl = 'http://localhost:8000/maintenance/attenuator'
     allDevicesSelected = checkIfAllDevicesIsSelected()
 
     if (!allDevicesSelected) {
@@ -34,7 +34,7 @@ async function saveInitialAttenuationState() {
 
     if (saveAttenuationState.error) {
         messageError = saveAttenuationState.message
-        return window.location = `${baseUrl}/render_error_page?message=${messageError}`
+        return window.location = `http://localhost:8000/maintenance/shared_core/render_error_page?message=${messageError}`
     }
     return window.location = `${baseUrl}/render_attenuations_page?tab_id=${maintenanceInfo.tabId}`
 }
