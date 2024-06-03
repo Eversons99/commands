@@ -130,12 +130,12 @@ async function generateCommands() {
         })
     }
 
-    try{
-        let getCommands = await fetch(`${baseUrl}/generator/get_commands`, requestOptions)
+    try {
+        let getCommands = await fetch(`${baseUrl}/shared_core/generate_commands`, requestOptions)
         getCommands = await getCommands.json()
         
         if (getCommands.error) {
-            messageError =  getCommands.message
+            const messageError = getCommands.message
             return window.location = `${baseUrl}/render_error_page?message=${messageError}`
         }
         return window.location = `${baseUrl}/shared_core/render_page_commands?tab_id=${maintenanceInfo.tabId}&mode=generator`

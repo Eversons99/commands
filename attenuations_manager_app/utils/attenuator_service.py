@@ -171,7 +171,7 @@ class AttenuationUtility:
     def separate_information_to_generate_commands(request, db_model):
         try:
             olt_api = Olt()
-            register_id = request.GET.get('tab_id')
+            register_id = json.loads(request.body).get('tabId')
             onts_to_generate_commands = []
             maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
             unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)

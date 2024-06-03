@@ -101,27 +101,3 @@ def next_attenuation(request):
 
     return redirect(home)
 
-
-def end_attenuations(request):
-    """
-    Gets all onts in attenuations and call the function that generate the commands
-    """
-    if request.method == 'GET':
-        db_model = AttenuatorDB
-        info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
-
-        if info_to_generate_commands.get('error'):
-            return info_to_generate_commands
-
-        register_id = info_to_generate_commands.get('register_id')
-        
-        commands_info = info_to_generate_commands.get('commands')
-        rollback_commands_info = info_to_generate_commands.get('rollback')
-        
-        commands = MaintenanceUtility.generate_commands(register_id, db_model, commands_info)
-        rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
-        MaintenanceUtility.generate_commands(register_id, db_model, rollback_commands_info)
-
-        return HttpResponse(json.dumps(commands))
-
-    return redirect(home)

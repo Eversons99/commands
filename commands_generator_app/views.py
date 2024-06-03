@@ -15,31 +15,6 @@ def home(request):
     return render(request, 'homepageGenerator.html')
 
 
-def get_commands(request):
-    """
-    Query NMT to generate commands and place the returned information in a database record
-    """
-    if request.method == 'POST':
-        db_model = GeneratorDB
-        info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
-
-        if info_to_generate_commands.get('error'):
-            return info_to_generate_commands
-
-        register_id = info_to_generate_commands.get('register_id')
-
-        commands_info = info_to_generate_commands.get('commands')
-        rollback_commands_info = info_to_generate_commands.get('rollback')
-
-        commands = MaintenanceUtility.generate_commands(register_id, db_model, commands_info)
-        rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
-        MaintenanceUtility.generate_commands(register_id, db_model, rollback_commands_info)
-
-        return HttpResponse(json.dumps(commands))
-
-    return redirect(home)
-
-
 def search_onts_via_ssh(request):
     """
     Renders the HTML page to make a new search of ONTs via SSH

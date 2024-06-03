@@ -1,5 +1,10 @@
-{% extends 'partials/base.html'%}
+{% extends 'shared_templates/base.html'%}
 {% load static%}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'files.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <header>
@@ -55,4 +60,9 @@
     </div>
 </section>
 
+{% endblock %}
+
+
+{% block scripts %}
+    <script src='{% static "files.js"%}'></script>
 {% endblock %}

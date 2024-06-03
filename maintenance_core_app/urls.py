@@ -14,7 +14,7 @@ urlpatterns = [
     path('shared_core/discard_commands', views.discard_commands, name='discard_commands'),
     path('shared-core/check_file_names', views.check_file_names, name='check_file_names'),
     path('shared_core/update_status_applied_commands', views.update_status_applied_commands, name='update_status_applied_commands'),
-    
+    path('shared_core/generate_commands', views.generate_commands, name='generate_commands'),
     path('attenuator/', include('attenuations_manager_app.urls')),
     path('generator/', include('commands_generator_app.urls')),
     path('sms/', include('send_sms_app.urls')),

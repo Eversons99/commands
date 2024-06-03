@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from .static.common.maintenance_service import MaintenanceUtility
+from commands_generator_app.utils.generator_service import CommandsUtility
+from attenuations_manager_app.utils.attenuator_service import AttenuationUtility
 from commands_generator_app.models import GeneratorDB
 from attenuations_manager_app.models import AttenuatorDB
 
@@ -79,6 +81,8 @@ def render_page_commands(request):
 
         return render(request, 'readyCommandsPage.html', context=commands)
 
+    return redirect(home)
+
 
 def render_logs(request):
     """
@@ -109,6 +113,8 @@ def render_logs(request):
             
         return render(request, 'readyCommandsLogs.html', context=logs)
 
+    return redirect(home)
+
 
 def get_maintenance_info(request):
     """
@@ -120,6 +126,8 @@ def get_maintenance_info(request):
         maintenance_info = MaintenanceUtility.get_maintenance_info_to_apply_commands(request, db_model)
 
         return HttpResponse(json.dumps(maintenance_info))
+
+    return redirect(home)
 
 
 def save_logs(request):
@@ -133,6 +141,8 @@ def save_logs(request):
         
         return HttpResponse(json.dumps(save_logs_on_db))
 
+    return redirect(home)
+
 
 def download_command_file(request):
     """
@@ -144,7 +154,7 @@ def download_command_file(request):
         file_commands = MaintenanceUtility.download_commands(request, db_model)
         return file_commands
 
-
+    return redirect(home)
 
 def discard_commands(request):
     """
@@ -157,12 +167,17 @@ def discard_commands(request):
 
         return commands_response
 
+    return redirect(home)
+
 
 def check_file_names(request):
     if request.method == 'GET':
         file_names = MaintenanceUtility.check_file_names(request)
 
         return HttpResponse(json.dumps(file_names))
+
+    return redirect(home)
+
 
 def update_status_applied_commands(request):
     if request.method == 'GET':
@@ -172,3 +187,28 @@ def update_status_applied_commands(request):
         
         return HttpResponse(json.dumps(update_info))
     
+    return redirect(home)
+
+
+def generate_commands(request):
+    if request.method == 'POST':
+        mode = json.loads(request.body).get('mode')
+        db_model = GeneratorDB if mode == 'generator' else AttenuatorDB
+
+        if db_model == GeneratorDB:
+            info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
+        else:
+            info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
+
+        register_id = info_to_generate_commands.get('register_id')
+        
+        commands_info = info_to_generate_commands.get('commands')
+        rollback_commands_info = info_to_generate_commands.get('rollback')
+        
+        commands = MaintenanceUtility.generate_commands(register_id, db_model, commands_info)
+        rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
+        MaintenanceUtility.generate_commands(register_id, db_model, rollback_commands_info)
+
+        return HttpResponse(json.dumps(commands))
+
+    return redirect(home)

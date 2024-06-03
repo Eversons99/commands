@@ -177,6 +177,7 @@ async function endAttenuation() {
 
     loadingAnimation(true)
 
+    const baseUrl = "http://localhost:8000/maintenance"
     const attenuationsTable = document.getElementById('attenuations-table')
     const attenuations = attenuationsTable.childNodes[1].childNodes
 
@@ -185,13 +186,29 @@ async function endAttenuation() {
         return alert('Nenhuma atenuação coletada, impossível prosseguir')
     }
 
-    const tabId = getIdentificator()
-    let endAttenuations = await fetch(`http://localhost:8000/maintenance/attenuator/end_attenuations?tab_id=${tabId}`)
-    endAttenuations = await endAttenuations.json()
-
-    if (endAttenuations.error) {
-        const messageError = endAttenuations.message
-        return window.location = `http://localhost:8000/maintenance/shared_core/render_error_page?message=${messageError}`
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            'tabId': getIdentificator(),
+            'mode': 'attenuator'
+        })
     }
-    return window.location = `http://localhost:8000/maintenance/shared_core/render_page_commands?tab_id=${tabId}`
+
+    try {
+        let endAttenuations = await fetch(`${baseUrl}/shared_core/generate_commands`, requestOptions)
+        endAttenuations = await endAttenuations.json()
+    
+        if (endAttenuations.error) {
+            const messageError = endAttenuations.message
+            return window.location = `${baseUrl}/shared_core/render_error_page?message=${messageError}`
+        }
+        return window.location = `${baseUrl}/shared_core/render_page_commands?tab_id=${getIdentificator()}&mode=attenuator`
+    } catch (error) {
+        loadingAnimation(false)
+        return alert(`Ocorreu um erro ao finalizar as atenuações. Err:${error}`)
+    } 
 }

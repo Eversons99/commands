@@ -1,5 +1,9 @@
-{% extends 'partials/base.html'%}
+{% extends 'shared_templates/base.html'%}
 {% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'files.css' %}">
+{% endblock %}
 
 {% block content %}
     <header>
@@ -39,4 +43,8 @@
         <button id="btn-home" onclick="location.href='{{ last_filter_url }}'">Voltar</button>
     </div>
     
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "files.js"%}'></script>
 {% endblock %}
