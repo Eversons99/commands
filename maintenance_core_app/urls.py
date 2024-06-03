@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('login', views.login, name='login'),
     path('shared_core/search_onts_via_snmp', views.search_onts_via_snmp, name='search_onts_via_snmp'),
     path('shared_core/render_error_page', views.render_error_page, name='render_error_page'),
     path('shared_core/render_onts_table', views.render_onts_table, name='render_onts_table'),

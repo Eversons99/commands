@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,7 +14,13 @@ def home(request):
     """
     Renders the 'homepage.html' template for the home page of the website.
     """
+    print(request.user)
     return render(request, 'homepage.html')
+
+
+def login(request):
+    if request.method == 'GET':
+        return render(request, 'login.html') 
 
 
 def search_onts_via_snmp(request):
