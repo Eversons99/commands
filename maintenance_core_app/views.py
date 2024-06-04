@@ -1,26 +1,50 @@
 import json
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate as dj_authenticate, login as dj_login, logout as dj_logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from .static.common.maintenance_service import MaintenanceUtility
-from commands_generator_app.utils.generator_service import CommandsUtility
-from attenuations_manager_app.utils.attenuator_service import AttenuationUtility
-from commands_generator_app.models import GeneratorDB
 from attenuations_manager_app.models import AttenuatorDB
+from attenuations_manager_app.utils.attenuator_service import AttenuationUtility
+from commands_generator_app.utils.generator_service import CommandsUtility
+from commands_generator_app.models import GeneratorDB
+from .static.common.maintenance_service import MaintenanceUtility
 
 
+def login(request):
+    
+    if request.method == 'GET':
+        return render(request, 'login.html')
+
+def authenticate(request):
+    print(request.POST)
+    username = request.POST['username']
+    password = request.POST['password']
+
+    user = dj_authenticate(request, username=username, password=password)
+
+    if user:
+        dj_login(request, user)
+        return redirect(home)
+    context = {
+        'error_message': 'Erro na autenticação, verifique o seu usuário e senha',
+        'username': username,
+        'password': password
+    }
+    return render(request, 'login.html', context)
+
+    
+
+def logout(request):
+    dj_logout(request)
+    return HttpResponse(json.dumps({'message': 'Sessão finalizada com sucesso'}))
+
+@login_required
 def home(request):
     """
     Renders the 'homepage.html' template for the home page of the website.
     """
-    print(request.user)
     return render(request, 'homepage.html')
-
-
-def login(request):
-    if request.method == 'GET':
-        return render(request, 'login.html') 
 
 
 def search_onts_via_snmp(request):

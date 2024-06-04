@@ -1,13 +1,11 @@
-import json
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
-from django.core.exceptions import ObjectDoesNotExist
 from .models import GeneratorDB
-from django.http.response import HttpResponse
 from maintenance_core_app.static.common.maintenance_service import MaintenanceUtility
 from commands_generator_app.utils.generator_service import CommandsUtility
 
-
+@login_required
 def home(request):
     """
     Renders the commands homepage

@@ -1,12 +1,12 @@
 import json
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .models import AttenuatorDB
 from maintenance_core_app.static.common.maintenance_service import MaintenanceUtility
 from attenuations_manager_app.utils.attenuator_service import AttenuationUtility
-from django.core.exceptions import ObjectDoesNotExist
 from django.http.response import HttpResponse
 
-
+@login_required
 def home(request):
     """
     Renders the HTML index page

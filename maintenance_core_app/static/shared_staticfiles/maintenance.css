@@ -432,3 +432,42 @@ textarea {
 .device-row:hover {
     background: #ebe5e5;
 }
+
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;    
+    max-width: 30%;
+    background-color: #f2f3f6;
+    border-radius: 10px;
+
+}
+.login-container h1 {
+    margin: 2.5vh 0;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 95%;
+}
+
+form input{
+    margin-bottom: 2.5vh;
+    padding: 1vh;
+    width: 100%;
+    font-size: 16px;
+    background: white;
+}
+
+#login-button {
+    background: #2f6be3;
+    padding: 1.5vh 5vh;
+}
+
+#login-button:hover {
+    background: #5c8be8;
+}
