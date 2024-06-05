@@ -9,7 +9,11 @@
 </head>
 <body>
     <nav class="logo">
-        <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+        <a href='http://localhost:8000/maintenance'>
+            <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
+        </a>
+
+        {% include 'shared_templates/logoutPartial.html' %}
     </nav>
 
     <h1 id="title-homepage">Aplicações disponíveis</h1>

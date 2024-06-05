@@ -12,8 +12,31 @@ header {
     width: 85%;
 }
 
+.logout-container {
+    display: flex;
+    justify-content: end;
+    white-space: unset;
+}
+
+.logout-container p {
+    margin-right: 1em;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.logout-container a {
+    text-decoration: none;
+    color: #0046d5;
+
+}
+
+.logout-container a:hover {
+    color: red;
+}
+
 .logo {
-    display: block;
+    display: flex;
+    align-items: center;
 }
 
 .logo img {

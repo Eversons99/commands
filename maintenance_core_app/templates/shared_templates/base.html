@@ -25,7 +25,12 @@
         <a href='http://localhost:8000/maintenance'>
             <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
         </a>
+
+        {% if request.user.is_authenticated %}
+            {% include 'shared_templates/logoutPartial.html' %}
+        {% endif %}
     </nav>
+    
 
     {% block content %} {% endblock %} 
     {% block scripts %} {% endblock %}

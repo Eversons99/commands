@@ -12,12 +12,17 @@ from .static.common.maintenance_service import MaintenanceUtility
 
 
 def login(request):
-    
+    """
+    Render the login page
+    """
     if request.method == 'GET':
         return render(request, 'login.html')
 
+
 def authenticate(request):
-    print(request.POST)
+    """
+    Authenticate the user
+    """
     username = request.POST['username']
     password = request.POST['password']
 
@@ -33,11 +38,14 @@ def authenticate(request):
     }
     return render(request, 'login.html', context)
 
-    
 
 def logout(request):
+    """
+    Logout the user
+    """
     dj_logout(request)
-    return HttpResponse(json.dumps({'message': 'Sessão finalizada com sucesso'}))
+    return redirect(login)
+
 
 @login_required
 def home(request):
@@ -186,6 +194,7 @@ def download_command_file(request):
         return file_commands
 
     return redirect(home)
+
 
 def discard_commands(request):
     """
