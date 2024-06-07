@@ -237,6 +237,7 @@ def generate_commands(request):
 
         if db_model == GeneratorDB:
             info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
+            print(info_to_generate_commands)
         else:
             info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
 

@@ -2,6 +2,7 @@
 {% load static%}
 
 {% block styles %}
+    <link rel="stylesheet" href="{% static 'attenuator.css' %}">
     <link rel="stylesheet" href="{% static 'files.css' %}">
 {% endblock %}
 
@@ -26,7 +27,7 @@
 
     <div id='files-containter'>
         {% if filtered == True and files|length == 0 %}
-            {% include 'partials/warnMessage.html' %}
+            {% include 'shared_templates/warnMessage.html' %}
         {% elif not files and not filtered and not selected_filter %}
         {% else %}
             <table id="files-table">

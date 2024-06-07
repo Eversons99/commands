@@ -70,9 +70,10 @@ class FilesUtility:
             db_model = AttenuatorDB
             
         maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
-        
+
         return {
             'general_info': maintenance_info,
-            'model_title': 'GC - Gerador de Comandos' if isinstance(db_model, GeneratorDB) else  'GA - Gerenciador de Atenuações',
+            'model_title': 'GC - Gerador de Comandos' if operation_mode == 'generator' else  'GA - Gerenciador de Atenuações',
+            'model_name': 'generator' if operation_mode == 'generator' else 'attenuator',
             'last_filter_url': last_filter_url
         }

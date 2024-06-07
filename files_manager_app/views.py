@@ -28,6 +28,8 @@ def show_logs(request):
 
         context = {
             'model_title': maintenance_info.get('model_title'),
+            'model_name': maintenance_info.get('model_name'),
+            'register_id': maintenance_info.get('general_info').register_id,
             'name': maintenance_info.get('general_info').file_name,
             'logs': maintenance_info.get('general_info').logs,
             'rollback_logs': maintenance_info.get('general_info').rollback_logs,

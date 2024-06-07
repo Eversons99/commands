@@ -115,53 +115,56 @@ class Olt:
         slot = maintenance_info.source_gpon.get('gpon').split('/')[1]
         port = maintenance_info.source_gpon.get('gpon').split('/')[2]
         source_host = maintenance_info.source_gpon.get('host')
-        
-        ssh_connection = self.connect_olt(source_host)
-        
-        original_configuration = self.get_original_port_configuration(ssh_connection, maintenance_info)
+        try:
+            ssh_connection = self.connect_olt(source_host)
+            
+            original_configuration = self.get_original_port_configuration(ssh_connection, maintenance_info)
 
-        search_vlans = ssh_connection.send_command_timing(f'display service-port port 0/{slot}/{port}')
-        output_olt = search_vlans.splitlines()
+            search_vlans = ssh_connection.send_command_timing(f'display service-port port 0/{slot}/{port}')
+            output_olt = search_vlans.splitlines()
 
-        exclusive_vlan = ['110', '286', '1500','1501', '1503', '1504', '1505', '1513', '1514', '1515', '1520']
-        separatted_outputs_olt = [] 
-        vlans_found = []
-        vlans_not_found = []
+            exclusive_vlan = ['110', '286', '1500','1501', '1503', '1504', '1505', '1513', '1514', '1515', '1520']
+            separatted_outputs_olt = [] 
+            vlans_found = []
+            vlans_not_found = []
 
-        for output in output_olt:
-            if 'common' in output:
-                separatted_outputs_olt.append(output)
+            for output in output_olt:
+                if 'common' in output:
+                    separatted_outputs_olt.append(output)
 
-        for output in separatted_outputs_olt:
+            for output in separatted_outputs_olt:
 
-            for vlan in exclusive_vlan:
+                for vlan in exclusive_vlan:
 
-                if f'{vlan} common' in output:
-                    
-                    standard = re.compile(r'gpon 0/[1-9]{0,2} {0,1}/[0-9]{0,2} {0,2}[0-9]{0,3}')
-                    search_id = standard.search(output)
+                    if f'{vlan} common' in output:
+                        
+                        standard = re.compile(r'gpon 0/[1-9]{0,2} {0,1}/[0-9]{0,2} {0,2}[0-9]{0,3}')
+                        search_id = standard.search(output)
 
-                    if search_id:
-                        get_id = search_id.group().split(' ')
+                        if search_id:
+                            get_id = search_id.group().split(' ')
 
-                        id = get_id[len(get_id) - 1]
+                            id = get_id[len(get_id) - 1]
 
-                        vlans_found.append({ "id": id, "vlan": vlan})
+                            vlans_found.append({ "id": id, "vlan": vlan})
 
-                    else:
-                        vlans_not_found.append({"uutput": output, "vlan": vlan})
+                        else:
+                            vlans_not_found.append({"uutput": output, "vlan": vlan})
 
-        for ont in onts:
-            for s_vlan in vlans_found:
-                if ont["id"] == s_vlan["id"]:
-                    ont["vlan"] = s_vlan["vlan"]
+            for ont in onts:
+                for s_vlan in vlans_found:
+                    if ont["id"] == s_vlan["id"]:
+                        ont["vlan"] = s_vlan["vlan"]
 
-            keys = ont.keys()
-            if 'vlan' not in keys:
-                ont["vlan"] = ""
-        
-        ssh_connection.disconnect()
-        return { 'onts': onts, 'port_configuration': original_configuration} 
+                keys = ont.keys()
+                if 'vlan' not in keys:
+                    ont["vlan"] = ""
+            
+            ssh_connection.disconnect()
+            return { 'onts': onts, 'port_configuration': original_configuration}
+
+        except Exception as err:
+            raise ConnectionError(f'Ocorreu um erro ao conectar no OLT. Erro: {err}')
 
     async def apply_commands(self, websocket, maintenance_info):
         rollback = maintenance_info.get('maintenanceInfo').get('rollback')

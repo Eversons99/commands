@@ -68,3 +68,10 @@ class CommandsUtility:
                 'message': f'Ocorreu um erro ao recuperar informações no banco. Erro {err}'
             }
             return HttpResponse(json.dumps(message_error))
+
+        except ConnectionError:
+            message_error = {
+                'error': True,
+                'message': "Ocorreu um erro ao conectar no OLT para coletar informações sobre as VLAN's."
+            }
+            return HttpResponse(json.dumps(message_error))
