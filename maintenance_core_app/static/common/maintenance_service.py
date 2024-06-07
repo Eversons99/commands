@@ -33,7 +33,8 @@ class MaintenanceUtility:
 
         initial_maintenance_info = {
             'register_id': register_id,
-            'source_gpon': source_gpon
+            'source_gpon': source_gpon,
+            'owner': request.user
         }
 
         ont_devices = MaintenanceUtility.get_onts_info_on_nmt(source_host, source_pon)
