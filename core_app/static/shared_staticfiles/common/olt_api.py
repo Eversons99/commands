@@ -3,6 +3,7 @@ import os
 import re
 import requests
 import asyncio
+from datetime import datetime
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
 load_dotenv(f'{os.getenv("PROJECT_DIR")}/.env')
@@ -323,4 +324,137 @@ class Olt:
         configuration = ssh_connection.send_command_timing(f'display current-configuration port {location_pon}')
         
         return configuration
+    
+    async def get_optical_info(self, websocket, olt_name, pon):
+        ssh_connection = self.connect_olt(olt_name)
+        reg_pattern = r'^[0-9]\/([0-1]?[0-9]|20)\/([0-1]?[0-9]|20)$'
+
+        if not re.match(reg_pattern, pon):            
+            message = {
+                'status' : 'failed', 
+                'message': 'Localização pon fora do padrão. Exemplo (0/1/1)'
+            }
+            ssh_connection.disconnect()
+            await asyncio.sleep(0.1)
+            await websocket.send(json.dumps(message))
+            await websocket.close()
+
+        directives = pon.split('/')
+        pon_slot = directives[1]
+        pon_port = directives[2]
+
+        signal_info = ssh_connection.send_multiline_timing([
+            f'interface gpon 0/{pon_slot}',
+            f'display ont info {pon_port} all',
+            f'display ont optical-info {pon_port} all'
+        ])
+
+        signal_info = signal_info.splitlines()
+        signal_on_port = []
+        amount_onts = {}
+        start_position = 0
+        
+        for index, info in enumerate(signal_info):
+            if 'ONTs are' in info:
+                if len(info.split()) == 13:
+                    amount_onts['online'] = int(info.split()[-1])
+                    amount_onts['offline'] = int(info.split()[10].split(',')[0]) - amount_onts['online']
+                    amount_onts['total'] = int(info.split()[10].split(',')[0])
+                else:
+                    amount_onts['online'] = int(info.split()[-1])
+                    amount_onts['offline'] = int(info.split()[9].split(',')[0]) - amount_onts['online']
+                    amount_onts['total'] = int(info.split()[9].split(',')[0])
+    
+            if '(dBm)' in info:
+                start_position = index + 2
+                break
+
+        for index, info in enumerate(signal_info[start_position:]):
+            if len(info.split()) == 8:
+                signal_on_port.append({
+                    'rx_power': info.split()[1],
+                    'tx_power': info.split()[3],
+                })
+
+        ssh_connection.disconnect()
+        optical_port_info = {'signal_on_port':signal_on_port, 'amount_onts': amount_onts}
+        return optical_port_info
+    
+    async def format_optical_info(self, optical_info):
+        all_tx_power = 0
+        all_rx_power = 0
+
+        if optical_info.get('amount_onts').get('online') == 0:
+            return {
+                'online': optical_info.get('amount_onts').get('online'),
+                'offline': optical_info.get('amount_onts').get('offline'),
+                'median': { 'rxPower': None, 'txPower':None },
+                'best': { 'rxPower': None, 'txPower': None },
+                'worst': { 'rxPower': None, 'txPower': None }
+            }
+            
+        formatted_optical = {
+            'online': int(optical_info.get('amount_onts').get('online')),
+            'offline': int(optical_info.get('amount_onts').get('offline')),
+            'median': {},
+            'best': {},
+            'worst': {}
+        }
+
+        for index, signal in enumerate(optical_info.get('signal_on_port')):
+            rx_power = float(signal.get('rx_power'))
+            tx_power = float(signal.get('tx_power'))
+            if index == 0 :
+                formatted_optical['best']['rxPower'] = rx_power
+                formatted_optical['best']['txPower'] = tx_power
+                formatted_optical['worst']['rxPower'] = rx_power
+                formatted_optical['worst']['txPower'] = tx_power
+
+            if index > 0:
+                if rx_power < formatted_optical['worst']['rxPower']:
+                    formatted_optical['worst']['rxPower'] = rx_power
+
+                if tx_power < formatted_optical['worst']['txPower']:
+                    formatted_optical['worst']['txPower'] = tx_power
+
+                if rx_power > formatted_optical['best']['rxPower']:
+                    formatted_optical['best']['rxPower'] = rx_power
+
+                if tx_power > formatted_optical['best']['txPower']:
+                    formatted_optical['best']['txPower'] = tx_power
+
+            all_rx_power = all_rx_power + float(rx_power)
+            all_tx_power = all_tx_power + float(tx_power)
+
+        formatted_optical['median']['rxPower'] = round(all_rx_power / optical_info.get('amount_onts').get('online'), 2)
+        formatted_optical['median']['txPower'] = round(all_tx_power / optical_info.get('amount_onts').get('online'), 2)
+
+        return formatted_optical
+    
+    async def get_optical_info_by_pon(self, websocket, pon_info):
+        try:
+            with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:
+                log_file.write(f'GET OPTICAL INFO: {pon_info} - {datetime.now()}\n')
+                    
+            pon = pon_info.get('pon')
+            olt_name = pon_info.get('olt')
+            optical_info = await self.get_optical_info(websocket, olt_name, pon)
+        
+            if isinstance(optical_info, dict) and optical_info.get('status') == 'failed':
+                await asyncio.sleep(0.1)
+                await websocket.send(json.dumps(optical_info))
+                await websocket.close()
+                
+            formatted_optical_info = await self.format_optical_info(optical_info)
+            await asyncio.sleep(0.1) 
+            await websocket.send(json.dumps({'status': 'success', 'opticalInfo': formatted_optical_info}))
+
+        except Exception as err:
+            message = {
+                'status': 'failed',
+                'message': f'Ocorreu um erro ao buscar informaçõe de sinal. Err: {err}'
+            }
+            await asyncio.sleep(0.1)
+            await websocket.send(json.dumps(message))
+            await websocket.close()
         
