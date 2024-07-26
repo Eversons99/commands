@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  ws-commands:
+    image: iws-commands:latest
+    container_name: ws-commands
+    networks:
+      - commands-network
+    ports:
+      - 5678:5678
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-commands
+    networks:
+      - commands-network
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+  
+  app-commands:
+    image: icommands:latest
+    container_name: app-commands
+    networks:
+      - commands-network
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+networks:
+  commands-network:
+    driver: bridge
+    
