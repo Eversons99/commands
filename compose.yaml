@@ -1,15 +1,5 @@
 version: "3.9"
 services:
-  ws-commands:
-    image: iws-commands:latest
-    container_name: ws-commands
-    networks:
-      - commands-network
-    ports:
-      - 5678:5678
-    env_file:
-      - .env
-
   postgres:
     image: postgres:latest
     container_name: postgres-commands
@@ -19,7 +9,28 @@ services:
       - 5432:5432
     env_file:
       - .env
-  
+    environment:
+      POSTGRES_DB: commands
+      POSTGRES_USER: commands
+      POSTGRES_PASSWORD: "@NmultiCMD288"
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+  ws-commands:
+    image: iws-commands:latest
+    container_name: ws-commands
+    networks:
+      - commands-network
+    ports:
+      - 5678:5678
+    env_file:
+      - .env
+    volumes:
+      - ws-commands-volume:/app/websocket-logs 
+    depends_on:
+      - postgres
+
   app-commands:
     image: icommands:latest
     container_name: app-commands
@@ -27,12 +38,21 @@ services:
       - commands-network
     ports:
       - 8000:8000
-    depends_on:
-      - postgres
     env_file:
       - .env
+    volumes:
+      - app-commands-volume:/app/logs
+      - app-commands-volume:/var/log/commands
+
+    depends_on:
+      - postgres
+    
 
 networks:
   commands-network:
     driver: bridge
     
+volumes:
+  postgres-volume:
+  ws-commands-volume:
+  app-commands-volume:
