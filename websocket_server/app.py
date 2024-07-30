@@ -24,6 +24,11 @@ async def olt(websocket, path):
             olt = Olt()
             await olt.apply_commands(websocket, maintenance_info)
 
+        elif path == '/get-optical-info':
+            pon_info = json.loads(data)
+            olt = Olt()
+            await olt.get_optical_info_by_pon(websocket, pon_info)
+        
         elif path == '/health':
             await websocket.send(json.dumps({'status': 'OK'}))
             await websocket.close()
@@ -43,7 +48,7 @@ async def server():
     except Exception as err:
         print(err)
         with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
-            log_file.write(f'{err}\n')
+            log_file.write(f'{err} - {datetime.now()}\n')
 
 
 try:
