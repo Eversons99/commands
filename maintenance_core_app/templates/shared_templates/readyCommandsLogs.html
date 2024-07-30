@@ -1,0 +1,12 @@
+{% extends 'shared_templates/base.html'%}
+{% load static %}
+
+{% block content %}
+    {%if operation_mode == 'generator' %}
+        {% include 'generatorCommandsTitle.html' %}
+    {% else %}
+        {% include 'attenuationsManagerTitle.html' %}
+    {% endif %}
+
+    {% include 'shared_templates/logsPage.html' %} 
+{% endblock %}

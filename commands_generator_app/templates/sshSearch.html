@@ -1,0 +1,33 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+{% block content %}
+
+<section id="new-search-ssh" class="new-search-ssh">
+    <p>
+        <b id="error">ATENÇÃO:</b>
+        A busca de ONT's via SNMP não retornou nada, realize uma nova busca via SSH clicando no botão abaixo. A busca via
+        SSH pode demorar um pouco.
+    </p>
+    <table id="query-info-table">
+        <tr>
+            <b>INFORMAÇÕES DA CONSULTA</b>
+        </tr>
+        <tr id="qinfo-table-head">
+            <td>ID</td>
+            <td>PON</td>
+            <td>HOST</td>
+        </tr>
+        <tr id="query-infos">
+            <td id="tab_id">{{ register_id }}</td>
+            <td id="pon">{{ pon }}</td>
+            <td id="host">{{ host }}</td>
+        </tr>
+    </table>
+    <button id="new-search-onts-btn" onclick="searchOntsViaSsh()">Nova busca via SSH</button>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'generator.js' %}"></script>
+{% endblock %}

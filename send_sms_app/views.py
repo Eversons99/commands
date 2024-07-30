@@ -1,6 +1,7 @@
 import ast
 import json
 import requests
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
 from django.db.utils import IntegrityError
@@ -10,9 +11,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+@login_required
 def home(request):
     """Render HTML index page"""
     return render(request, 'index_sms.html')
+
 
 def search_onts(request):
     """Receive a request and call the function to get ONTS"""
@@ -52,6 +55,7 @@ def search_onts(request):
 
     return redirect(home)
 
+
 def get_onts_snmp_in_nmt(host, pon_location):
     """Make a request to NMT to get ONT"""
     try:
@@ -81,10 +85,12 @@ def get_onts_snmp_in_nmt(host, pon_location):
             'message': f'Ocorreu um erro ao buscar as ONTs no NMT. Err: {err}'
         }
 
+
 def render_error_page(request):
     """"Render error page, showing the error message"""
     error_message = {'message': request.GET.get('message')}
     return render(request, 'error.html', context=error_message)
+
 
 def save_sms_infos_in_database(initial_sms_info):
     """Save device info in database"""
@@ -99,6 +105,7 @@ def save_sms_infos_in_database(initial_sms_info):
             'message': f'Erro de integridade, {err}'
         }
     
+
 def render_onts_table(request):
     """Render a table with all devices (ONT's)"""
     register_id = request.GET.get('tab_id')
@@ -126,6 +133,7 @@ def render_onts_table(request):
 
         return render(request,'error.html', context=error_message)
 
+
 def get_sms_info_in_database(register_id):
     """Make a query in database and return an register"""
     try:
@@ -135,6 +143,7 @@ def get_sms_info_in_database(register_id):
     except ObjectDoesNotExist as err:
         raise ObjectDoesNotExist from err
 
+
 def update_sms_info_in_database(data_to_update, register_id):
     """Update datas about sms info in database"""
     try:
@@ -142,6 +151,7 @@ def update_sms_info_in_database(data_to_update, register_id):
 
     except Exception as err:
         raise Exception from err
+
 
 def get_numbers_to_send_sms(request):
     """Update sms info and go to NMT and get numbers of clientes"""
@@ -182,6 +192,7 @@ def get_numbers_to_send_sms(request):
 
     return redirect(home)
 
+
 def render_contacts_page(request):
     """Get contact info and render contact pages"""
     register_id = request.GET.get('tab_id')
@@ -203,7 +214,8 @@ def render_contacts_page(request):
         }
 
         return render(request, 'error.html', context=error_message)
-    
+   
+ 
 def create_rupture(request):
     """Create rupture on NMT"""
     if request.method == 'POST':
@@ -269,6 +281,7 @@ def create_rupture(request):
                 'message': f'Ocorreu um erro ao criar o rompimento no NMT. Err: {err}'
             }))
 
+
 def render_rupture_page(request):
     register_id = request.GET.get('tab_id')
 
@@ -295,7 +308,8 @@ def render_rupture_page(request):
         }
 
         return render(request, 'error.html', context=error_message)
-    
+
+ 
 def send_sms(request):
     if request.method == 'POST':
         body_request = json.loads(request.body)
@@ -340,6 +354,7 @@ def send_sms(request):
             'message': f'Ocorreu um erro ao enviar os SMS.'
         }))
 
+
 def render_sms_result_page(request):
     register_id = request.GET.get('tab_id')
     try:
@@ -363,3 +378,4 @@ def render_sms_result_page(request):
         }
 
         return render(request, 'error.html', context=error_message)
+

@@ -6,6 +6,7 @@ class GeneratorDB(models.Model):
     Table which save data from generator commands
     """
     register_id = models.TextField(max_length=150, primary_key=True)
+    owner = models.TextField(max_length=100, null=True)
     file_name = models.TextField(max_length=150, null=True)
     source_gpon = models.JSONField(null=True)
     destination_gpon = models.JSONField(null=True)

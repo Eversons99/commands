@@ -8,12 +8,12 @@ async function getReadyCommandFiles(){
     }
 
     loadingAnimation(false)
-    window.location = `http://commands.nmultifibra.com.br/files/get_files?filter=${selectedFilter}`
+    window.location = `http://commands.nmultifibra.com.br/maintenance/files/get_files?filter=${selectedFilter}`
 }
 
 async function displayAllLogs(operationMode, registerId){
     const lastFilter = window.location.href
-    const url = `http://commands.nmultifibra.com.br/files/show_logs?tabId=${registerId}&operationMode=${operationMode}&lastFilter=${lastFilter}`
+    const url = `http://commands.nmultifibra.com.br/maintenance/files/show_logs?tabId=${registerId}&operationMode=${operationMode}&lastFilter=${lastFilter}`
     return window.location = url
 }
 
@@ -54,8 +54,8 @@ function showOperationList(){
 function handleActionChange(selectElement) {
     let selectedValue = selectElement.value;
     let moduleName = selectElement.parentNode.parentNode.childNodes[7].textContent.toLowerCase()
-    let registerId = selectElement.parentNode.parentNode.childNodes[1].textContent
-
+    let registerId = selectElement.parentNode.parentNode.childNodes[1].textContent.toLowerCase()
+    
     switch (selectedValue) {
         case "apply":
             apllyCommands(moduleName, false, registerId);
@@ -72,5 +72,5 @@ function handleActionChange(selectElement) {
         default:
             break;
     }
-    selectElement.value = "";
+    selectElement.value = "...";
 }

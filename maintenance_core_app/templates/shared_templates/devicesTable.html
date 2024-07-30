@@ -1,0 +1,36 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+{% block content %}
+
+{% if operation_mode == 'generator' %}
+    {% include 'generatorCommandsTitle.html' %}
+{% else %}
+    {% include 'attenuationsManagerTitle.html' %}
+{% endif %}
+
+{% include 'shared_templates/ontsTable.html' %}
+
+<div id="file">
+    <h2>Selecione um nome para o arquivo</h2>
+    <input type="text" id="file-name">
+</div>
+
+{% include 'shared_templates/gponForm.html' %}
+
+{% if operation_mode == 'generator' %}
+    <div class="generate-btn">
+        <button onclick="generateCommands()">Gerar comandos</button>
+    </div>
+{% else %}
+    <div class="generate-btn">
+        <button onclick="saveInitialAttenuationState()">Continuar</button>
+    </div>
+{% endif %}
+
+
+{% block scripts %}
+    <script src="{% static 'generator.js' %}"></script>
+    <script src="{% static 'attenuator.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

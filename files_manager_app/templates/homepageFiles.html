@@ -1,5 +1,11 @@
-{% extends 'partials/base.html'%}
+{% extends 'shared_templates/base.html'%}
 {% load static%}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'attenuator.css' %}">
+    <link rel="stylesheet" href="{% static 'files.css' %}">
+{% endblock %}
+
 {% block content %}
 
 <header>
@@ -21,7 +27,7 @@
 
     <div id='files-containter'>
         {% if filtered == True and files|length == 0 %}
-            {% include 'partials/warnMessage.html' %}
+            {% include 'shared_templates/warnMessage.html' %}
         {% elif not files and not filtered and not selected_filter %}
         {% else %}
             <table id="files-table">
@@ -55,4 +61,9 @@
     </div>
 </section>
 
+{% endblock %}
+
+
+{% block scripts %}
+    <script src='{% static "files.js"%}'></script>
 {% endblock %}

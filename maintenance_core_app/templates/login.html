@@ -1,0 +1,35 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'attenuator.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% if error_message %}
+        {% include 'shared_templates/errorMessage.html' %}
+    {% endif %}
+    <div class="login-container">
+        <header>
+            <h1>LOGIN</h1>
+        </header>
+
+        <div class="modal-login">
+            {% if error_message %}
+                <form action="{% url 'authenticate' %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Username" value="{{ username }}">
+                    <input type="password" name="password" placeholder="Password" value="{{ password }}">
+                    <button type="submit" id="login-button">Login</button>
+                </form>
+            {% else %}
+                <form action="{% url 'authenticate' %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Username">
+                    <input type="password" name="password" placeholder="Password">
+                    <button type="submit" id="login-button">Login</button>
+                </form>    
+            {% endif %}
+        </div>
+    </div>
+{% endblock%}

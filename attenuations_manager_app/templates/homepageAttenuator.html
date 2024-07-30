@@ -1,0 +1,12 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% include 'attenuationsManagerTitle.html' %}
+    <section id="source-container">
+        {% include 'shared_templates/gponForm.html' %}
+        <div class="search-btn">
+            <button onclick="searchOnts('attenuator')">Buscar</button>
+        </div>
+    </section>
+{% endblock %}

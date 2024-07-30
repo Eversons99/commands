@@ -2,8 +2,8 @@ import ast
 import json
 from django.http.response import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from core_app.static.shared_staticfiles.common.utils import GeneralUtility
-from core_app.static.shared_staticfiles.common.olt_api import Olt
+from maintenance_core_app.static.common.olt_api import Olt
+from maintenance_core_app.static.common.maintenance_service import MaintenanceUtility
 
 
 class AttenuationUtility:
@@ -15,7 +15,7 @@ class AttenuationUtility:
         """
         Query the database and remove and register (an attenuation)
         """
-        maintenance_info =  GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info =  MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         all_attenuations = maintenance_info.attenuations
         id_to_remove = attenuation_id
 
@@ -25,7 +25,7 @@ class AttenuationUtility:
             if current_attenuation_id == id_to_remove:
                 maintenance_info.attenuations.remove(attenuation)
                 data_to_update = {"attenuations": all_attenuations}
-                GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+                MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
                 return {'error': False}
 
@@ -49,7 +49,7 @@ class AttenuationUtility:
                 'attenuations': [{"attenuation_id": 0, "onts": all_onts_id}]
             }
              
-            GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+            MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
             success_response = {'error': False}
             return success_response
@@ -68,13 +68,13 @@ class AttenuationUtility:
         Make a new query to get onts and analize to find changes on onts status
         """
         register_id = request.GET.get('tab_id')
-        maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+        maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
         host = maintenance_info.source_gpon.get('host')
         pon_location = maintenance_info.source_gpon.get('gpon')
         all_attenuations = maintenance_info.attenuations
         old_onts = ast.literal_eval(maintenance_info.unchanged_onts)
 
-        all_onts = GeneralUtility.get_onts_info_on_nmt(host, pon_location)
+        all_onts = MaintenanceUtility.get_onts_info_on_nmt(host, pon_location)
         onts = all_onts.get('onts')
 
         onts_in_current_attenuation = AttenuationUtility.separate_offline_onts_in_attenuation(old_onts, onts, all_attenuations)
@@ -165,22 +165,22 @@ class AttenuationUtility:
             "attenuations": all_attenuations
         }
 
-        GeneralUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+        MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
     @staticmethod
     def separate_information_to_generate_commands(request, db_model):
         try:
             olt_api = Olt()
-            register_id = request.GET.get('tab_id')
+            register_id = json.loads(request.body).get('tabId')
             onts_to_generate_commands = []
-            maintenance_info = GeneralUtility.get_maintenance_info_in_database(register_id, db_model)
+            maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
             unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
             onts_info = AttenuationUtility.get_onts_to_generate_commands(maintenance_info)
             id_devices_selected = onts_info.get('id_devices_selected')
             onts_checked = olt_api.check_vlan(unchanged_onts, maintenance_info)
             port_config = {'source_port_config': onts_checked.get('port_configuration')}
 
-            GeneralUtility.update_maintenance_info_in_database(
+            MaintenanceUtility.update_maintenance_info_in_database(
                 data_to_update=port_config,
                 register_id=register_id,
                 db_model=db_model

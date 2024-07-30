@@ -83,15 +83,15 @@ async function searchOntsSms() {
         })
     }
     
-    const ontsRequest = await fetch('http://commands.nmultifibra.com.br/sms/search_onts', requestOptions)
+    const ontsRequest = await fetch('http://commands.nmultifibra.com.br/maintenance/sms/search_onts', requestOptions)
     const responsOfontsRequest = await ontsRequest.json()
     console.log(responsOfontsRequest)
     if (responsOfontsRequest.error == true) {
         const messageError = responsOfontsRequest.message
-        return window.location = `http://commands.nmultifibra.com.br/sms/render_error_page?message=${messageError}`
+        return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_error_page?message=${messageError}`
     }
 
-    return window.location = `http://commands.nmultifibra.com.br/sms/render_onts_table?tab_id=${tabId}` 
+    return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_onts_table?tab_id=${tabId}` 
 }
 
 async function getNumbersToSendSms() {
@@ -121,14 +121,14 @@ async function getNumbersToSendSms() {
         })
     }
 
-    let getContacts = await fetch('http://commands.nmultifibra.com.br/sms/get_contacts', requestOptions)
+    let getContacts = await fetch('http://commands.nmultifibra.com.br/maintenance/sms/get_contacts', requestOptions)
     getContacts = await getContacts.json()
     
     if (getContacts.error) {
         messageError =  getContacts.message
-        return window.location = `http://commands.nmultifibra.com.br/sms/render_error_page?message=${messageError}`
+        return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_error_page?message=${messageError}`
     }
-    return window.location = `http://commands.nmultifibra.com.br/sms/render_contacts_page?tab_id=${tabId}` 
+    return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_contacts_page?tab_id=${tabId}` 
 }
 
 async function createRupture() {
@@ -152,14 +152,14 @@ async function createRupture() {
         })
     }
 
-    const createRuptureRequest = await fetch('http://commands.nmultifibra.com.br/sms/create_rupture', requestOptions)
+    const createRuptureRequest = await fetch('http://commands.nmultifibra.com.br/maintenance/sms/create_rupture', requestOptions)
     const ruptureResponse = await createRuptureRequest.json()
 
     if (ruptureResponse.error) {
         messageError =  ruptureResponse.message
-        return window.location = `http://commands.nmultifibra.com.br/sms/render_error_page?message=${messageError}`
+        return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_error_page?message=${messageError}`
     }
-    return window.location = `http://commands.nmultifibra.com.br/sms/render_rupture_page?tab_id=${tabId}` 
+    return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_rupture_page?tab_id=${tabId}` 
 }
 
 async function sendSms() {
@@ -177,14 +177,14 @@ async function sendSms() {
         })
     }
 
-    const sendSmsRequest = await fetch('http://commands.nmultifibra.com.br/sms/send_sms', requestOptions)
+    const sendSmsRequest = await fetch('http://commands.nmultifibra.com.br/maintenance/sms/send_sms', requestOptions)
     const smsResponse = await sendSmsRequest.json()
 
     if (smsResponse.error) {
         messageError =  smsResponse.message
-        return window.location = `http://commands.nmultifibra.com.br/sms/render_error_page?message=${messageError}`
+        return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_error_page?message=${messageError}`
     }
-    return window.location = `http://commands.nmultifibra.com.br/sms/render_sms_result_page?tab_id=${tabId}` 
+    return window.location = `http://commands.nmultifibra.com.br/maintenance/sms/render_sms_result_page?tab_id=${tabId}` 
 }
 
 async function getBoardsHost() {
