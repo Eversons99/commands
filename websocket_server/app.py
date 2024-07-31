@@ -37,13 +37,13 @@ async def olt(websocket, path):
 async def server():
     try:
         # Set the stop condition when receiving SIGTERM. SIGTERM is foward when the connetion is closed
-        # loop = asyncio.get_running_loop()
-        # stop = loop.create_future()
-        # loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+        loop = asyncio.get_running_loop()
+        stop = loop.create_future()
+        loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
 
-        async with websockets.serve(olt, '127.0.0.1', 5678):
+        async with websockets.serve(olt, '127.0.0.1', 8001):
             await asyncio.Future()
-            # await stop
+            await stop
 
     except Exception as err:
         print(err)
@@ -59,4 +59,3 @@ try:
 except Exception as err:
     with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
         log_file.write(f'{err}\n')
-
