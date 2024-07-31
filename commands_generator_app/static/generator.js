@@ -30,11 +30,11 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh() {
     loadingAnimation(true)
-    const baseUrl = 'http://dk.commands.nmultifibra.com.br/maintenance'
+    const baseUrl = 'http://commands.nmultifibra.com.br/dk/maintenance'
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
-    const socket = new WebSocket('ws://dk.commands.nmultifibra.com.br:5678/get-onts')
+    const socket = new WebSocket('ws://commands.nmultifibra.com.br:8002/dk/get-onts')
     const tabId = getIdentificator()
     const onts = []
     let sessionStarted = false
@@ -98,7 +98,7 @@ async function searchOntsViaSsh() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://dk.commands.nmultifibra.com.br/maintenance"
+    const baseUrl = "http://commands.nmultifibra.com.br/dk/maintenance"
     const idDevicesSelected = getIdDevicesSelected()
     const loadingText = document.getElementById('loader-message')
     loadingText.textContent = 'Gerando comandos...'

@@ -66,7 +66,7 @@ function setIdentificator() {
 async function searchOnts(operationMode) {
     setIdentificator()
     loadingAnimation(true)
-    const baseUrl = 'http://dk.commands.nmultifibra.com.br/maintenance/shared_core'
+    const baseUrl = 'http://commands.nmultifibra.com.br/dk/maintenance/shared_core'
     const sourceHost = document.getElementById('select-olt').value
     const sourceSlot = document.getElementById('select-slot').value
     const sourcePort = document.getElementById('select-port').value
@@ -108,7 +108,7 @@ async function searchOnts(operationMode) {
         return window.location = `${baseUrl}/render_error_page?message=${messageError}`
     }
     else if (responseofOntsRequest.error == true) {
-        return window.location = `http://dk.commands.nmultifibra.com.br/maintenance/generator/search_onts_via_ssh?tab_id=${tabId}`
+        return window.location = `http://commands.nmultifibra.com.br/dk/maintenance/generator/search_onts_via_ssh?tab_id=${tabId}`
     }
     return window.location = `${baseUrl}/render_onts_table?tab_id=${tabId}&mode=${operationMode}`
 }
@@ -149,7 +149,7 @@ async function getMaintenanceInfoFromForm() {
 }
 
 async function checkFileNameExists(fileName){
-    let allFileNames = await fetch(`http://dk.commands.nmultifibra.com.br/maintenance/shared-core/check_file_names?fileName=${fileName}`)
+    let allFileNames = await fetch(`http://commands.nmultifibra.com.br/dk/maintenance/shared-core/check_file_names?fileName=${fileName}`)
     allFileNames = await allFileNames.json()
 
     return allFileNames
@@ -215,7 +215,7 @@ async function apllyCommands(operationMode, rollback, registerId) {
 
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode, registerId)
-    const socket = new WebSocket('ws://dk.commands.nmultifibra.com.br:5678/apply-commands')
+    const socket = new WebSocket('ws://commands.nmultifibra.com.br:8002/dk/apply-commands')
     const loadingText = document.getElementById('loader-message')
     const commandsApplied = []
     let sessionStarted
@@ -258,7 +258,7 @@ async function apllyCommands(operationMode, rollback, registerId) {
 }
 
 async function getMaintenanceInfo(operationMode, registerId) {
-    const url = `http://dk.commands.nmultifibra.com.br/maintenance/shared_core/get_maintenance_info`
+    const url = `http://commands.nmultifibra.com.br/dk/maintenance/shared_core/get_maintenance_info`
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -278,7 +278,7 @@ async function getMaintenanceInfo(operationMode, registerId) {
 }
 
 async function showLogs(logs, operationMode, rollback, registerId) {
-    const baseUrl = 'http://dk.commands.nmultifibra.com.br/maintenance/shared_core'
+    const baseUrl = 'http://commands.nmultifibra.com.br/dk/maintenance/shared_core'
     const requestOptions = {
         method: 'POST',
         headers: {
@@ -302,7 +302,7 @@ async function showLogs(logs, operationMode, rollback, registerId) {
 }
 
 async function downloadCommandsFile(operationMode, registerId) {
-    const url = `http://dk.commands.nmultifibra.com.br/maintenance/shared_core/download_command_file?tab_id=${registerId}&mode=${operationMode}`
+    const url = `http://commands.nmultifibra.com.br/dk/maintenance/shared_core/download_command_file?tab_id=${registerId}&mode=${operationMode}`
     const link = document.createElement('a')
     const currentUrl = window.location.href
 
@@ -327,7 +327,7 @@ async function discardCommands(operationMode, registerId) {
 
     const currentUrl =  window.location.href
     const donwloadButton = document.getElementById('btn-save')
-    const url = `http://dk.commands.nmultifibra.com.br/maintenance/shared_core/discard_commands`
+    const url = `http://commands.nmultifibra.com.br/dk/maintenance/shared_core/discard_commands`
     const requestOptions = {
         method: 'DELETE',
         headers: {
@@ -351,7 +351,7 @@ async function discardCommands(operationMode, registerId) {
             removeButton.disabled = true
         }
         alert(removeCommands.message)
-        return window.location = 'http://dk.commands.nmultifibra.com.br/maintenance/'
+        return window.location = 'http://commands.nmultifibra.com.br/dk/maintenance/'
     } else {
         alert(removeCommands.message)
         window.location = window.location.href;
@@ -360,7 +360,7 @@ async function discardCommands(operationMode, registerId) {
 
 async function updateStatusAppliedCommands(operationMode, maintenanceInfo, rollback){
     const queryParams = `tabId=${maintenanceInfo.register_id}&rollback=${rollback}&mode=${operationMode}`
-    const url = `http://dk.commands.nmultifibra.com.br/maintenance/shared_core/update_status_applied_commands?${queryParams}`
+    const url = `http://commands.nmultifibra.com.br/dk/maintenance/shared_core/update_status_applied_commands?${queryParams}`
     let updateInfo = await fetch(url)
     updateInfo = await updateInfo.json()
 
