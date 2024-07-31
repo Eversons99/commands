@@ -34,7 +34,7 @@ async function searchOntsViaSsh() {
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
-    const socket = new WebSocket('ws://commands.nmultifibra.com.br:8002/dk/get-onts')
+    const socket = new WebSocket('ws://commands.nmultifibra.com.br:5678/dk/get-onts')
     const tabId = getIdentificator()
     const onts = []
     let sessionStarted = false

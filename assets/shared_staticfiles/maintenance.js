@@ -215,7 +215,7 @@ async function apllyCommands(operationMode, rollback, registerId) {
 
     loadingAnimation(true)
     const maintenanceInfo = await getMaintenanceInfo(operationMode, registerId)
-    const socket = new WebSocket('ws://commands.nmultifibra.com.br:8002/dk/apply-commands')
+    const socket = new WebSocket('ws://commands.nmultifibra.com.br:5678/dk/apply-commands')
     const loadingText = document.getElementById('loader-message')
     const commandsApplied = []
     let sessionStarted

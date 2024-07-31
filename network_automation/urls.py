@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('maintenance/', include('maintenance_core_app.urls')),
-    path('gpon/', include('gpon_health_app.urls')),
-    path('admin/', admin.site.urls),
+    path('dk/maintenance/', include('maintenance_core_app.urls')),
+    path('dk/gpon/', include('gpon_health_app.urls')),
+    path('dk/admin/', admin.site.urls),
 ]
