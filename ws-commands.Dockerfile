@@ -6,7 +6,7 @@ COPY ws-requirements.txt /app/
 
 RUN pip install --no-cache-dir -r ws-requirements.txt
 
-COPY websocket_logs/ /app/websocket_logs/
+RUN mkdir -p /app/websocket_logs/ && chmod -R 777 /app/websocket_logs/
 
 COPY maintenance_core_app/ /app/maintenance_core_app/
 
