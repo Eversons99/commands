@@ -145,7 +145,7 @@ USE_TZ = True
 #     f'{ABSOLUTE_PATH}/maintenance_core_app/static'
 # ]
 
-STATIC_URL = 'assets/'
+STATIC_URL = 'dk/assets/'
 STATIC_ROOT = f'{ABSOLUTE_PATH}/assets'
 
 # Default primary key field type
