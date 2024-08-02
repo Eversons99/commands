@@ -13,6 +13,7 @@
     {% endif %}
     {% block styles %} {% endblock %}
     <link rel='stylesheet' type='text/css' href="{% static 'shared_staticfiles/maintenance.css' %}">
+    <link rel='stylesheet' type='text/css' href="{% static 'shared_staticfiles/mobile-maintenance.css' %}">
 </head>
 <body>
     {% csrf_token %}
@@ -22,7 +23,7 @@
     </div>
 
     <nav class="logo">
-        <a href='http://commands.nmultifibra.com.br/maintenance'>
+        <a href='http://127.0.0.1:8000/maintenance'>
             <img src="{% static '/img/logoNM.png' %}" alt="Logo N-Multifibra" />
         </a>
 
@@ -30,7 +31,6 @@
             {% include 'shared_templates/logoutPartial.html' %}
         {% endif %}
     </nav>
-    
 
     {% block content %} {% endblock %} 
     {% block scripts %} {% endblock %}

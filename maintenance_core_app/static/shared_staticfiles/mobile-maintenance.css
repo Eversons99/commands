@@ -1,0 +1,61 @@
+@media only screen and (max-width: 700px) {
+    * { 
+        flex-direction: column;
+        scrollbar-width: 1px;
+        width: 100%;
+
+    }
+
+    #apps { 
+        display: flex;
+        flex-direction: column;
+        margin: 0.1em auto;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        flex-direction: row;
+        width: 30;
+    }
+
+    .logo p {
+        width: 100%;
+        font-size: 9px;
+        text-align: end;
+    }
+
+    .logo img {
+        width: 60%;
+        margin: 0.5em 0 0.5em 1em;
+    }
+
+    title {
+        display: none;
+    }
+
+    .app {
+        display: flex;
+        max-width: 90%;
+        margin: 0.5em auto;
+    }
+
+    .card-header {
+        display: flex;
+    }
+
+    .app-explanation, .app-title, .btn-app {
+        width: 90%;
+    }
+
+    .app a {
+        padding: 0;
+        text-align: center;
+    }
+
+    .btn-app {
+        width: 50%;
+        font-size: 12px;
+        text-align: center;
+    }
+}

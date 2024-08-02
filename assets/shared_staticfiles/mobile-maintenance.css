@@ -1,0 +1,10 @@
+@media only screen and (max-width: 600px) {
+    * { 
+        background-color: red;
+    }
+
+    #apps {
+        display: flex;
+        flex-direction: column;
+    }
+}
