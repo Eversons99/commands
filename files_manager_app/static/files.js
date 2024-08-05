@@ -8,12 +8,12 @@ async function getReadyCommandFiles(){
     }
 
     loadingAnimation(false)
-    window.location = `http://127.0.0.1:8000/maintenance/files/get_files?filter=${selectedFilter}`
+    window.location = `http://168.0.96.11:50074/maintenance/files/get_files?filter=${selectedFilter}`
 }
 
 async function displayAllLogs(operationMode, registerId){
     const lastFilter = window.location.href
-    const url = `http://127.0.0.1:8000/maintenance/files/show_logs?tabId=${registerId}&operationMode=${operationMode}&lastFilter=${lastFilter}`
+    const url = `http://168.0.96.11:50074/maintenance/files/show_logs?tabId=${registerId}&operationMode=${operationMode}&lastFilter=${lastFilter}`
     return window.location = url
 }
 

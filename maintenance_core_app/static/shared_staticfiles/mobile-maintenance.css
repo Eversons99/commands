@@ -1,4 +1,5 @@
 @media only screen and (max-width: 700px) {
+    /*Hompage*/
     * { 
         flex-direction: column;
         scrollbar-width: 1px;
@@ -32,8 +33,9 @@
     }
 
     .logo p {
-        font-size: 8px;
+        font-size: 10px;
         text-align: end;
+        text-align: center;
     }
 
     .logout-container {
@@ -41,7 +43,7 @@
     }
 
     .logo img {
-        width: 80%;
+        width: 70%;
     }
 
     title {
@@ -68,7 +70,7 @@
         text-align: center;
     }
 
-    .btn-app {
+    .btn-app, #login-button {
         width: 70%;
         font-size: 12px;
         text-align: center;
@@ -77,5 +79,34 @@
         border-radius: 10px;
         color: white;
         cursor: pointer;
+    }
+
+    /*Login Page*/
+    .login-container {
+        display: flex;
+        max-width: 90%;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .logo a {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    #error-message {
+        display: flex;
+        margin: 2em auto;
+        width: 90%;
+        flex-direction: row;
+    }
+
+    #error-message h1 {
+        font-size: 12px;
+    }
+
+    #alert-img, #error-img {
+        margin: 0 0.2em;
     }
 }
