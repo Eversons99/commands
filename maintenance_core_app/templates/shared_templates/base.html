@@ -10,6 +10,8 @@
         <title>Gerenciador de Atenuações</title>
     {% elif '/files/' in request.path %}
         <title>Gerenciador de arquivos</title>
+    {% elif '/login' in request.path  %}
+        <title>Login</title>
     {% endif %}
     {% block styles %} {% endblock %}
     <link rel='stylesheet' type='text/css' href="{% static 'shared_staticfiles/maintenance.css' %}">

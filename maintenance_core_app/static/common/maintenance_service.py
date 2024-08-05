@@ -3,13 +3,14 @@ import json
 import os
 import pandas as pd
 import requests
+import dotenv
 from datetime import datetime, timezone
 from commands_generator_app.models import GeneratorDB
 from attenuations_manager_app.models import AttenuatorDB
 from django.http.response import HttpResponse, FileResponse
 from django.db.utils import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
-
+dotenv.load_dotenv('../.env')
 
 class MaintenanceUtility:
     @staticmethod

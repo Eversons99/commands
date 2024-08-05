@@ -7,7 +7,8 @@ import os
 import websockets
 from datetime import datetime
 dotenv.load_dotenv('../.env')
-sys.path.append(f'{os.getenv("PROJECT_DIR")}/maintenance_core_app/static/common/')
+# sys.path.append(f'{os.getenv("PROJECT_DIR")}/maintenance_core_app/static/common/')
+sys.path.append('C:/Users/Everson/Desktop/commands/maintenance_core_app/static/common/')
 
 from olt_api import Olt
 
@@ -37,13 +38,14 @@ async def olt(websocket, path):
 async def server():
     try:
         # Set the stop condition when receiving SIGTERM. SIGTERM is foward when the connetion is closed
-        loop = asyncio.get_running_loop()
-        stop = loop.create_future()
-        loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
-
+        # loop = asyncio.get_running_loop()
+        # stop = loop.create_future()
+        # loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+        
+        print(f'Servidor Websocket foi inicializado com sucesso - {datetime.now()}\n')
         async with websockets.serve(olt, '127.0.0.1', 8001):
             await asyncio.Future()
-            await stop
+            # await stop
 
     except Exception as err:
         print(err)
@@ -53,8 +55,7 @@ async def server():
 
 try:
     asyncio.run(server())
-    with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:
-        log_file.write(f'Servidor Websocket foi inicializado com sucesso - {datetime.now()}\n')
+
 
 except Exception as err:
     with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
