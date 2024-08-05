@@ -1,5 +1,5 @@
 {% load static %}
 
 <div class="logout-container">
-    <p>BEM-VINDO(A),<b>{{ request.user|upper }}</b>. <a href="{% url 'logout' %}">ENCERRAR SESSÃO</a></p>
+    <p>BEM-VINDO(A),<b>{{ request.user|upper }}</b>. <a href="{% url 'logout' %}" id="link-logout">ENCERRAR SESSÃO</a></p>
 </div>

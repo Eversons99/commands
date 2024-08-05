@@ -3,7 +3,18 @@
         flex-direction: column;
         scrollbar-width: 1px;
         width: 100%;
+    }
 
+    #title-homepage {
+        font-size: 22px;
+    }
+
+    .app-title {
+        font-size: 16px;
+    }
+
+    .app-explanation {
+        font-size: 14px;
     }
 
     #apps { 
@@ -16,18 +27,21 @@
     .logo {
         display: flex;
         flex-direction: row;
-        width: 30;
+        width: 100%;
+        margin: 0.1em auto;
     }
 
     .logo p {
-        width: 100%;
-        font-size: 9px;
+        font-size: 8px;
         text-align: end;
     }
 
+    .logout-container {
+        margin: 0 0.5em;
+    }
+
     .logo img {
-        width: 60%;
-        margin: 0.5em 0 0.5em 1em;
+        width: 80%;
     }
 
     title {
@@ -42,6 +56,7 @@
 
     .card-header {
         display: flex;
+        height: 30vh;
     }
 
     .app-explanation, .app-title, .btn-app {
@@ -54,8 +69,13 @@
     }
 
     .btn-app {
-        width: 50%;
+        width: 70%;
         font-size: 12px;
         text-align: center;
+        padding: 12px 50px;
+        font-weight: bold;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
     }
 }
