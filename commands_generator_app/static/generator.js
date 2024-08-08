@@ -30,11 +30,11 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh() {
     loadingAnimation(true)
-    const baseUrl = 'http://168.0.96.11:50074/maintenance'
+    const baseUrl = 'http://10.0.50.204:8000/maintenance'
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
-    const socket = new WebSocket('ws://127.0.0.1:5678/get-onts')
+    const socket = new WebSocket('ws://10.0.50.204:8001/get-onts')
     const tabId = getIdentificator()
     const onts = []
     let sessionStarted = false
@@ -98,7 +98,7 @@ async function searchOntsViaSsh() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://168.0.96.11:50074/maintenance"
+    const baseUrl = "http://10.0.50.204:8000/maintenance"
     const idDevicesSelected = getIdDevicesSelected()
     const loadingText = document.getElementById('loader-message')
     loadingText.textContent = 'Gerando comandos...'

@@ -43,7 +43,7 @@ async def server():
         # loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
         
         print(f'Servidor Websocket foi inicializado com sucesso - {datetime.now()}\n')
-        async with websockets.serve(olt, '127.0.0.1', 8001):
+        async with websockets.serve(olt, '10.0.50.204', 8001):
             await asyncio.Future()
             # await stop
 
