@@ -34,7 +34,7 @@ async function searchOntsViaSsh() {
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
-    const socket = new WebSocket('ws://127.0.0.1:5678/get-onts')
+    const socket = new WebSocket('ws://commands.nmultifibra.com.br:5678/get-onts')
     const tabId = getIdentificator()
     const onts = []
     let sessionStarted = false
@@ -133,7 +133,6 @@ async function generateCommands() {
     try {
         let getCommands = await fetch(`${baseUrl}/shared_core/generate_commands`, requestOptions)
         getCommands = await getCommands.json()
-        
         if (getCommands.error) {
             const messageError = getCommands.message
             return window.location = `${baseUrl}/render_error_page?message=${messageError}`

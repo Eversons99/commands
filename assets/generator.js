@@ -62,7 +62,7 @@ async function searchOntsViaSsh() {
 
             } else if (currentMessage.id) {
                 controllerPercentage+=1
-                let percentage = Math.trunc((100 * controllerPercentage) / total_number_onts)
+                let percentage = Math.trunc((100 * controllerPercentage) / totalNumberOnts)
                 loadingText.textContent = `Carregando dados dos dispositivos  - ${percentage}%`
                 onts.push(currentMessage)
 
@@ -133,7 +133,6 @@ async function generateCommands() {
     try {
         let getCommands = await fetch(`${baseUrl}/shared_core/generate_commands`, requestOptions)
         getCommands = await getCommands.json()
-        
         if (getCommands.error) {
             const messageError = getCommands.message
             return window.location = `${baseUrl}/render_error_page?message=${messageError}`

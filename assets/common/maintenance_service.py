@@ -33,7 +33,8 @@ class MaintenanceUtility:
 
         initial_maintenance_info = {
             'register_id': register_id,
-            'source_gpon': source_gpon
+            'source_gpon': source_gpon,
+            'owner': request.user
         }
 
         ont_devices = MaintenanceUtility.get_onts_info_on_nmt(source_host, source_pon)
@@ -166,6 +167,7 @@ class MaintenanceUtility:
 
         try:
             maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
+
             onts_info = {
                 'error': False,
                 'all_devices':  ast.literal_eval(maintenance_info.unchanged_onts)
@@ -197,7 +199,6 @@ class MaintenanceUtility:
 
             commands = requests.post(url, headers=headers_request, data=options_request, timeout=60)
             commands_response = commands.json()
-
             data_to_update = {}
             
             if info_to_generate_commands.get('rollback'):
@@ -267,13 +268,16 @@ class MaintenanceUtility:
         """
         Makes a request to update a record on database
         """
-        request_body = json.loads(request.body)
-        register_id = request_body.get("tab_id")
-        onts = request_body.get("onts")
-        data_to_update = {"unchanged_onts": onts}
-        MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
+        try:
+            request_body = json.loads(request.body)
+            register_id = request_body.get("tab_id")
+            onts = request_body.get("onts")
+            data_to_update = {"unchanged_onts": onts}
+            MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
-        return HttpResponse(status=200)
+            return HttpResponse(status=200)
+        except Exception as err:
+            return HttpResponse(json.dumps(err))
 
     @staticmethod
     def get_maintenance_info_to_apply_commands(request, db_model):

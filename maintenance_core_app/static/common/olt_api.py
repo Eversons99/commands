@@ -23,11 +23,11 @@ class Olt:
             'password': os.getenv('OLT_PASS'),
             'port': 22
         }
-
+        
         ssh_connection = ConnectHandler(**params_to_connection)
         ssh_connection.enable()
         ssh_connection.config_mode()
-
+        
         return ssh_connection
 
     async def get_onts(self, websocket_connection, gpon_info):
@@ -91,7 +91,11 @@ class Olt:
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        requests.post('http://commands.nmultifibra.com.br/generator/update_onts_in_database', headers=headers, data=body)
+        update_info_log = requests.post('http://commands.nmultifibra.com.br/maintenance/generator/update_onts_in_database', headers=headers, data=body)
+        
+            
+        with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:
+            log_file.write(f'GET ONT INFO BY SSH: {update_info_log} - {datetime.now()}\n')
 
         await websocket_connection.close()
         ssh_connection.disconnect()
@@ -124,7 +128,7 @@ class Olt:
         search_vlans = ssh_connection.send_command_timing(f'display service-port port 0/{slot}/{port}')
         output_olt = search_vlans.splitlines()
 
-        exclusive_vlan = ['110', '286', '1500','1501', '1503', '1504', '1505', '1513', '1514', '1515', '1520']
+        exclusive_vlan = ['110', '286', '1500','1501', '1503', '1504', '1505', '1506', '1513', '1514', '1515', '1520']
         separatted_outputs_olt = [] 
         vlans_found = []
         vlans_not_found = []

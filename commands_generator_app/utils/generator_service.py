@@ -20,7 +20,6 @@ class CommandsUtility:
         try:
             maintenance_info = MaintenanceUtility.get_maintenance_info_in_database(register_id, db_model)
             unchanged_onts = ast.literal_eval(maintenance_info.unchanged_onts)
-
             onts_checked = olt_api.check_vlan(unchanged_onts, maintenance_info)
             port_config = { 'source_port_config': onts_checked.get('port_configuration')}
 

@@ -86,7 +86,6 @@ def render_onts_table(request):
             operation_mode = request.GET.get('mode')
             db_model = GeneratorDB if operation_mode == 'generator' else AttenuatorDB
             onts_info = MaintenanceUtility.get_unchanged_onts_on_database(request, db_model)
-
             onts_info['operation_mode'] = operation_mode
 
             if onts_info.get('error'):
@@ -234,19 +233,20 @@ def generate_commands(request):
     if request.method == 'POST':
         mode = json.loads(request.body).get('mode')
         db_model = GeneratorDB if mode == 'generator' else AttenuatorDB
-
+        
         if db_model == GeneratorDB:
             info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
         else:
             info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
 
         register_id = info_to_generate_commands.get('register_id')
-        
+
         commands_info = info_to_generate_commands.get('commands')
         rollback_commands_info = info_to_generate_commands.get('rollback')
         
         commands = MaintenanceUtility.generate_commands(register_id, db_model, commands_info)
         rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
+
         MaintenanceUtility.generate_commands(register_id, db_model, rollback_commands_info)
 
         return HttpResponse(json.dumps(commands))

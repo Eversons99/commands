@@ -14,13 +14,14 @@ header {
 
 .logout-container {
     display: flex;
-    width: 50%;
     justify-content: end;
+    white-space: unset;
 }
 
 .logout-container p {
-    font-size: 11px;
     margin-right: 1em;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 .logout-container a {
