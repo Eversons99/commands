@@ -91,7 +91,7 @@ class Olt:
 
         headers = {"Content-Type": 'Application.json'}
         body = json.dumps({"onts": collection_onts, "tab_id": tab_id})
-        update_info_log = requests.post('http://commands.nmultifibra.com.br/maintenance/generator/update_onts_in_database', headers=headers, data=body)
+        update_info_log = requests.post('https://commands.nmultifibra.com.br/maintenance/generator/update_onts_in_database', headers=headers, data=body)
         
             
         with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:

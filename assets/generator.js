@@ -30,7 +30,7 @@ function markSelectedItem() {
 
 async function searchOntsViaSsh() {
     loadingAnimation(true)
-    const baseUrl = 'http://commands.nmultifibra.com.br/maintenance'
+    const baseUrl = 'https://commands.nmultifibra.com.br/maintenance'
     const loadingText = document.getElementById('loader-message')
     const pon = document.getElementById('pon').textContent
     const host = document.getElementById('host').textContent
@@ -98,7 +98,7 @@ async function searchOntsViaSsh() {
 
 async function generateCommands() {
     loadingAnimation(true)
-    const baseUrl = "http://commands.nmultifibra.com.br/maintenance"
+    const baseUrl = "https://commands.nmultifibra.com.br/maintenance"
     const idDevicesSelected = getIdDevicesSelected()
     const loadingText = document.getElementById('loader-message')
     loadingText.textContent = 'Gerando comandos...'
