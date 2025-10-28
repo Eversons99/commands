@@ -1,0 +1,23 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'files.css' %}">
+{% endblock %}
+
+{% block content %}
+    <section>
+        <h1>Buscar ONT's não autorizadas</h1>
+    </section>
+    <section id="source-container">
+        {% include 'shared_templates/gponForm.html' %}
+        <div class="search-btn">
+            <button onclick="searchOntsUnauthorized()">Buscar</button>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "shared_staticfiles/maintenance.js"%}'></script>
+    <script src='{% static "temp_files.js"%}'></script>
+{% endblock %}

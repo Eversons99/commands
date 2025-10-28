@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'gpon_health_app',
     'send_sms_app',
     'maintenance_core_app',
+    'temp_ont_provisioning',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,7 +66,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            f'{ABSOLUTE_PATH}/attenuations_manager_app/templates',
+            f'{ABSOLUTE_PATH}/temp_ont_provisioning/templates/',
+            f'{ABSOLUTE_PATH}/attenuations_manager_app/templates/',
             f'{ABSOLUTE_PATH}/commands_generator_app/templates/',
             f'{ABSOLUTE_PATH}/files_manager_app/templates/',
             f'{ABSOLUTE_PATH}/gpon_health_app/templates/',

@@ -461,4 +461,6 @@ class Olt:
             await asyncio.sleep(0.1)
             await websocket.send(json.dumps(message))
             await websocket.close()
-        
+
+    async def get_unauthorized_onts(self, websocket, gpon_info):
+        pass
