@@ -462,5 +462,28 @@ class Olt:
             await websocket.send(json.dumps(message))
             await websocket.close()
 
-    async def get_unauthorized_onts(self, websocket, gpon_info):
-        pass
+    async def get_unauthorized_onts_by_port(self, websocket, gpon_info):
+        # Conecto a OLT
+        # Obtenho a lista de ONTs não autorizadas
+        # Mando a lista via websocket
+        olt = gpon_info.get('host')
+        slot = gpon_info.get('slot')
+        port = gpon_info.get('port')
+
+        ssh_connection = self.connect_olt(olt)
+
+        commands_list = [
+            f'interface gpon 0/{slot}\n',
+            f'display ont autofind {port}\n'
+        ]
+
+        output_olt = []
+        for index, command in enumerate(commands_list):
+            output = ssh_connection.send_command_timing(command)
+            if index == 1:
+                output_olt.append(output)
+            
+        await websocket.send(json.dumps({'data': output_olt}))
+        ssh_connection.disconnect()
+        await websocket.close()
+        

@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class TempOntProvisioningConfig(AppConfig):
+class MigrationOntsDiginetConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'temp_ont_provisioning'
+    name = 'migration_onts_diginet'

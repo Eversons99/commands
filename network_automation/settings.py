@@ -27,9 +27,20 @@ SECRET_KEY = 'django-insecure-#&ab8rg6xc10q#r)=%gowijmly$^q+un^sh0p5s+1lu8f#&^z%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '168.0.96.11', '10.0.30.252', 'localhost']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    '168.0.96.0/22',
+    '10.0.30.0/24',
+    '10.0.100.0/22'
+]
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'https://commands.nmultifibra.com.br', 'http://commands.nmultifibra.com.br', 'http://commands.nmultifibra.com.br']
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'https://commands.nmultifibra.com.br',
+    'http://commands.nmultifibra.com.br',
+    'http://commands.nmultifibra.com.br'
+]
 
 # Application definition
 
@@ -40,7 +51,7 @@ INSTALLED_APPS = [
     'gpon_health_app',
     'send_sms_app',
     'maintenance_core_app',
-    'temp_ont_provisioning',
+    'migration_onts_diginet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -66,7 +77,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            f'{ABSOLUTE_PATH}/temp_ont_provisioning/templates/',
+            f'{ABSOLUTE_PATH}/migration_onts_diginet/templates/',
             f'{ABSOLUTE_PATH}/attenuations_manager_app/templates/',
             f'{ABSOLUTE_PATH}/commands_generator_app/templates/',
             f'{ABSOLUTE_PATH}/files_manager_app/templates/',

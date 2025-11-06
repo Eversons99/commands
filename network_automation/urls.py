@@ -19,6 +19,6 @@ from django.urls import path, include
 urlpatterns = [
     path('maintenance/', include('maintenance_core_app.urls')),
     path('gpon/', include('gpon_health_app.urls')),
-    path('temporarilly/', include('temp_ont_provisioning.urls')),
+    path('migration_onts_diginet/', include('migration_onts_diginet.urls')),
     path('admin/', admin.site.urls),
 ]

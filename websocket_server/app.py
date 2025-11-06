@@ -11,7 +11,6 @@ sys.path.append(f'{os.getenv("PROJECT_DIR")}/maintenance_core_app/static/common/
 
 from olt_api import Olt
 
-
 async def olt(websocket, path):
     async for data in websocket:
         if path == '/get-onts':
@@ -28,34 +27,43 @@ async def olt(websocket, path):
             pon_info = json.loads(data)
             olt = Olt()
             await olt.get_optical_info_by_pon(websocket, pon_info)
-        
+
+        elif path == '/get_unauthorized_onts_by_port':
+            gpon_info = json.loads(data)
+            olt = Olt()
+            await olt.get_unauthorized_onts_by_port(websocket, gpon_info)
+
         elif path == '/health':
             await websocket.send(json.dumps({'status': 'OK'}))
             await websocket.close()
-            
+
 
 async def server():
     try:
-        # Set the stop condition when receiving SIGTERM. SIGTERM is foward when the connetion is closed
-        loop = asyncio.get_running_loop()
-        stop = loop.create_future()
-        loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
-
+        stop = asyncio.Future()
+        
+        if os.name != 'nt': # nt is for Windows
+            loop = asyncio.get_event_loop()
+            loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)
+            
         async with websockets.serve(olt, '127.0.0.1', 8001):
-            await asyncio.Future()
-            await stop
+            print("Servidor WebSocket rodando em ws://127.0.0.1:8001")
+            await stop # Wait until the stop condition is met. Signals on Linux, manual interrupt on Windows 
 
     except Exception as err:
-        print(err)
+        print(f'Error on websocket server: {err}')
         with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
             log_file.write(f'{err} - {datetime.now()}\n')
 
 
-try:
-    asyncio.run(server())
-    with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:
-        log_file.write(f'Servidor Websocket foi inicializado com sucesso - {datetime.now()}\n')
+if __name__ == '__main__':
+    try:
+        asyncio.run(server())
+        with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stdout.log', 'a', encoding='UTF-8') as log_file:
+            log_file.write(f'Servidor Websocket foi inicializado com sucesso - {datetime.now()}\n')
 
-except Exception as err:
-    with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
-        log_file.write(f'{err}\n')
+    except KeyboardInterrupt:
+        print('Server interrupted manually. Shutting down...')
+    except Exception as err:
+        with open(f'{os.getenv("DIR_WEBSOCKET_LOGS")}/stderr.log', 'a', encoding='UTF-8') as log_file:
+            log_file.write(f'{err} - {datetime.now()}\n')
