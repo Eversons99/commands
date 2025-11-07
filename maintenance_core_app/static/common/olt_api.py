@@ -3,6 +3,7 @@ import os
 import re
 import requests
 import asyncio
+import websockets
 from datetime import datetime
 from netmiko import ConnectHandler
 from dotenv import load_dotenv
@@ -463,27 +464,84 @@ class Olt:
             await websocket.close()
 
     async def get_unauthorized_onts_by_port(self, websocket, gpon_info):
-        # Conecto a OLT
-        # Obtenho a lista de ONTs não autorizadas
-        # Mando a lista via websocket
-        olt = gpon_info.get('host')
-        slot = gpon_info.get('slot')
-        port = gpon_info.get('port')
+        try:
+            # Conecto a OLT
+            # Obtenho a lista de ONTs não autorizadas
+            # Mando a lista via websocket
+            olt = gpon_info.get('host')
+            slot = gpon_info.get('slot')
+            port = gpon_info.get('port')
+            ssh_connection = self.connect_olt(olt)
 
-        ssh_connection = self.connect_olt(olt)
-
-        commands_list = [
-            f'interface gpon 0/{slot}\n',
-            f'display ont autofind {port}\n'
-        ]
-
-        output_olt = []
-        for index, command in enumerate(commands_list):
-            output = ssh_connection.send_command_timing(command)
-            if index == 1:
-                output_olt.append(output)
+            commands_list = [
+                f'interface gpon 0/{slot}\n',
+                f'display ont autofind {port}\n'
+            ]
             
-        await websocket.send(json.dumps({'data': output_olt}))
-        ssh_connection.disconnect()
-        await websocket.close()
-        
+            # Getting unauthorized onts
+            output_olt = []
+            for index, command in enumerate(commands_list):
+                output = ssh_connection.send_command_timing(command)
+                if index == 1:
+                    output_olt = output
+            
+            if 'Failure: The automatically found ONTs do not exist' in output_olt:
+                await asyncio.sleep(0.1)
+                await websocket.send(json.dumps({
+                    'status': 'failed',
+                    'message': f'Nenhum equipamento sem provisionamento encontrado na pon 0/{slot}/{port}.'
+                }))
+                ssh_connection.disconnect()
+                await websocket.close()
+
+            # Formatting output
+            # output_olt = """
+            # ---------------------------------------------------------------------------- 
+            # Number : 1 
+            # F/S/P : 0/6/4 
+            # Ont SN : 48575443D5A49DAF (HWTC-D5A49DAF) 
+            # Password : 0x00000000000000000000 
+            # Loid : 
+            # Checkcode : 
+            # VendorID : 
+            # HWTC Ont Version : 343D.D 
+            # Ont SoftwareVersion : V5R022C00S265 
+            # Ont EquipmentID : EG8145X6-10 
+            # Ont Customized Info : BREBG 
+            # Ont MAC : B885-7B56-17BD 
+            # Ont Equipment SN : 2150086688AGQ6000079 
+            # Ont autofind time : 30/10/2025 20:05:46-03:00 
+            # Multi channel : - 
+            # ---------------------------------------------------------------------------- 
+            # Number : 2 
+            # F/S/P : 0/14/0 
+            # Ont SN : 48575443F47B15A6 (HWTC-F47B15A6) 
+            # Password : 0x00000000000000000000 
+            # Loid : 
+            # Checkcode : 
+            # VendorID : HWTC 
+            # Ont Version : 22AD.A 
+            # Ont SoftwareVersion : V5R020C00S060 
+            # Ont EquipmentID : EG8145X6 
+            # Ont Customized Info : COMMON4 
+            # Ont MAC : E813-6EA4-F232 
+            # Ont Equipment SN : 2150084445HYM8012817 
+            # Ont autofind time : 30/10/2025 20:10:49-03:00 
+            # Multi channel : - 
+            # ---------------------------------------------------------------------------- 
+            # The number of GPON autofind ONT is 2
+
+            # """
+            unaythorized_onts = re.findall(r'Ont SN\s*:\s*([A-Z0-9]+)', output_olt)
+            
+            await websocket.send(json.dumps({
+                'status': 'success',
+                'data': unaythorized_onts
+            }))
+
+            ssh_connection.disconnect()
+            await websocket.close()
+
+        except websockets.exceptions.ConnectionClosedOK:
+            # Websocket connection closed normally.')
+            pass

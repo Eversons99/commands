@@ -1,12 +1,10 @@
 
 
 async function searchOntsUnauthorized() {
-    setIdentificator()
     const loadingText = document.getElementById('loader-message')
     const host = document.getElementById('select-olt').value
     const slot = document.getElementById('select-slot').value
     const port = document.getElementById('select-port').value
-    const pon = `0/${slot}/${port}`
     let sessionStarted = false
 
     if (!host || !slot || !port) return alert('Por favor, selecione a OLT, slot e porta para continuar.')
@@ -33,7 +31,7 @@ async function searchOntsUnauthorized() {
                 return alert(currentMessage.message)
             }
             const snsUnauthorized = currentMessage.data
-            await renderUnauthorizedOntsTable(snsUnauthorized, host, pon)
+            await renderUnauthorizedOntsTable(snsUnauthorized)
         }
 
         socket.onclose = () => {
@@ -50,26 +48,14 @@ async function searchOntsUnauthorized() {
     }
 }
 
-async function renderUnauthorizedOntsTable(snsUnauthorized, host, pon) {
+async function renderUnauthorizedOntsTable(snsUnauthorized) {
     if (!snsUnauthorized) return alert('A lista de equipamentos não autorizados está vazia.')
 
     const requestOptions = {
         method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
-            'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({
-            serialNumbers : snsUnauthorized,
-            pon,
-            host,
-            tabId: getIdentificator()
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sns: snsUnauthorized })
     }
 
-    let request = await fetch('http://127.0.0.1:8000/migration_onts_diginet/save_unauthorized_devices_on_database', requestOptions)
-
-    if (request.status === 500) return alert(await request.text())
-    
-    window.location.href = `http://127.0.0.1:8000/migration_onts_diginet/render_unauthorized_onts_table?tabId=${getIdentificator()}`
+    await fetch('http://127.0.0.1:8000/render_unauthorized_onts_table', requestOptions)
 }

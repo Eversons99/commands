@@ -48,7 +48,7 @@ class AttenuationUtility:
                 'destination_gpon': destination_gpon,
                 'attenuations': [{"attenuation_id": 0, "onts": all_onts_id}]
             }
-             
+
             MaintenanceUtility.update_maintenance_info_in_database(data_to_update, register_id, db_model)
 
             success_response = {'error': False}

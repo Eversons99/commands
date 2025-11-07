@@ -1,0 +1,32 @@
+{% extends 'shared_templates/base.html' %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'files.css' %}">
+{% endblock %}
+
+{% block content %}
+    <section>
+        <h1>ONTS Não Autorizadas. PON: {{ pon }} HOST: {{ host }} </h1>
+    </section>
+    <section>
+    {% for device in all_devices %}
+        <tr class="device-row">
+            <td><input type="checkbox" id="cbx-single-item" class="input-device" onclick="markSelectedItem()"></td>
+            <td>{{ device.id }}</td>
+            <td>{{ device.sn }}</td>
+            <td>{{ device.type }}</td>
+            {% if device.status == 1 %}
+                <td class="ont-online">ONLINE</td>
+            {% else %}
+                <td class="ont-offline">OFFLINE</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src='{% static "shared_staticfiles/maintenance.js"%}'></script>
+    <script src='{% static "migrationOntsDiginet.js"%}'></script>
+{% endblock %}

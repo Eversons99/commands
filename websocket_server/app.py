@@ -48,7 +48,8 @@ async def server():
             
         async with websockets.serve(olt, '127.0.0.1', 8001):
             print("Servidor WebSocket rodando em ws://127.0.0.1:8001")
-            await stop # Wait until the stop condition is met. Signals on Linux, manual interrupt on Windows 
+            await stop # Wait until the stop condition is met. Signals on Linux, manual interrupt on Windows
+
 
     except Exception as err:
         print(f'Error on websocket server: {err}')
