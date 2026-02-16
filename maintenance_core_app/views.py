@@ -230,25 +230,28 @@ def update_status_applied_commands(request):
 
 
 def generate_commands(request):
-    if request.method == 'POST':
-        mode = json.loads(request.body).get('mode')
-        db_model = GeneratorDB if mode == 'generator' else AttenuatorDB
-        
-        if db_model == GeneratorDB:
-            info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
-        else:
-            info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
+    try:
+        if request.method == 'POST':
+            mode = json.loads(request.body).get('mode')
+            db_model = GeneratorDB if mode == 'generator' else AttenuatorDB
+            
+            if db_model == GeneratorDB:
+                info_to_generate_commands = CommandsUtility.separate_information_to_generate_commands(request, db_model)
+            else:
+                info_to_generate_commands = AttenuationUtility.separate_information_to_generate_commands(request, db_model)
 
-        register_id = info_to_generate_commands.get('register_id')
+            register_id = info_to_generate_commands.get('register_id')
 
-        commands_info = info_to_generate_commands.get('commands')
-        rollback_commands_info = info_to_generate_commands.get('rollback')
-        
-        commands = MaintenanceUtility.generate_commands(register_id, db_model, commands_info)
-        rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
+            commands_info = info_to_generate_commands.get('commands')
+            rollback_commands_info = info_to_generate_commands.get('rollback')
+            
+            commands = MaintenanceUtility.generate_commands(register_id, db_model, commands_info)
+            rollback_commands_info['idsUsed'] = commands['response'].get('idsSelecteds')
 
-        MaintenanceUtility.generate_commands(register_id, db_model, rollback_commands_info)
+            MaintenanceUtility.generate_commands(register_id, db_model, rollback_commands_info)
 
-        return HttpResponse(json.dumps(commands))
+            return HttpResponse(json.dumps(commands))
 
-    return redirect(home)
+        return redirect(home)
+    except Exception as err:
+        raise Exception(f'Erro ao gerar comandos. Error: {err}')
